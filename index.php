@@ -79,7 +79,7 @@ $cards = [
             </div>
         </form>
         <div class="header__nav-wrapper">
-            <?php if ($is_auth === 1): ?>
+            <?php if ($is_auth === 1) : ?>
             <nav class="header__nav">
                 <ul class="header__my-nav">
                     <li class="header__my-page header__my-page--popular">
@@ -242,28 +242,27 @@ $cards = [
         </div>
         <div class="popular__posts">
 
-            <?php foreach ($cards as $card): ?>
-
+            <?php foreach ($cards as $card) : ?>
                <article class="popular__post post <?= $card['type']; ?>">
                 <header class="post__header">
                     <h2><?= $card['header']; ?></h2>
                 </header>
                 <div class="post__main">
-                    <?php if ($card['type'] === "post-quote"): ?>
+                    <?php if ($card['type'] === "post-quote") : ?>
                         <blockquote>
                             <p>
                                 <?= $card['content']; ?>
                             </p>
                         </blockquote>
-                    <?php elseif ($card['type'] === "post-text"): ?>
+                    <?php elseif ($card['type'] === "post-text") : ?>
                         <p>
                             <?= $card['content']; ?>
                         </p>
-                    <?php elseif ($card['type'] === "post-photo"): ?>
+                    <?php elseif ($card['type'] === "post-photo") : ?>
                         <div class="post-photo__image-wrapper">
                             <img src="img/<?= $card['content']; ?>" alt="Фото от пользователя" width="360" height="240">
                         </div>
-                    <?php elseif ($card['type'] === "post-link"): ?>
+                    <?php elseif ($card['type'] === "post-link") : ?>
                         <div class="post-link__wrapper">
                             <a class="post-link__external" href="http://<?= $card['content']; ?>" title="Перейти по ссылке">
                                 <div class="post-link__info-wrapper">
