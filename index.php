@@ -249,38 +249,35 @@ $cards = [
                     <h2><?= $card['header']; ?></h2>
                 </header>
                 <div class="post__main">
-                    <?php if ($card['type'] === "post-quote") { ?>
-                            <blockquote>
-                                <p>
-                                    <?= $card['content']; ?>
-                                </p>
-                            </blockquote>
-                    <?php } ?>
-                    <?php if ($card['type'] === "post-text") { ?>
+                    <?php if ($card['type'] === "post-quote"): ?>
+                        <blockquote>
                             <p>
                                 <?= $card['content']; ?>
                             </p>
-                    <?php } ?>
-                    <?php if ($card['type'] === "post-photo") { ?>
-                            <div class="post-photo__image-wrapper">
-                                <img src="img/<?= $card['content']; ?>" alt="Фото от пользователя" width="360" height="240">
-                            </div>
-                    <?php } ?>
-                    <?php if ($card['type'] === "post-link") { ?>
-                            <div class="post-link__wrapper">
-                                <a class="post-link__external" href="http://<?= $card['content']; ?>" title="Перейти по ссылке">
-                                    <div class="post-link__info-wrapper">
-                                        <div class="post-link__icon-wrapper">
-                                            <img src="https://www.google.com/s2/favicons?domain=htmlacademy.ru" alt="Иконка">
-                                        </div>
-                                        <div class="post-link__info">
-                                            <h3><?= $card['header']; ?></h3>
-                                        </div>
+                        </blockquote>
+                    <?php elseif ($card['type'] === "post-text"): ?>
+                        <p>
+                            <?= $card['content']; ?>
+                        </p>
+                    <?php elseif ($card['type'] === "post-photo"): ?>
+                        <div class="post-photo__image-wrapper">
+                            <img src="img/<?= $card['content']; ?>" alt="Фото от пользователя" width="360" height="240">
+                        </div>
+                    <?php elseif ($card['type'] === "post-link"): ?>
+                        <div class="post-link__wrapper">
+                            <a class="post-link__external" href="http://<?= $card['content']; ?>" title="Перейти по ссылке">
+                                <div class="post-link__info-wrapper">
+                                    <div class="post-link__icon-wrapper">
+                                        <img src="https://www.google.com/s2/favicons?domain=htmlacademy.ru" alt="Иконка">
                                     </div>
-                                    <span><?= $card['content']; ?></span>
-                                </a>
-                            </div>
-                    <?php } ?>
+                                    <div class="post-link__info">
+                                        <h3><?= $card['header']; ?></h3>
+                                    </div>
+                                </div>
+                                <span><?= $card['content']; ?></span>
+                            </a>
+                        </div>
+                    <?php endif ?>
                 </div>
                 <footer class="post__footer">
                     <div class="post__author">
