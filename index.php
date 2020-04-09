@@ -14,7 +14,7 @@ $cards = [
     [
         'header' => 'Игра престолов',
         'type' => 'post-text',
-        'content' => 'Не могу дождаться начала финального сезона своего любимого сериала!Не могу дождаться начала финального сезона своего любимого сериала!Не могу дождаться начала финального сезона своего любимого сериала!Не могу дождаться начала финального сезона своего любимого сериала!',
+        'content' => 'Не могу дождаться начала финального сезона своего любимого сериала! Не могу дождаться начала финального сезона своего любимого сериала! Не могу дождаться начала финального сезона своего любимого сериала! Не могу дождаться начала финального сезона своего любимого сериала!Не могу дождаться начала финального сезона своего любимого сериала!',
         'username' => 'Владик',
         'userpic' => 'userpic.jpg'
     ],
@@ -41,21 +41,20 @@ $cards = [
     ]
 ];
 
-function textTrim($text, $lengthMax = 300)
+function textTrim(string $text, int $lengthMax = 300) : string
 {
-    if (strlen($text) <= $lengthMax) {
+    if (mb_strlen($text) <= $lengthMax) {
         return $text;
     }
     $arrText = explode(" ", $text);
     $arrTextNew = [];
     $len = 0;
     foreach ($arrText as $word) {
-        if (($len + strlen($word)) < $lengthMax) {
-            $arrTextNew[] = $word;
-            $len += strlen($word) + 1;
-        } else {
+        if (($len + mb_strlen($word)) >= $lengthMax) {
             break;
         }
+        $arrTextNew[] = $word;
+        $len += mb_strlen($word) + 1;
     }
     return implode(" ", $arrTextNew)."...";
 }
