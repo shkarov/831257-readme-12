@@ -14,7 +14,7 @@ $cards = [
     [
         'header' => 'Игра престолов',
         'type' => 'post-text',
-        'content' => 'Не могу дождаться начала финального сезона своего любимого сериала!',
+        'content' => 'Не могу дождаться начала финального сезона своего любимого сериала!Не могу дождаться начала финального сезона своего любимого сериала!Не могу дождаться начала финального сезона своего любимого сериала!Не могу дождаться начала финального сезона своего любимого сериала!',
         'username' => 'Владик',
         'userpic' => 'userpic.jpg'
     ],
@@ -41,7 +41,26 @@ $cards = [
     ]
 ];
 
+function textTrim($text, $lengthMax = 300)
+{
+    if (strlen($text) <= $lengthMax) {
+        return $text;
+    }
+    $arrText = explode(" ", $text);
+    $arrTextNew = [];
+    $len = 0;
+    foreach ($arrText as $word) {
+        if (($len + strlen($word)) < $lengthMax) {
+            $arrTextNew[] = $word;
+            $len += strlen($word) + 1;
+        } else {
+            break;
+        }
+    }
+    return implode(" ", $arrTextNew)."...";
+}
 ?>
+
 <!DOCTYPE html>
 <html lang="ru">
 <head>
@@ -256,8 +275,11 @@ $cards = [
                         </blockquote>
                     <?php elseif ($card['type'] === "post-text") : ?>
                         <p>
-                            <?= $card['content']; ?>
+                            <?= textTrim($card['content']); ?>
                         </p>
+                        <?php if (substr(textTrim($card['content']), -3) === "...") : ?>
+                            <a class="post-text__more-link" href="#">Читать далее</a>
+                        <?php endif; ?>
                     <?php elseif ($card['type'] === "post-photo") : ?>
                         <div class="post-photo__image-wrapper">
                             <img src="img/<?= $card['content']; ?>" alt="Фото от пользователя" width="360" height="240">
