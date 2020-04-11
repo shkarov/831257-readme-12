@@ -41,23 +41,7 @@ $cards = [
     ]
 ];
 
-function textTrim(string $text, int $lengthMax = 300) : string
-{
-    if (mb_strlen($text) <= $lengthMax) {
-        return $text;
-    }
-    $arrText = explode(" ", $text);
-    $arrTextNew = [];
-    $len = 0;
-    foreach ($arrText as $word) {
-        if (($len + mb_strlen($word)) >= $lengthMax) {
-            break;
-        }
-        $arrTextNew[] = $word;
-        $len += mb_strlen($word) + 1;
-    }
-    return implode(" ", $arrTextNew)."...";
-}
+require_once 'functions/template.php';
 
 require_once 'helpers.php';
 
