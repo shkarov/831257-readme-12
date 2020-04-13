@@ -1,4 +1,7 @@
 <?php
+
+require_once 'bootstrap.php';
+
 $is_auth = rand(0, 1);
 
 $user_name = 'Boris';
@@ -40,12 +43,6 @@ $cards = [
         'userpic' => 'userpic.jpg'
     ]
 ];
-
-date_default_timezone_set('Europe/Moscow');
-
-require_once 'functions/template.php';
-
-require_once 'helpers.php';
 
 $page_content = include_template("main.php", $cards);
 
