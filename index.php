@@ -1,4 +1,7 @@
 <?php
+
+require_once 'bootstrap.php';
+
 $is_auth = rand(0, 1);
 
 $user_name = 'Boris';
@@ -41,12 +44,8 @@ $cards = [
     ]
 ];
 
-require_once 'functions/template.php';
-
-require_once 'helpers.php';
-
 $page_content = include_template("main.php", $cards);
 
-$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user' => $user_name]);
+$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user' => $user_name, 'is_auth' => $is_auth]);
 
 print($layout_content);

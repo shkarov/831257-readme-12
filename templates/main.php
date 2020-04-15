@@ -86,7 +86,7 @@
         </div>
         <div class="popular__posts">
 
-            <?php foreach ($data as $card) : ?>
+            <?php foreach ($data as $key => $card) : ?>
                <article class="popular__post post <?= $card['type']; ?>">
                 <header class="post__header">
                     <h2><?= htmlspecialchars($card['header']); ?></h2>
@@ -133,7 +133,12 @@
                             </div>
                             <div class="post__info">
                                 <b class="post__author-name"><?= htmlspecialchars($card['username']); ?></b>
-                                <time class="post__time" datetime="">дата</time>
+                                <?php
+                                    $dateOrigin = generate_random_date($key);
+                                    $dateTitle = strftime('%d.%m.%Y %H:%M', strtotime($dateOrigin));
+                                    $dateView = dateDifferent($dateOrigin);
+                                ?>
+                                <time class="post__time" datetime="<?= $dateOrigin ?>" title="<?= $dateTitle ?>"><?= $dateView ?></time>
                             </div>
                         </a>
                     </div>
