@@ -182,7 +182,9 @@ function dateDifferent(string $date) : string
     $markPost = strtotime($date);
     $markNow = time();
     $markDiff =  $markNow - $markPost;
-
+    if ($markDiff < 0) {
+        exit('Переданная дата не может быть больше текущей');
+    }
     $datePost = date_create($date);
     $dateNow = date_create("now");
     $dateDiff = date_diff($datePost, $dateNow);
