@@ -10,3 +10,8 @@ error_reporting(E_ALL);
 
 ini_set("display_error", true);
 ini_set("error_reporting", E_ALL);
+
+const DB_HOST = 'localhost';
+const DB_USER = 'root';
+const DB_PASSWORD = 'klop0987';
+const DB_NAME = 'readme';

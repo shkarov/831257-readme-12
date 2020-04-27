@@ -117,6 +117,7 @@ function extract_youtube_id($youtube_url)
  * @param $index
  * @return false|string
  */
+/*
 function generate_random_date($index)
 {
     $deltas = [['minutes' => 59], ['hours' => 23], ['days' => 6], ['weeks' => 4], ['months' => 11]];
@@ -139,7 +140,7 @@ function generate_random_date($index)
 
     return $dt;
 }
-
+*/
 /**
  * Обрезает строку
  *

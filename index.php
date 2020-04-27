@@ -6,45 +6,22 @@ $is_auth = rand(0, 1);
 
 $user_name = 'Boris';
 
-$cards = [
-    [
-        'header' => 'Цитата',
-        'type' => 'post-quote',
-        'content' => 'Мы в жизни любим только раз, а после ищем лишь похожих',
-        'username' => 'Лариса',
-        'userpic' => 'userpic-larisa-small.jpg'
-    ],
-    [
-        'header' => 'Игра престолов',
-        'type' => 'post-text',
-        'content' => 'Не могу дождаться начала финального сезона своего любимого сериала! Не могу дождаться начала финального сезона своего любимого сериала! Не могу дождаться начала финального сезона своего любимого сериала! Не могу дождаться начала финального сезона своего любимого сериала!Не могу дождаться начала финального сезона своего любимого сериала!',
-        'username' => 'Владик',
-        'userpic' => 'userpic.jpg'
-    ],
-    [
-        'header' => 'Наконец, обработал фотки!',
-        'type' => 'post-photo',
-        'content' => 'rock-medium.jpg',
-        'username' => 'Виктор',
-        'userpic' => 'userpic-mark.jpg'
-    ],
-    [
-        'header' => 'Моя мечта',
-        'type' => 'post-photo',
-        'content' => 'coast-medium.jpg',
-        'username' => 'Лариса',
-        'userpic' => 'userpic-larisa-small.jpg'
-    ],
-    [
-        'header' => 'Лучшие курсы',
-        'type' => 'post-link',
-        'content' => 'www.htmlacademy.ru',
-        'username' => 'Владик',
-        'userpic' => 'userpic.jpg'
-    ]
-];
+$connect =  dbConnect(DB_HOST, DB_USER, DB_PASSWORD, DB_NAME);
 
-$page_content = include_template("main.php", $cards);
+$sqlTypeContent = "SELECT * FROM content_type";
+
+$sqlPostUserType = "SELECT p.*, u.login, u.avatar, c.class
+                    FROM   post AS p
+                           JOIN user AS u
+                           ON u.id = p.user_id
+                           JOIN content_type AS c
+                           ON c.id = p.content_type_id
+                    ORDER BY p.views DESC";
+
+$types = dbQuery($connect, $sqlTypeContent);
+$cards = dbQuery($connect, $sqlPostUserType);
+
+$page_content = include_template("main.php", ['types' => $types, 'cards' => $cards]);
 
 $layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user' => $user_name, 'is_auth' => $is_auth]);
 

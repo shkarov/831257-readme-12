@@ -57,3 +57,39 @@ function db_get_prepare_stmt($link, $sql, $data = [])
     return $stmt;
 }
 
+/**
+ * Устанавливает соединение с базой данных(БД) и возвращает объект соединения
+ *
+ * @param $host string Хост
+ * @param $username string Имя пользователя БД
+ * @param $psaaword string Пароль пользователя БД
+ * @param $database string Имя БД
+ *
+ * @return $con object Объект-соединение с БД
+ */
+function dbConnect(string $host, string $username, string $password, string $database_name) : object
+{
+    $con =  mysqli_connect($host, $username, $password, $database_name);
+    if (!$con) {
+        exit("Ошибка подключения: " . mysqli_connect_error());
+    }
+    mysqli_set_charset($con, "utf8");
+    return($con);
+}
+
+/**
+ * Отправляет запрос на чтение к текущей БД и возвращает Ассоциативный массив
+ *
+ * @param $con object Объект-соединение с БД
+ * @param $sql string Строка запроса
+ *
+ * @return  Ассоциативный массив
+ */
+function dbQuery(object $con, string $sql) : array
+{
+    $result = mysqli_query($con, $sql);
+    if (!$result) {
+        print("Ошибка MySQL: " . mysqli_error($con));
+    }
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
