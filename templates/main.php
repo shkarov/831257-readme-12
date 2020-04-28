@@ -88,41 +88,41 @@
         </div>
         <div class="popular__posts">
 
-            <?php foreach ($data['cards'] as $key => $card) : ?>
-               <article class="popular__post post <?= $card['class']; ?>">
+            <?php foreach ($data['posts'] as $key => $post) : ?>
+               <article class="popular__post post <?= $post['class']; ?>">
                 <header class="post__header">
-                    <h2><?= htmlspecialchars($card['heading']); ?></h2>
+                    <h2><?= htmlspecialchars($post['heading']); ?></h2>
                 </header>
                 <div class="post__main">
-                    <?php if ($card['class'] === "post-quote") : ?>
+                    <?php if ($post['class'] === "post-quote") : ?>
                         <blockquote>
                             <p>
-                                <?= htmlspecialchars($card['text']); ?>
+                                <?= htmlspecialchars($post['text']); ?>
                             </p>
                         </blockquote>
-                    <?php elseif ($card['class'] === "post-text") : ?>
+                    <?php elseif ($post['class'] === "post-text") : ?>
                         <p>
-                            <?= htmlspecialchars(textTrim($card['text'])); ?>
+                            <?= htmlspecialchars(textTrim($post['text'])); ?>
                         </p>
-                        <?php if (substr(textTrim($card['text']), -3) === "...") : ?>
+                        <?php if (substr(textTrim($post['text']), -3) === "...") : ?>
                             <a class="post-text__more-link" href="#">Читать далее</a>
                         <?php endif; ?>
-                    <?php elseif ($card['class'] === "post-photo") : ?>
+                    <?php elseif ($post['class'] === "post-photo") : ?>
                         <div class="post-photo__image-wrapper">
-                            <img src="<?= htmlspecialchars($card['picture']); ?>" alt="Фото от пользователя" width="360" height="240">
+                            <img src="<?= htmlspecialchars($post['picture']); ?>" alt="Фото от пользователя" width="360" height="240">
                         </div>
-                    <?php elseif ($card['class'] === "post-link") : ?>
+                    <?php elseif ($post['class'] === "post-link") : ?>
                         <div class="post-link__wrapper">
-                            <a class="post-link__external" href="http://<?= htmlspecialchars($card['link']); ?>" title="Перейти по ссылке">
+                            <a class="post-link__external" href="http://<?= htmlspecialchars($post['link']); ?>" title="Перейти по ссылке">
                                 <div class="post-link__info-wrapper">
                                     <div class="post-link__icon-wrapper">
                                         <img src="https://www.google.com/s2/favicons?domain=htmlacademy.ru" alt="Иконка">
                                     </div>
                                     <div class="post-link__info">
-                                        <h3><?= $card['heading']; ?></h3>
+                                        <h3><?= $post['heading']; ?></h3>
                                     </div>
                                 </div>
-                                <span><?= $card['text']; ?></span>
+                                <span><?= $post['text']; ?></span>
                             </a>
                         </div>
                     <?php endif ?>
@@ -132,15 +132,15 @@
                     <div class="post__author">
                         <a class="post__author-link" href="#" title="Автор">
                             <div class="post__avatar-wrapper">
-                                <img class="post__author-avatar" src="<?= $card['avatar']; ?>" alt="Аватар пользователя">
+                                <img class="post__author-avatar" src="<?= $post['avatar']; ?>" alt="Аватар пользователя">
                             </div>
                             <div class="post__info">
-                                <b class="post__author-name"><?= htmlspecialchars($card['login']); ?></b>
+                                <b class="post__author-name"><?= htmlspecialchars($post['login']); ?></b>
                                 <?php
-                                    $dateTitle = strftime('%d.%m.%Y %H:%M', strtotime($card['creation_time']));
-                                    $dateView = dateDifferent($card['creation_time']);
+                                    $dateTitle = strftime('%d.%m.%Y %H:%M', strtotime($post['creation_time']));
+                                    $dateView = dateDifferent($post['creation_time']);
                                 ?>
-                                <time class="post__time" datetime="<?= $card['creation_time'] ?>" title="<?= $dateTitle ?>"><?= $dateView ?></time>
+                                <time class="post__time" datetime="<?= $post['creation_time'] ?>" title="<?= $dateTitle ?>"><?= $dateView ?></time>
                             </div>
                         </a>
                     </div>
