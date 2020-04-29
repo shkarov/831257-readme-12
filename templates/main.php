@@ -41,104 +41,106 @@
                             <span>Все</span>
                         </a>
                     </li>
-                    <li class="popular__filters-item filters__item">
-                        <a class="filters__button filters__button--photo button" href="#">
-                            <span class="visually-hidden">Фото</span>
-                            <svg class="filters__icon" width="22" height="18">
-                                <use xlink:href="#icon-filter-photo"></use>
-                            </svg>
-                        </a>
-                    </li>
-                    <li class="popular__filters-item filters__item">
-                        <a class="filters__button filters__button--video button" href="#">
-                            <span class="visually-hidden">Видео</span>
-                            <svg class="filters__icon" width="24" height="16">
-                                <use xlink:href="#icon-filter-video"></use>
-                            </svg>
-                        </a>
-                    </li>
-                    <li class="popular__filters-item filters__item">
-                        <a class="filters__button filters__button--text button" href="#">
-                            <span class="visually-hidden">Текст</span>
-                            <svg class="filters__icon" width="20" height="21">
-                                <use xlink:href="#icon-filter-text"></use>
-                            </svg>
-                        </a>
-                    </li>
-                    <li class="popular__filters-item filters__item">
-                        <a class="filters__button filters__button--quote button" href="#">
-                            <span class="visually-hidden">Цитата</span>
-                            <svg class="filters__icon" width="21" height="20">
-                                <use xlink:href="#icon-filter-quote"></use>
-                            </svg>
-                        </a>
-                    </li>
-                    <li class="popular__filters-item filters__item">
-                        <a class="filters__button filters__button--link button" href="#">
-                            <span class="visually-hidden">Ссылка</span>
-                            <svg class="filters__icon" width="21" height="18">
-                                <use xlink:href="#icon-filter-link"></use>
-                            </svg>
-                        </a>
-                    </li>
+
+                    <?php foreach ($data['types'] as $type) :?>
+                        <li class="popular__filters-item filters__item">
+                            <?php if ($type['class'] === 'post-photo') : ?>
+                                <a class="filters__button filters__button--photo button" href="#">
+                                    <span class="visually-hidden">Фото</span>
+                                    <svg class="filters__icon" width="22" height="18">
+                                        <use xlink:href="#icon-filter-photo"></use>
+                                    </svg>
+                                </a>
+                            <?php elseif ($type['class'] === 'post-video') : ?>
+                                <a class="filters__button filters__button--video button" href="#">
+                                    <span class="visually-hidden">Видео</span>
+                                    <svg class="filters__icon" width="24" height="16">
+                                        <use xlink:href="#icon-filter-video"></use>
+                                    </svg>
+                                </a>
+                            <?php elseif ($type['class'] === 'post-text') : ?>
+                                <a class="filters__button filters__button--text button" href="#">
+                                    <span class="visually-hidden">Текст</span>
+                                    <svg class="filters__icon" width="20" height="21">
+                                        <use xlink:href="#icon-filter-text"></use>
+                                    </svg>
+                                </a>
+                            <?php elseif ($type['class'] === 'post-quote') : ?>
+                                <a class="filters__button filters__button--quote button" href="#">
+                                    <span class="visually-hidden">Цитата</span>
+                                    <svg class="filters__icon" width="21" height="20">
+                                        <use xlink:href="#icon-filter-quote"></use>
+                                    </svg>
+                                </a>
+                            <?php elseif ($type['class'] === 'post-link') : ?>
+                                <a class="filters__button filters__button--link button" href="#">
+                                    <span class="visually-hidden">Ссылка</span>
+                                    <svg class="filters__icon" width="21" height="18">
+                                        <use xlink:href="#icon-filter-link"></use>
+                                    </svg>
+                                </a>
+                            <?php endif; ?>
+                        </li>
+                    <?php endforeach; ?>
+
                 </ul>
             </div>
         </div>
         <div class="popular__posts">
 
-            <?php foreach ($data as $key => $card) : ?>
-               <article class="popular__post post <?= $card['type']; ?>">
+            <?php foreach ($data['posts'] as $key => $post) : ?>
+               <article class="popular__post post <?= $post['class']; ?>">
                 <header class="post__header">
-                    <h2><?= htmlspecialchars($card['header']); ?></h2>
+                    <h2><?= htmlspecialchars($post['heading']); ?></h2>
                 </header>
                 <div class="post__main">
-                    <?php if ($card['type'] === "post-quote") : ?>
+                    <?php if ($post['class'] === "post-quote") : ?>
                         <blockquote>
                             <p>
-                                <?= htmlspecialchars($card['content']); ?>
+                                <?= htmlspecialchars($post['text']); ?>
                             </p>
                         </blockquote>
-                    <?php elseif ($card['type'] === "post-text") : ?>
+                    <?php elseif ($post['class'] === "post-text") : ?>
                         <p>
-                            <?= htmlspecialchars(textTrim($card['content'])); ?>
+                            <?= htmlspecialchars(textTrim($post['text'])); ?>
                         </p>
-                        <?php if (substr(textTrim($card['content']), -3) === "...") : ?>
+                        <?php if (substr(textTrim($post['text']), -3) === "...") : ?>
                             <a class="post-text__more-link" href="#">Читать далее</a>
                         <?php endif; ?>
-                    <?php elseif ($card['type'] === "post-photo") : ?>
+                    <?php elseif ($post['class'] === "post-photo") : ?>
                         <div class="post-photo__image-wrapper">
-                            <img src="img/<?= htmlspecialchars($card['content']); ?>" alt="Фото от пользователя" width="360" height="240">
+                            <img src="<?= htmlspecialchars($post['picture']); ?>" alt="Фото от пользователя" width="360" height="240">
                         </div>
-                    <?php elseif ($card['type'] === "post-link") : ?>
+                    <?php elseif ($post['class'] === "post-link") : ?>
                         <div class="post-link__wrapper">
-                            <a class="post-link__external" href="http://<?= htmlspecialchars($card['content']); ?>" title="Перейти по ссылке">
+                            <a class="post-link__external" href="http://<?= htmlspecialchars($post['link']); ?>" title="Перейти по ссылке">
                                 <div class="post-link__info-wrapper">
                                     <div class="post-link__icon-wrapper">
                                         <img src="https://www.google.com/s2/favicons?domain=htmlacademy.ru" alt="Иконка">
                                     </div>
                                     <div class="post-link__info">
-                                        <h3><?= $card['header']; ?></h3>
+                                        <h3><?= $post['heading']; ?></h3>
                                     </div>
                                 </div>
-                                <span><?= $card['content']; ?></span>
+                                <span><?= $post['text']; ?></span>
                             </a>
                         </div>
                     <?php endif ?>
                 </div>
+
                 <footer class="post__footer">
                     <div class="post__author">
                         <a class="post__author-link" href="#" title="Автор">
                             <div class="post__avatar-wrapper">
-                                <img class="post__author-avatar" src="img/<?= $card['userpic']; ?>" alt="Аватар пользователя">
+                                <img class="post__author-avatar" src="<?= $post['avatar']; ?>" alt="Аватар пользователя">
                             </div>
                             <div class="post__info">
-                                <b class="post__author-name"><?= htmlspecialchars($card['username']); ?></b>
+                                <b class="post__author-name"><?= htmlspecialchars($post['login']); ?></b>
                                 <?php
-                                    $dateOrigin = generate_random_date($key);
-                                    $dateTitle = strftime('%d.%m.%Y %H:%M', strtotime($dateOrigin));
-                                    $dateView = dateDifferent($dateOrigin);
+                                    $dateTitle = strftime('%d.%m.%Y %H:%M', strtotime($post['creation_time']));
+                                    $dateView = dateDifferent($post['creation_time']);
                                 ?>
-                                <time class="post__time" datetime="<?= $dateOrigin ?>" title="<?= $dateTitle ?>"><?= $dateView ?></time>
+                                <time class="post__time" datetime="<?= $post['creation_time'] ?>" title="<?= $dateTitle ?>"><?= $dateView ?></time>
                             </div>
                         </a>
                     </div>
