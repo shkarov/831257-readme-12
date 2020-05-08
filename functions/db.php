@@ -106,8 +106,13 @@ function dbGetPosts(mysqli $con) : array
                    JOIN user AS u
                    ON u.id = p.user_id
                    JOIN content_type AS c
-                   ON c.id = p.content_type_id
-            ORDER BY p.views DESC";
+                   ON c.id = p.content_type_id";
+
+    if (isset($_GET['type_id'])) {
+        $sql = $sql." WHERE c.id =".(string) $_GET['type_id'];
+    }
+
+    $sql = $sql." ORDER BY p.views DESC";
 
     $result = mysqli_query($con, $sql);
     if (!$result) {
@@ -116,3 +121,28 @@ function dbGetPosts(mysqli $con) : array
     return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
+/**
+ * Отправляет запрос на чтение данных о конкретном посте, к таблицам post, user,content_type в текущей БД и возвращает Ассоциативный массив
+ *
+ * @param $con mysqli Объект-соединение с БД
+ *
+ * @return  Ассоциативный массив Информация о посте
+ */
+function dbGetSinglePost(mysqli $con) : array
+{
+    $sql = "SELECT p.*, u.login, u.avatar, c.class
+            FROM   post AS p
+                   JOIN user AS u
+                   ON u.id = p.user_id
+                   JOIN content_type AS c
+                   ON c.id = p.content_type_id
+            WHERE  p.id = ";
+
+    $sql = $sql.(string) $_GET['post_id'];
+
+    $result = mysqli_query($con, $sql);
+    if (!$result) {
+        exit("Ошибка MySQL: " . mysqli_error($con));
+    }
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
