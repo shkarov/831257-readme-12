@@ -34,10 +34,12 @@
                 </ul>
             </div>
             <div class="popular__filters filters">
+                <?php $typeId = getTypeFromRequest($_GET); ?>
+
                 <b class="popular__filters-caption filters__caption">Тип контента:</b>
                 <ul class="popular__filters-list filters__list">
                     <li class="popular__filters-item popular__filters-item--all filters__item filters__item--all">
-                        <a class="filters__button filters__button--ellipse filters__button--all filters__button--active" href="#">
+                        <a class="filters__button filters__button--ellipse filters__button--all <?php echo ($typeId == 0) ? "filters__button--active" : ""; ?>" href="index.php">
                             <span>Все</span>
                         </a>
                     </li>
@@ -45,35 +47,35 @@
                     <?php foreach ($data['types'] as $type) :?>
                         <li class="popular__filters-item filters__item">
                             <?php if ($type['class'] === 'post-photo') : ?>
-                                <a class="filters__button filters__button--photo button" href="#">
+                                <a class="filters__button filters__button--photo button <?php echo ($typeId == 3) ? "filters__button--active" : ""; ?>" href="index.php?type_id=3">
                                     <span class="visually-hidden">Фото</span>
                                     <svg class="filters__icon" width="22" height="18">
                                         <use xlink:href="#icon-filter-photo"></use>
                                     </svg>
                                 </a>
                             <?php elseif ($type['class'] === 'post-video') : ?>
-                                <a class="filters__button filters__button--video button" href="#">
+                                <a class="filters__button filters__button--video button <?php echo ($typeId == 4) ? "filters__button--active" : ""; ?>" href="index.php?type_id=4">
                                     <span class="visually-hidden">Видео</span>
                                     <svg class="filters__icon" width="24" height="16">
                                         <use xlink:href="#icon-filter-video"></use>
                                     </svg>
                                 </a>
                             <?php elseif ($type['class'] === 'post-text') : ?>
-                                <a class="filters__button filters__button--text button" href="#">
+                                <a class="filters__button filters__button--text button <?php echo ($typeId == 1) ? "filters__button--active" : ""; ?>" href="index.php?type_id=1">
                                     <span class="visually-hidden">Текст</span>
                                     <svg class="filters__icon" width="20" height="21">
                                         <use xlink:href="#icon-filter-text"></use>
                                     </svg>
                                 </a>
                             <?php elseif ($type['class'] === 'post-quote') : ?>
-                                <a class="filters__button filters__button--quote button" href="#">
+                                <a class="filters__button filters__button--quote button <?php echo ($typeId == 2) ? "filters__button--active" : ""; ?>" href="index.php?type_id=2">
                                     <span class="visually-hidden">Цитата</span>
                                     <svg class="filters__icon" width="21" height="20">
                                         <use xlink:href="#icon-filter-quote"></use>
                                     </svg>
                                 </a>
                             <?php elseif ($type['class'] === 'post-link') : ?>
-                                <a class="filters__button filters__button--link button" href="#">
+                                <a class="filters__button filters__button--link button <?php echo ($typeId == 5) ? "filters__button--active" : ""; ?>" href="index.php?type_id=5">
                                     <span class="visually-hidden">Ссылка</span>
                                     <svg class="filters__icon" width="21" height="18">
                                         <use xlink:href="#icon-filter-link"></use>
@@ -91,7 +93,7 @@
             <?php foreach ($data['posts'] as $key => $post) : ?>
                <article class="popular__post post <?= $post['class']; ?>">
                 <header class="post__header">
-                    <h2><?= htmlspecialchars($post['heading']); ?></h2>
+                    <a href="index.php?post_id=<?= $post['id'] ?>"><h2><?= htmlspecialchars($post['heading']); ?></h2></a>
                 </header>
                 <div class="post__main">
                     <?php if ($post['class'] === "post-quote") : ?>

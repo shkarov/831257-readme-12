@@ -8,15 +8,18 @@ $user_name = 'Boris';
 
 $connect =  dbConnect($config);
 
-$types = dbGetTypes($connect);
-$posts = dbGetPosts($connect);
+$postId = getPostIdFromRequest($_GET);
 
-$page_content = include_template("main.php", ['types' => $types, 'posts' => $posts]);
+if ($postId > 0) {
+    $post = dbGetSinglePost($connect, $postId);
 
-//if (isset($_GET['post_id'])) {
-//    $post = dbGetSinglePost($connect);
- //   $page_content = include_template("post.php", $post);
-//}
+    $page_content = include_template("post.php", $post);
+} else {
+    $types = dbGetTypes($connect);
+    $posts = dbGetPosts($connect);
+
+    $page_content = include_template("main.php", ['types' => $types, 'posts' => $posts]);
+}
 
 $layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user' => $user_name, 'is_auth' => $is_auth]);
 
