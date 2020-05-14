@@ -96,10 +96,12 @@ function dbGetTypes(mysqli $con) : array
  * Отправляет запрос на чтение к таблицам post, user,content_type в текущей БД и возвращает Ассоциативный массив
  *
  * @param $con mysqli Объект-соединение с БД
+ * @param $typeId id типа контента
+ * @param $sort вид сортировки
  *
- * @return  Ассоциативный массив Результат запроса
+ * @return array Ассоциативный массив Результат запроса
  */
-function dbGetPosts(mysqli $con) : array
+function dbGetPosts(mysqli $con, $typeId, $sort) : array
 {
     $sql = "SELECT p.*, u.login, u.avatar, c.class
             FROM   post AS p
@@ -108,14 +110,18 @@ function dbGetPosts(mysqli $con) : array
                    JOIN content_type AS c
                    ON c.id = p.content_type_id";
 
-    $typeId = getTypeFromRequest($_GET);
-    if ($typeId > 0) {
+
+    if (!is_null($typeId)) {
         $sql = $sql." WHERE c.id = ?";
     }
 
-    $sql = $sql." ORDER BY p.views DESC";
+    if (is_null($sort)) {
+        $sort = 'views';
+    }
 
-    if ($typeId > 0) {
+    $sql = $sql." ORDER BY p.".$sort." DESC";
+
+    if (!is_null($typeId)) {
         $stmt = db_get_prepare_stmt($con, $sql, [$typeId]);
         mysqli_stmt_execute($stmt);
         $result = mysqli_stmt_get_result($stmt);
@@ -131,34 +137,77 @@ function dbGetPosts(mysqli $con) : array
 }
 
 /**
- * Возвращает id типа контента из массива параметров запроса, если такой тип существует, иначе возвращает 0
- * @arr array массив параметров запроса
- * @return int
+ * Возвращает id типа контента из массива параметров запроса, если такой тип существует, иначе возвращает null
+ *
+ * @param $arr array массив параметров запроса
+ *
+ * @return int or null
  */
-function getTypeFromRequest($arr): int
+function getTypeFromRequest(array $arr)
 {
-    return (int) ($arr['type_id'] ?? 0);
+    if (!isset($arr['type_id'])) {
+        return null;
+    }
+    if (!is_numeric($arr['type_id'])) {
+        exit('Некорректный параметр type_id');
+    }
+    return (int) $arr['type_id'];
 }
 
 /**
- * Возвращает id поста из массива параметров запроса, если id найден, иначе возвращает 0
+ * Возвращает id поста из массива параметров запроса, если id найден, иначе возвращает null
+ *
  * @arr array массив параметров запроса
- * @return int
+ *
+ * @return int or null
  */
-function getPostIdFromRequest($arr): int
+function getPostIdFromRequest(array $arr)
 {
-    return (int) ($arr['post_id'] ?? 0);
+    if (!isset($arr['post_id'])) {
+        return null;
+    }
+    if (!is_numeric($arr['post_id'])) {
+        exit('Некорректный параметр post_id');
+    }
+    return (int) $arr['post_id'];
 }
+
+
+/**
+ * Возвращает признак сортировки из массива параметров запроса, если параметр найден, иначе возвращает null
+ *
+ * @arr array массив параметров запроса
+ *
+ * @return int or null
+ */
+function getSortFromRequest(array $arr)
+{
+    if (!isset($arr['sort'])) {
+        return null;
+    }
+    if (!is_string($arr['sort'])) {
+        exit('Некорректный параметр sort');
+    }
+    return $arr['sort'];
+}
+
+
+
 
 /**
  * Отправляет запрос на чтение данных о конкретном посте, к таблицам post, user,content_type в текущей БД и возвращает Ассоциативный массив
  *
  * @param $con mysqli Объект-соединение с БД
+ * @param $postId int or null, id выбранного поста
  *
- * @return  Ассоциативный массив Информация о посте
+ * @return  array Ассоциативный массив Информация о посте
  */
-function dbGetSinglePost(mysqli $con, int $postId) : array
+function dbGetSinglePost(mysqli $con, $postId) : array
 {
+    if (is_null($postId)) {
+        return [];
+    }
+
     $sql = "SELECT p.*, u.login, u.avatar, u.subscrubers, u.posts, c.class
             FROM   post AS p
                    JOIN user AS u

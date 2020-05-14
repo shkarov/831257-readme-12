@@ -6,16 +6,18 @@ $is_auth = rand(0, 1);
 
 $user_name = 'Boris';
 
-$types = dbGetTypes($connect);
+$postId = getPostIdFromRequest($_GET);
 
-$typeId = getTypeFromRequest($_GET);
+$post = dbGetSinglePost($connect, $postId);
 
-$sort = getSortFromRequest($_GET);
+if ($post === []) {
+    header("HTTP/1.0 404 Not Found");
+    exit;
+}
 
-$posts = dbGetPosts($connect, $typeId, $sort);
-
-$page_content = include_template("main.php", ['types' => $types, 'posts' => $posts, 'type_id' => $typeId, 'sort' => $sort]);
+$page_content = include_template("post-details.php", $post);
 
 $layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user' => $user_name, 'is_auth' => $is_auth]);
 
 print($layout_content);
+
