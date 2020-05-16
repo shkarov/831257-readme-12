@@ -14,3 +14,5 @@ if (!file_exists('config.php')) {
     exit('Создайте файл config.php на основе config.sample.php и сконфигурируйте его');
 }
 $config = require 'config.php';
+
+$connect =  dbConnect($config);
