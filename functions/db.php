@@ -62,8 +62,8 @@ function db_get_prepare_stmt($link, $sql, $data = [])
  *
  * @param $conf array Массив с параматрами для подключения к БД
  *
- * @return $con mysqli Объект-соединение с БД
-  */
+ * @return mysqli Объект-соединение с БД
+*/
 function dbConnect(array $conf) : mysqli
 {
     $dbConf = $conf['db'];
@@ -80,7 +80,7 @@ function dbConnect(array $conf) : mysqli
  *
  * @param $con mysqli Объект-соединение с БД
  *
- * @return  Ассоциативный массив Результат запроса
+ * @return  array Ассоциативный массив Результат запроса
  */
 function dbGetTypes(mysqli $con) : array
 {
@@ -96,12 +96,12 @@ function dbGetTypes(mysqli $con) : array
  * Отправляет запрос на чтение к таблицам post, user,content_type в текущей БД и возвращает Ассоциативный массив
  *
  * @param $con mysqli Объект-соединение с БД
- * @param $typeId id типа контента
- * @param $sort вид сортировки
+ * @param $typeId int (может быть  null) id типа контента
+ * @param $sort string (может быть  null) вид сортировки
  *
  * @return array Ассоциативный массив Результат запроса
  */
-function dbGetPosts(mysqli $con, $typeId, $sort) : array
+function dbGetPosts(mysqli $con, ?int $typeId, ?string $sort) : array
 {
     $sql = "SELECT p.*, u.login, u.avatar, c.class
             FROM   post AS p
@@ -143,7 +143,7 @@ function dbGetPosts(mysqli $con, $typeId, $sort) : array
  *
  * @return int or null
  */
-function getTypeFromRequest(array $arr)
+function getTypeFromRequest(array $arr) : ?int
 {
     if (!isset($arr['type_id'])) {
         return null;
@@ -161,7 +161,7 @@ function getTypeFromRequest(array $arr)
  *
  * @return int or null
  */
-function getPostIdFromRequest(array $arr)
+function getPostIdFromRequest(array $arr) : ?int
 {
     if (!isset($arr['post_id'])) {
         return null;
@@ -172,7 +172,6 @@ function getPostIdFromRequest(array $arr)
     return (int) $arr['post_id'];
 }
 
-
 /**
  * Возвращает признак сортировки из массива параметров запроса, если параметр найден, иначе возвращает null
  *
@@ -180,7 +179,7 @@ function getPostIdFromRequest(array $arr)
  *
  * @return int or null
  */
-function getSortFromRequest(array $arr)
+function getSortFromRequest(array $arr) : ?int
 {
     if (!isset($arr['sort'])) {
         return null;
@@ -191,9 +190,6 @@ function getSortFromRequest(array $arr)
     return $arr['sort'];
 }
 
-
-
-
 /**
  * Отправляет запрос на чтение данных о конкретном посте, к таблицам post, user,content_type в текущей БД и возвращает Ассоциативный массив
  *
@@ -202,13 +198,13 @@ function getSortFromRequest(array $arr)
  *
  * @return  array Ассоциативный массив Информация о посте
  */
-function dbGetSinglePost(mysqli $con, $postId) : array
+function dbGetSinglePost(mysqli $con, ?int $postId) : array
 {
     if (is_null($postId)) {
         return [];
     }
 
-    $sql = "SELECT p.*, u.login, u.avatar, u.subscrubers, u.posts, c.class
+    $sql = "SELECT p.*, u.login, u.avatar, u.subscribers, u.posts, c.class
             FROM   post AS p
                    JOIN user AS u
                    ON u.id = p.user_id

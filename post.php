@@ -20,4 +20,3 @@ $page_content = include_template("post-details.php", $post);
 $layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user' => $user_name, 'is_auth' => $is_auth]);
 
 print($layout_content);
-
