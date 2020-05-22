@@ -155,6 +155,23 @@ function getTypeFromRequest(array $arr) : ?int
 }
 
 /**
+ * Возвращает id типа контента из массива параметров запроса, если такой тип существует, иначе возвращает null
+ *
+ * @param $arr array массив параметров запроса
+ *
+ * @return int or null
+ */
+function getTypeFromRequestS(array $get, array $post) : ?int
+{
+    if (isset($get['type_id'])) {
+        return (int) $get['type_id'];
+    } elseif (isset($post['type_id'])) {
+        return (int) $post['type_id'];
+    }
+    return null;
+}
+
+/**
  * Возвращает id поста из массива параметров запроса, если id найден, иначе возвращает null
  *
  * @arr array массив параметров запроса
@@ -220,4 +237,8 @@ function dbGetSinglePost(mysqli $con, ?int $postId) : array
         exit("Ошибка MySQL: " . mysqli_error($con));
     }
     return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+function getPostVal($arr, $name) {
+    return $arr[$name] ?? "";
 }
