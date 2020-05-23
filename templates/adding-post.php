@@ -53,16 +53,227 @@
                 </div>
 
                 <div class="adding-post__tab-content">
+
                     <?php if (is_null($type_id) || $type_id === 1) : ?>
-                        <?php require 'templates/adding-photo.php'; ?>
+
+                        <section class="adding-post__photo tabs__content tabs__content--active">
+                            <h2 class="visually-hidden">Форма добавления фото</h2>
+                            <form class="adding-post__form form" action="add.php" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="type_id" value="1">
+                                <div class="form__text-inputs-wrapper">
+                                    <div class="form__text-inputs ">
+
+                                        <?php $heading = getHeadingAddPost($type_id); ?>
+                                        <?php require 'templates/adding-heading.php'; ?>
+
+                                        <div class="adding-post__input-wrapper form__input-wrapper <?= isset($errors['photo-url']) ? "form__input-section--error" : ""; ?>">
+                                            <label class="adding-post__label form__label" for="photo-url">Ссылка из интернета</label>
+                                            <div class="form__input-section">
+                                                <input class="adding-post__input form__input" id="photo-url" type="text" name="photo-url" placeholder="Введите ссылку" value="<?= getPostVal($_POST, 'photo-url'); ?>">
+                                                <button class="form__error-button button" type="button">!<span class="visually-hidden">Информация об ошибке</span></button>
+                                                <div class="form__error-text">
+                                                    <h3 class="form__error-title"><?= $errors['photo-url']['header'] ?></h3>
+                                                    <p class="form__error-desc"><?= $errors['photo-url']['description'] ?></p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <?php $tags = getTagsAddPost($type_id); ?>
+                                        <?php require 'templates/adding-tags.php'; ?>
+
+                                    </div>
+
+                                    <?php require 'templates/adding-errors.php'; ?>
+
+                                </div>
+                                <div class="adding-post__input-file-container form__input-container form__input-container--file">
+                                    <div class="adding-post__input-file-wrapper form__input-file-wrapper">
+                                        <div class="adding-post__file-zone adding-post__file-zone--photo form__file-zone dropzone">
+                                            <input class="adding-post__input-file form__input-file" id="userpic-file-photo" type="file" name="userpic-file-photo" title=" ">
+                                            <div class="form__file-zone-text">
+                                                <span>Перетащите фото сюда</span>
+                                            </div>
+                                        </div>
+                                        <button class="adding-post__input-file-button form__input-file-button form__input-file-button--photo button" type="button">
+                                            <span>Выбрать фото</span>
+                                            <svg class="adding-post__attach-icon form__attach-icon" width="10" height="20">
+                                                <use xlink:href="#icon-attach"></use>
+                                            </svg>
+                                        </button>
+                                    </div>
+                                    <div class="adding-post__file adding-post__file--photo form__file dropzone-previews">
+
+                                    </div>
+                                </div>
+
+                                <?php require 'templates/adding-publish.php'; ?>
+
+                            </form>
+                        </section>
+
                     <?php elseif ($type_id === 2) : ?>
-                        <?php require 'templates/adding-video.php'; ?>
+
+                        <section class="adding-post__video tabs__content tabs__content--active">
+                            <h2 class="visually-hidden">Форма добавления видео</h2>
+                            <form class="adding-post__form form" action="add.php" method="post" enctype="multipart/form-data">
+                                <input type="hidden" name="type_id" value="2">
+                                <div class="form__text-inputs-wrapper">
+                                    <div class="form__text-inputs">
+
+                                        <?php $heading = getHeadingAddPost($type_id); ?>
+                                        <?php require 'templates/adding-heading.php'; ?>
+
+                                        <div class="adding-post__input-wrapper form__input-wrapper <?= isset($errors['video-url']) ? "form__input-section--error" : ""; ?>">
+                                            <label class="adding-post__label form__label" for="video-url">Ссылка youtube <span class="form__input-required">*</span></label>
+                                            <div class="form__input-section">
+                                                <input class="adding-post__input form__input" id="video-url" type="text" name="video-url" placeholder="Введите ссылку" value="<?= getPostVal($_POST, 'video-url'); ?>">
+                                                <button class="form__error-button button" type="button">!<span class="visually-hidden">Информация об ошибке</span></button>
+                                                <div class="form__error-text">
+                                                    <h3 class="form__error-title"><?= $errors['video-url']['header'] ?></h3>
+                                                    <p class="form__error-desc"><?= $errors['video-url']['description'] ?></p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <?php $tags = getTagsAddPost($type_id); ?>
+                                        <?php require 'templates/adding-tags.php'; ?>
+
+                                    </div>
+
+                                    <?php require 'templates/adding-errors.php'; ?>
+
+                                </div>
+
+                                <?php require 'templates/adding-publish.php'; ?>
+
+                            </form>
+                        </section>
+
                     <?php elseif ($type_id === 3) : ?>
-                        <?php require 'templates/adding-text.php'; ?>
+
+                        <section class="adding-post__text tabs__content tabs__content--active">
+                            <h2 class="visually-hidden">Форма добавления текста</h2>
+                            <form class="adding-post__form form" action="add.php" method="post">
+                                <input type="hidden" name="type_id" value="3">
+                                <div class="form__text-inputs-wrapper">
+                                    <div class="form__text-inputs">
+
+                                        <?php $heading = getHeadingAddPost($type_id); ?>
+                                        <?php require 'templates/adding-heading.php'; ?>
+
+                                        <div class="adding-post__textarea-wrapper form__textarea-wrapper <?= isset($errors['text-text']) ? "form__input-section--error" : ""; ?>">
+                                            <label class="adding-post__label form__label" for="text-text">Текст поста <span class="form__input-required">*</span></label>
+                                            <div class="form__input-section">
+                                                <textarea class="adding-post__textarea form__textarea form__input" id="text-text" name="text-text" placeholder="Введите текст публикации"><?= getPostVal($_POST, 'text-text'); ?></textarea>
+                                                <button class="form__error-button button" type="button">!<span class="visually-hidden">Информация об ошибке</span></button>
+                                                <div class="form__error-text">
+                                                    <h3 class="form__error-title"><?= $errors['text-text']['header'] ?></h3>
+                                                    <p class="form__error-desc"><?= $errors['text-text']['description'] ?></p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <?php $tags = getTagsAddPost($type_id); ?>
+                                        <?php require 'templates/adding-tags.php'; ?>
+
+                                    </div>
+
+                                    <?php require 'templates/adding-errors.php'; ?>
+
+                                </div>
+
+                                <?php require 'templates/adding-publish.php'; ?>
+
+                            </form>
+                        </section>
+
                     <?php elseif ($type_id === 4) : ?>
-                        <?php require 'templates/adding-quote.php'; ?>
+
+                        <section class="adding-post__quote tabs__content tabs__content--active">
+                            <h2 class="visually-hidden">Форма добавления цитаты</h2>
+                            <form class="adding-post__form form" action="add.php" method="post">
+                                <input type="hidden" name="type_id" value="4">
+                                <div class="form__text-inputs-wrapper">
+                                    <div class="form__text-inputs">
+
+                                        <?php $heading = getHeadingAddPost($type_id); ?>
+                                        <?php require 'templates/adding-heading.php'; ?>
+
+                                        <div class="adding-post__input-wrapper form__textarea-wrapper <?= isset($errors['quote-text']) ? "form__input-section--error" : ""; ?>">
+                                            <label class="adding-post__label form__label" for="quote-text">Текст цитаты <span class="form__input-required">*</span></label>
+                                            <div class="form__input-section">
+                                                <textarea class="adding-post__textarea adding-post__textarea--quote form__textarea form__input" id="quote-text" name="quote-text" placeholder="Текст цитаты"><?= getPostVal($_POST, 'quote-text'); ?></textarea>
+                                                <button class="form__error-button button" type="button">!<span class="visually-hidden">Информация об ошибке</span></button>
+                                                <div class="form__error-text">
+                                                    <h3 class="form__error-title"><?= $errors['quote-text']['header'] ?></h3>
+                                                    <p class="form__error-desc"><?= $errors['quote-text']['description'] ?></p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        <div class="adding-post__textarea-wrapper form__input-wrapper <?= isset($errors['quote-author']) ? "form__input-section--error" : ""; ?>">
+                                            <label class="adding-post__label form__label" for="quote-author">Автор <span class="form__input-required">*</span></label>
+                                            <div class="form__input-section">
+                                                <input class="adding-post__input form__input" id="quote-author" type="text" name="quote-author" value="<?= getPostVal($_POST, 'quote-author'); ?>">
+                                                <button class="form__error-button button" type="button">!<span class="visually-hidden">Информация об ошибке</span></button>
+                                                <div class="form__error-text">
+                                                    <h3 class="form__error-title"><?= $errors['quote-author']['header'] ?></h3>
+                                                    <p class="form__error-desc"><?= $errors['quote-author']['description'] ?></p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <?php $tags = getTagsAddPost($type_id); ?>
+                                        <?php require 'templates/adding-tags.php'; ?>
+
+                                    </div>
+
+                                    <?php require 'templates/adding-errors.php'; ?>
+
+                                </div>
+
+                                <?php require 'templates/adding-publish.php'; ?>
+
+                            </form>
+                        </section>
+
                     <?php elseif ($type_id === 5) : ?>
-                        <?php require 'templates/adding-link.php'; ?>
+
+                        <section class="adding-post__link tabs__content tabs__content--active">
+                            <h2 class="visually-hidden">Форма добавления ссылки</h2>
+                            <form class="adding-post__form form" action="add.php" method="post">
+                                <input type="hidden" name="type_id" value="5">
+                                <div class="form__text-inputs-wrapper">
+                                    <div class="form__text-inputs">
+
+                                        <?php $heading = getHeadingAddPost($type_id); ?>
+                                        <?php require 'templates/adding-heading.php'; ?>
+
+                                        <div class="adding-post__textarea-wrapper form__input-wrapper <?= isset($errors['link-url']) ? "form__input-section--error" : ""; ?>">
+                                            <label class="adding-post__label form__label" for="link-url">Ссылка <span class="form__input-required">*</span></label>
+                                            <div class="form__input-section">
+                                                <input class="adding-post__input form__input" id="link-url" type="text" name="link-url" value="<?= getPostVal($_POST, 'link-url'); ?>">
+                                                <button class="form__error-button button" type="button">!<span class="visually-hidden">Информация об ошибке</span></button>
+                                                <div class="form__error-text">
+                                                    <h3 class="form__error-title"><?= $errors['link-url']['header'] ?></h3>
+                                                    <p class="form__error-desc"><?= $errors['link-url']['description'] ?></p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        <?php $tags = getTagsAddPost($type_id); ?>
+                                        <?php require 'templates/adding-tags.php'; ?>
+
+                                    </div>
+
+                                    <?php require 'templates/adding-errors.php'; ?>
+
+                                </div>
+
+                                <?php require 'templates/adding-publish.php'; ?>
+
+                            </form>
+                        </section>
+
                     <?php endif ?>
                 </div>
             </div>

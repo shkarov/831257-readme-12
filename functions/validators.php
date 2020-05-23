@@ -229,6 +229,7 @@ function validateUrl($name) {
     return $error;
 }
 
+/*
 //Проверка длины
 function isCorrectLength($name, $min, $max) {
     $len = strlen($_POST[$name]);
@@ -243,3 +244,4 @@ function validateEmail($name) {
         return "Введите корректный email";
     }
 }
+*/

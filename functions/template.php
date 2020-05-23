@@ -212,3 +212,53 @@ function dateDifferent(string $date) : string
     }
     return $interval;
 }
+
+/**
+ * Возращает строку - тип заголовка нового поста
+ *
+ * @param int $type_id - тип контента
+ *
+ * @return string
+ *
+ */
+function getHeadingAddPost(?int $type_id) : string
+{
+    $heading = '';
+    if (is_null($type_id) || $type_id === 1) {
+        $heading = 'photo-heading';
+    } elseif ($type_id === 2) {
+        $heading = 'video-heading';
+    } elseif ($type_id === 3) {
+        $heading = 'text-heading';
+    } elseif ($type_id === 4) {
+        $heading = 'quote-heading';
+    } elseif ($type_id === 5) {
+        $heading = 'link-heading';
+    }
+    return $heading;
+}
+
+/**
+ * Возращает строку - тип тегов нового поста
+ *
+ * @param int $type_id - тип контента
+ *
+ * @return string
+ *
+ */
+function getTagsAddPost(?int $type_id) : string
+{
+    $heading = '';
+    if (is_null($type_id) || $type_id === 1) {
+        $heading = 'photo-tags';
+    } elseif ($type_id === 2) {
+        $heading = 'video-tags';
+    } elseif ($type_id === 3) {
+        $heading = 'text-tags';
+    } elseif ($type_id === 4) {
+        $heading = 'quote-tags';
+    } elseif ($type_id === 5) {
+        $heading = 'link-tags';
+    }
+    return $heading;
+}
