@@ -143,25 +143,7 @@ function dbGetPosts(mysqli $con, ?int $typeId, ?string $sort) : array
  *
  * @return int or null
  */
-function getTypeFromRequest(array $arr) : ?int
-{
-    if (!isset($arr['type_id'])) {
-        return null;
-    }
-    if (!is_numeric($arr['type_id'])) {
-        exit('Некорректный параметр type_id');
-    }
-    return (int) $arr['type_id'];
-}
-
-/**
- * Возвращает id типа контента из массива параметров запроса, если такой тип существует, иначе возвращает null
- *
- * @param $arr array массив параметров запроса
- *
- * @return int or null
- */
-function getTypeFromRequestS(array $get, array $post) : ?int
+function getTypeFromRequest(array $get, array $post = []) : ?int
 {
     if (isset($get['type_id'])) {
         return (int) $get['type_id'];
@@ -196,7 +178,7 @@ function getPostIdFromRequest(array $arr) : ?int
  *
  * @return int or null
  */
-function getSortFromRequest(array $arr) : ?int
+function getSortFromRequest(array $arr) : ?string
 {
     if (!isset($arr['sort'])) {
         return null;
@@ -239,6 +221,297 @@ function dbGetSinglePost(mysqli $con, ?int $postId) : array
     return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
-function getPostVal($arr, $name) {
-    return $arr[$name] ?? "";
+/**
+ * Возвращает знавение массива по ключу $key, если такое существует, иначе - пустую строку
+ *
+ * @param  @arr array ассоциативный массив
+ * @param  @key string ключ массива
+ *
+ * @return string
+ */
+function getPostVal(array $arr, string $key) : string
+{
+    return $arr[$key] ?? "";
+}
+
+/**
+ * Запись нового поста в БД
+ *
+ * @param  mysqli $con Объект-соединение с БД
+ * @param  int $$user_id id  пользователя
+ * @param  array $post глобальный массив $_POST
+ * @param  array $files глобальный массив $_FILES
+ *
+ * @return array возвращает id добавленного поста либо null
+ */
+function dbAddPost(mysqli $con, int $user_id, array $post, array $files) : ?int
+{
+    if ($post === []) {
+        return null;
+    }
+    $type_id = $post['type_id'];
+
+    switch ($type_id) {
+        case 1:
+            return dbAddPostPhoto($con, $user_id, $post, $files);
+            break;
+        case 2:
+            return dbAddPostVideo($con, $user_id, $post);
+            break;
+        case 3:
+            return dbAddPostText($con, $user_id, $post);
+            break;
+        case 4:
+            return dbAddPostQuote($con, $user_id, $post);
+            break;
+        case 5:
+            return dbAddPostLink($con, $user_id, $post);
+            break;
+        default:
+            return checkPhotoForm($post);
+    }
+}
+
+/**
+ * Запись нового поста ФОТО в БД
+ *
+ * @param  mysqli $con Объект-соединение с БД
+ * @param  int $$user_id id  пользователя
+ * @param  array $post глобальный массив $_POST
+ * @param  array $files глобальный массив $_FILES
+ *
+ * @return array возвращает id добавленного поста либо null
+ */
+function dbAddPostPhoto(mysqli $con, int $user_id, array $post, array $files) : ?int
+{
+    $post_id = null;
+    $creation_time = date("Y-m-d H:i:s");
+    $heading = $post['photo-heading'];
+    $content_type_id = 1;
+
+    $file_path = 'uploads/';
+
+    $file = $files['userpic-file-photo'];
+    //файл получен с локального ПК
+    if (!empty($file['name'])) {
+        //формируем новое имя файла
+        $file_name = hash_hmac_file('md5', $file['tmp_name'], (string) $user_id);
+        $file_ext = mb_substr($file['type'], mb_strpos($file['type'], '/') + 1);
+        $file_ext = $file_ext === 'jpeg' ? 'jpg' : $file_ext;
+        $file_url = $file_path.$file_name.'.'.$file_ext;
+
+        if (!move_uploaded_file($file['tmp_name'], $file_url)) {
+            echo "Ошибка перемещения файла";
+        };
+    //файл получен по интернет-ссылке
+    } else {
+        //определяем тип файла и формируем расширение
+        $file_headers = get_headers($post['photo-url']);
+        $content_type = '';
+        foreach ($file_headers as $key => $value) {
+            if (mb_strpos($value, 'Content-Type:') !== false) {
+                $content_type = ltrim(mb_substr($value, -10));
+            }
+        }
+        $file_ext = mb_substr($content_type, mb_strpos($content_type, '/') + 1);
+        $file_ext = $file_ext === 'jpeg' ? 'jpg' : $file_ext;
+
+        //вычисляем имя загружаемого файла
+        $file_name_old = mb_substr($post['photo-url'], mb_strpos($post['photo-url'], '/', -1));
+        //формируем новое имя файла
+        $file_name = hash_hmac_file('md5', $file_name_old, (string) $user_id);
+
+        $file_origin = file_get_contents($post['photo-url']);
+        if (!$file_origin) {
+            echo "Ошибка загрузки файла";
+        }
+
+        $file_url = $file_path.$file_name.'.'.$file_ext;
+        if (!file_put_contents($file_url, $file_origin)) {
+            echo "Ошибка создания файла";
+        }
+    }
+
+    $sql = 'INSERT post (creation_time, heading, picture, user_id, content_type_id) VALUES (?,?,?,?,?)';
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 'sssii', $creation_time, $heading, $file_url, $user_id, $content_type_id);
+    mysqli_stmt_execute($stmt);
+    $post_id = mysqli_stmt_insert_id($stmt);
+    mysqli_stmt_close($stmt);
+
+    //Запись тегов поста
+    dbWriteTags($con, $post['photo-tags'], $post_id);
+
+    return $post_id;
+}
+
+/**
+ * Запись нового поста ВИДЕО в БД
+ *
+ * @param  mysqli $con Объект-соединение с БД
+ * @param  int $$user_id id  пользователя
+ * @param  array $post глобальный массив $_POST
+ *
+ * @return array возвращает id добавленного поста либо null
+ */
+function dbAddPostVideo(mysqli $con, int $user_id, array $post) : ?int
+{
+    $post_id = null;
+    $creation_time = date("Y-m-d H:i:s");
+    $heading = $post['video-heading'];
+    $url = $post['video-url'];
+    $content_type_id = 2;
+
+    $sql = 'INSERT post (creation_time, heading, video, user_id, content_type_id) VALUES (?,?,?,?,?)';
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 'sssii', $creation_time, $heading, $url, $user_id, $content_type_id);
+    mysqli_stmt_execute($stmt);
+    $post_id = mysqli_stmt_insert_id($stmt);
+    mysqli_stmt_close($stmt);
+
+    //Запись тегов поста
+    dbWriteTags($con, $post['video-tags'], $post_id);
+
+    return $post_id;
+}
+
+/**
+ * Запись нового поста ТЕКСТ в БД
+ *
+ * @param  mysqli $con Объект-соединение с БД
+ * @param  int $$user_id id  пользователя
+ * @param  array $post глобальный массив $_POST
+ *
+ * @return array возвращает id добавленного поста либо null
+ */
+function dbAddPostText(mysqli $con, int $user_id, array $post) : ?int
+{
+    $post_id = null;
+    $creation_time = date("Y-m-d H:i:s");
+    $heading = $post['text-heading'];
+    $text = $post['text-text'];
+    $content_type_id = 3;
+
+    $sql = 'INSERT post (creation_time, heading, `text`, user_id, content_type_id) VALUES (?,?,?,?,?)';
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 'sssii', $creation_time, $heading, $text, $user_id, $content_type_id);
+    mysqli_stmt_execute($stmt);
+    $post_id = mysqli_stmt_insert_id($stmt);
+    mysqli_stmt_close($stmt);
+
+    //Запись тегов поста
+    dbWriteTags($con, $post['text-tags'], $post_id);
+
+    return $post_id;
+}
+
+/**
+ * Запись нового поста ЦИТАТА в БД
+ *
+ * @param  mysqli $con Объект-соединение с БД
+ * @param  int $$user_id id  пользователя
+ * @param  array $post глобальный массив $_POST
+ *
+ * @return array возвращает id добавленного поста либо null
+ */
+function dbAddPostQuote(mysqli $con, int $user_id, array $post) : ?int
+{
+    $post_id = null;
+    $creation_time = date("Y-m-d H:i:s");
+    $heading = $post['quote-heading'];
+    $text = $post['quote-text'];
+    $author = $post['quote-author'];
+    $content_type_id = 4;
+
+var_dump($post);
+
+    $sql = 'INSERT post (creation_time, heading, `text`, author-quote, user_id, content_type_id) VALUES (?,?,?,?,?,?)';
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 'ssssii', $creation_time, $heading, $text, $author, $user_id, $content_type_id);
+    mysqli_stmt_execute($stmt);
+    $post_id = mysqli_stmt_insert_id($stmt);
+    mysqli_stmt_close($stmt);
+
+    //Запись тегов поста
+    dbWriteTags($con, $post['quote-tags'], $post_id);
+
+    return $post_id;
+}
+
+/**
+ * Запись нового поста ССЫЛКА в БД
+ *
+ * @param  mysqli $con Объект-соединение с БД
+ * @param  int $$user_id id  пользователя
+ * @param  array $post глобальный массив $_POST
+ *
+ * @return array возвращает id добавленного поста либо null
+ */
+function dbAddPostLink(mysqli $con, int $user_id, array $post) : ?int
+{
+    $post_id = null;
+    $creation_time = date("Y-m-d H:i:s");
+    $heading = $post['link-heading'];
+    $link = $post['link-url'];
+    $content_type_id = 5;
+
+    $sql = 'INSERT post (creation_time, heading, link, user_id, content_type_id) VALUES (?,?,?,?,?)';
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 'sssii', $creation_time, $heading, $link, $user_id, $content_type_id);
+    mysqli_stmt_execute($stmt);
+    $post_id = mysqli_stmt_insert_id($stmt);
+    mysqli_stmt_close($stmt);
+
+    //Запись тегов поста
+    dbWriteTags($con, $post['link-tags'], $post_id);
+
+    return $post_id;
+}
+
+/**
+ * Запись тегов поста в БД
+ *
+ * @param  mysqli $con Объект-соединение с БД
+ * @param  string $input_tags значение поля Теги формы
+ * @param  int $post_id id нового поста
+ *
+ * @return
+ */
+function dbWriteTags(mysqli $con, string $input_tags, ?int $post_id ) : void
+{
+    $field_tags = trim($input_tags);
+
+    if (!empty($field_tags)) {
+        $tags = explode(' ', $field_tags);
+
+        foreach ($tags as $key => $tag) {
+            //поиск тага
+            $sql_tag = "SELECT id FROM hashtag WHERE name = ?";
+            $stmt_tag = mysqli_prepare($con, $sql_tag);
+            mysqli_stmt_bind_param($stmt_tag, 's', $tag);
+            mysqli_stmt_execute($stmt_tag);
+            $res_tag = mysqli_stmt_get_result($stmt_tag);
+            $rows_tag = mysqli_fetch_all($res_tag, MYSQLI_ASSOC);
+
+            //такого тага ещё нет в базе
+            if (empty($rows_tag)) {
+                $sql_tag_new = 'INSERT hashtag (name) VALUES (?)';
+                $stmt_tag_new = mysqli_prepare($con, $sql_tag_new);
+                mysqli_stmt_bind_param($stmt_tag_new, 's', $tag);
+                mysqli_stmt_execute($stmt_tag_new);
+                $hashtag_id = mysqli_stmt_insert_id($stmt_tag_new);
+                mysqli_stmt_close($stmt_tag_new);
+            //такой таг уже есть в базе
+            } else {
+                $hashtag_id = $rows_tag[0]['id'];
+            }
+
+            $sql_post_tag = 'INSERT post_hashtag (post_id, hashtag_id) VALUES (?,?)';
+            $stmt_post_tag = mysqli_prepare($con, $sql_post_tag);
+            mysqli_stmt_bind_param($stmt_post_tag, 'ii', $post_id, $hashtag_id);
+            mysqli_stmt_execute($stmt_post_tag);
+            mysqli_stmt_close($stmt_post_tag);
+        }
+    }
+    return;
 }

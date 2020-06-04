@@ -62,7 +62,9 @@ function include_template($name, array $data = [])
     }
 
     ob_start();
-    extract($data, EXTR_PREFIX_INVALID, 'post');
+
+    extract($data);
+
     require $name;
 
     $result = ob_get_clean();
@@ -223,17 +225,24 @@ function dateDifferent(string $date) : string
  */
 function getHeadingAddPost(?int $type_id) : string
 {
-    $heading = '';
-    if (is_null($type_id) || $type_id === 1) {
-        $heading = 'photo-heading';
-    } elseif ($type_id === 2) {
-        $heading = 'video-heading';
-    } elseif ($type_id === 3) {
-        $heading = 'text-heading';
-    } elseif ($type_id === 4) {
-        $heading = 'quote-heading';
-    } elseif ($type_id === 5) {
-        $heading = 'link-heading';
+    switch ($type_id) {
+        case 1:
+            $heading = 'photo-heading';
+            break;
+        case 2:
+            $heading = 'video-heading';
+            break;
+        case 3:
+            $heading = 'text-heading';
+            break;
+        case 4:
+            $heading = 'quote-heading';
+            break;
+        case 5:
+            $heading = 'link-heading';
+            break;
+        default:
+            $heading = 'photo-heading';
     }
     return $heading;
 }
@@ -248,17 +257,24 @@ function getHeadingAddPost(?int $type_id) : string
  */
 function getTagsAddPost(?int $type_id) : string
 {
-    $heading = '';
-    if (is_null($type_id) || $type_id === 1) {
-        $heading = 'photo-tags';
-    } elseif ($type_id === 2) {
-        $heading = 'video-tags';
-    } elseif ($type_id === 3) {
-        $heading = 'text-tags';
-    } elseif ($type_id === 4) {
-        $heading = 'quote-tags';
-    } elseif ($type_id === 5) {
-        $heading = 'link-tags';
+    switch ($type_id) {
+        case 1:
+            $tag = 'photo-tags';
+            break;
+        case 2:
+            $tag = 'video-tags';
+            break;
+        case 3:
+            $tag = 'text-tags';
+            break;
+        case 4:
+            $tag = 'quote-tags';
+            break;
+        case 5:
+            $tag = 'link-tags';
+            break;
+        default:
+            $tag = 'photo-tags';
     }
-    return $heading;
+    return $tag;
 }
