@@ -218,7 +218,7 @@ function dbGetSinglePost(mysqli $con, ?int $postId) : array
     if (!$result) {
         exit("Ошибка MySQL: " . mysqli_error($con));
     }
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+    return mysqli_fetch_assoc($result);
 }
 
 /**
@@ -254,19 +254,14 @@ function dbAddPost(mysqli $con, int $user_id, array $post, array $files) : ?int
     switch ($type_id) {
         case 1:
             return dbAddPostPhoto($con, $user_id, $post, $files);
-            break;
         case 2:
             return dbAddPostVideo($con, $user_id, $post);
-            break;
         case 3:
             return dbAddPostText($con, $user_id, $post);
-            break;
         case 4:
             return dbAddPostQuote($con, $user_id, $post);
-            break;
         case 5:
             return dbAddPostLink($con, $user_id, $post);
-            break;
         default:
             return checkPhotoForm($post);
     }
@@ -423,9 +418,7 @@ function dbAddPostQuote(mysqli $con, int $user_id, array $post) : ?int
     $author = $post['quote-author'];
     $content_type_id = 4;
 
-var_dump($post);
-
-    $sql = 'INSERT post (creation_time, heading, `text`, author-quote, user_id, content_type_id) VALUES (?,?,?,?,?,?)';
+    $sql = 'INSERT post (creation_time, heading, `text`, author_quote, user_id, content_type_id) VALUES (?,?,?,?,?,?)';
     $stmt = mysqli_prepare($con, $sql);
     mysqli_stmt_bind_param($stmt, 'ssssii', $creation_time, $heading, $text, $author, $user_id, $content_type_id);
     mysqli_stmt_execute($stmt);

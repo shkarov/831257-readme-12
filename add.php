@@ -18,12 +18,10 @@ $page_content = include_template("adding-post.php", ['types' => $types, 'type_id
 if ($errors === []) {
     $postId = dbAddPost($connect, $userId, $_POST, $_FILES);
     if (!is_null($postId)) {
-        $post = dbGetSinglePost($connect, $postId);
-        if ($post === []) {
-            header("HTTP/1.0 404 Not Found");
-            exit;
-        }
-        $page_content = include_template("post-details.php", ['post' => $post]);
+        $url = "post.php?post_id="."$postId";
+        header("HTTP/1.1 301 Moved Permanently");
+        header('Location: '.$url);
+        exit();
     }
 }
 

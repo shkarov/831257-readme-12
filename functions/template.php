@@ -227,24 +227,18 @@ function getHeadingAddPost(?int $type_id) : string
 {
     switch ($type_id) {
         case 1:
-            $heading = 'photo-heading';
-            break;
+            return 'photo-heading';
         case 2:
-            $heading = 'video-heading';
-            break;
+            return 'video-heading';
         case 3:
-            $heading = 'text-heading';
-            break;
+            return 'text-heading';
         case 4:
-            $heading = 'quote-heading';
-            break;
+            return 'quote-heading';
         case 5:
-            $heading = 'link-heading';
-            break;
+            return 'link-heading';
         default:
-            $heading = 'photo-heading';
+            return 'photo-heading';
     }
-    return $heading;
 }
 
 /**
@@ -259,22 +253,16 @@ function getTagsAddPost(?int $type_id) : string
 {
     switch ($type_id) {
         case 1:
-            $tag = 'photo-tags';
-            break;
+            return 'photo-tags';
         case 2:
-            $tag = 'video-tags';
-            break;
+            return 'video-tags';
         case 3:
-            $tag = 'text-tags';
-            break;
+            return 'text-tags';
         case 4:
-            $tag = 'quote-tags';
-            break;
+            return 'quote-tags';
         case 5:
-            $tag = 'link-tags';
-            break;
+            return 'link-tags';
         default:
-            $tag = 'photo-tags';
+            return 'photo-tags';
     }
-    return $tag;
 }

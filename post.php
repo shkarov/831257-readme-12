@@ -10,7 +10,6 @@ $postId = getPostIdFromRequest($_GET);
 
 $post = dbGetSinglePost($connect, $postId);
 
-
 if ($post === []) {
     header("HTTP/1.0 404 Not Found");
     exit;
