@@ -62,7 +62,9 @@ function include_template($name, array $data = [])
     }
 
     ob_start();
+
     extract($data);
+
     require $name;
 
     $result = ob_get_clean();
@@ -211,4 +213,56 @@ function dateDifferent(string $date) : string
         $interval = $dateDiff->format('%m')." ".get_noun_plural_form((int) $dateDiff->format('%m'), "месяц", "месяца", "месяцев")." назад";
     }
     return $interval;
+}
+
+/**
+ * Возращает строку - тип заголовка нового поста
+ *
+ * @param int $type_id - тип контента
+ *
+ * @return string
+ *
+ */
+function getHeadingAddPost(?int $type_id) : string
+{
+    switch ($type_id) {
+        case 1:
+            return 'photo-heading';
+        case 2:
+            return 'video-heading';
+        case 3:
+            return 'text-heading';
+        case 4:
+            return 'quote-heading';
+        case 5:
+            return 'link-heading';
+        default:
+            return 'photo-heading';
+    }
+}
+
+/**
+ * Возращает строку - тип тегов нового поста
+ *
+ * @param int $type_id - тип контента
+ *
+ * @return string
+ *
+ */
+function getTagsAddPost(?int $type_id) : string
+{
+    switch ($type_id) {
+        case 1:
+            return 'photo-tags';
+        case 2:
+            return 'video-tags';
+        case 3:
+            return 'text-tags';
+        case 4:
+            return 'quote-tags';
+        case 5:
+            return 'link-tags';
+        default:
+            return 'photo-tags';
+    }
 }

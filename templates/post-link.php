@@ -1,13 +1,13 @@
 <!-- пост-ссылка -->
 <div class="post__main">
   <div class="post-link__wrapper">
-	<a class="post-link__external" href="http://<?=$data[0]['link'];?>" title="Перейти по ссылке">
+	<a class="post-link__external" href="http://<?=$post['link'];?>" title="Перейти по ссылке">
 	  <div class="post-link__info-wrapper">
 		<div class="post-link__icon-wrapper">
-		  <img src="https://www.google.com/s2/favicons?domain=<?=$data[0]['link'];?>" alt="Иконка">
+		  <img src="https://www.google.com/s2/favicons?domain=<?=$post['link'];?>" alt="Иконка">
 		</div>
 		<div class="post-link__info">
-		  <h3><?=$data[0]['link'];?></h3>
+		  <h3><?=$post['link'];?></h3>
 		</div>
 	  </div>
 	</a>
