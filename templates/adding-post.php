@@ -86,8 +86,12 @@
                                     <?php require 'templates/adding-errors.php'; ?>
 
                                 </div>
-                                <div class="adding-post__input-file-container form__input-container form__input-container--file">
-                                    <input id="userpic-file-photo" type="file" name="userpic-file-photo" title=" ">
+
+                                <div class="adding-post__input-wrapper form__input-wrapper">
+                                    <label class="adding-post__label form__label" for="userpic-file-photo">Выбор файла</label>
+                                    <div class="adding-post__input-file-container form__input-container form__input-container--file">
+                                        <input id="userpic-file-photo" type="file" name="userpic-file-photo" title=" ">
+                                    </div>
                                 </div>
 
                                 <?php require 'templates/adding-publish.php'; ?>
