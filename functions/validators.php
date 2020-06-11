@@ -483,7 +483,7 @@ function validateUrl(?string $name) : array
 /**
  * Валидация полей формы, перенаправление к валидации формы конкретного типа контента
  *
- * @param $con mysqli Объект-соединение с БД
+ * @param mysqli $con Объект-соединение с БД
  * @param  array $post глобальный массив $_POST
  * @param  array $files глобальный массив $_FILES
  *
@@ -520,7 +520,7 @@ function checkFormRegistration(mysqli $con, array $post, array $files) : array
 /**
  * Проверка поля формы "Электронная почта"
  *
- * @param $con mysqli Объект-соединение с БД
+ * @param mysqli $con Объект-соединение с БД
  * @param  string $name
  *
  * @return array массив сообшений об ошибках
@@ -549,7 +549,7 @@ function validateEmail(mysqli $con, ?string $name) : array
 /**
  * Проверка поля формы "Логин"
  *
- * @param $con mysqli Объект-соединение с БД
+ * @param mysqli $con Объект-соединение с БД
  * @param  string $name
  *
  * @return array массив сообшений об ошибках
