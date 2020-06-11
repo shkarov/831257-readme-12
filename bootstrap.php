@@ -10,6 +10,7 @@ ini_set("error_reporting", E_ALL);
 require_once 'functions/template.php';
 require_once 'functions/validators.php';
 require_once 'functions/db.php';
+require_once 'functions/requests.php';
 if (!file_exists('config.php')) {
     exit('Создайте файл config.php на основе config.sample.php и сконфигурируйте его');
 }

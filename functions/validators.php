@@ -132,7 +132,6 @@ function checkForm(array $arr) : array
  *
  * @return array вызов функции для проверки формы данного типа контента, возвращающей массив ошибок
  */
-//function checkForm(?int $type_id, array $post, array $files) : array
 function checkForm(array $post, array $files) : array
 {
     if ($post === []) {
@@ -300,7 +299,7 @@ function validateFilled(?string $name) : bool
  * Проверка поля формы "Заголовок"
  * @param  string $name
  *
- * @return array массив сообшений об ошибоках
+ * @return array массив сообшений об ошибках
  */
 function validateHeading(?string $name) : array
 {
@@ -318,7 +317,7 @@ function validateHeading(?string $name) : array
  * Проверка поля формы "Теги"
  * @param  string $name
  *
- * @return array массив сообшений об ошибоках
+ * @return array массив сообшений об ошибках
  */
 function validateTag(?string $name) : array
 {
@@ -345,7 +344,7 @@ function validateTag(?string $name) : array
  * @param  string $url ссылка на файл в сети
  * @param  array $files глобальный массив $_FILES
  *
- * @return array массив сообшений об ошибоках
+ * @return array массив сообшений об ошибках
  */
 function validateFile(?string $url, array $files = []) : array
 {
@@ -353,8 +352,9 @@ function validateFile(?string $url, array $files = []) : array
 
     $file = $files['userpic-file-photo'];
     if (!empty($file['name'])) {
+        $type = 'Выбор файла.';
         if (!($file['type'] === 'image/jpeg' || $file['type'] === 'image/png' || $file['type'] === 'image/gif')) {
-            $error['report'] = "Файл. Допустимый тип файла JPEG, PNG, GIF.";
+            $error['report'] = $type."Допустимый тип файла JPEG, PNG, GIF.";
             $error['header'] = "Выбран недопустимый тип файла.";
             $error['description'] = "Выберите файл формата JPEG, PNG или GIF.";
         }
@@ -400,7 +400,7 @@ function validateFile(?string $url, array $files = []) : array
  * Проверка поля формы "Youtube ссылка"
  * @param  string $name
  *
- * @return array массив сообшений об ошибоках
+ * @return array массив сообшений об ошибках
  */
 function validateYoutubeLink(?string $name) : array
 {
@@ -426,7 +426,7 @@ function validateYoutubeLink(?string $name) : array
  * Проверка поля формы "Текст"
  * @param string $name
  *
- * @return array массив сообшений об ошибоках
+ * @return array массив сообшений об ошибках
  */
 function validateText(?string $name) : array
 {
@@ -444,7 +444,7 @@ function validateText(?string $name) : array
  * Проверка поля формы "Автор цитаты"
  * @param  string $name
  *
- * @return array массив сообшений об ошибоках
+ * @return array массив сообшений об ошибках
  */
 function validateAuthor(?string $name) : array
 {
@@ -462,7 +462,7 @@ function validateAuthor(?string $name) : array
  * Проверка поля формы "URL ссылка"
  * @param  string $name
  *
- * @return array массив сообшений об ошибоках
+ * @return array массив сообшений об ошибках
  */
 function validateUrl(?string $name) : array
 {
@@ -480,6 +480,159 @@ function validateUrl(?string $name) : array
     return $error;
 }
 
+/**
+ * Валидация полей формы, перенаправление к валидации формы конкретного типа контента
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param  array $post глобальный массив $_POST
+ * @param  array $files глобальный массив $_FILES
+ *
+ * @return array вызов функции для проверки формы данного типа контента, возвращающей массив ошибок
+ */
+function checkFormRegistration(mysqli $con, array $post, array $files) : array
+{
+    if ($post === []) {
+        return $post;
+    }
+    $errors = [];
+    foreach ($post as $key => $value) {
+        switch ($key) {
+            case 'email':
+                $errors[$key] = validateEmail($con, $value);
+                break;
+            case 'login':
+                $errors[$key] = validateLogin($con, $value);
+                break;
+            case 'password':
+                $errors[$key] = validatePassword($value);
+                break;
+            case 'password-repeat':
+                $errors[$key] = validatePasswordRepeat($value, $post['password']);
+                break;
+        }
+    }
+
+    $errors[key($files)] = validateFileAvatar($files);
+
+    return array_filter($errors);
+}
+
+/**
+ * Проверка поля формы "Электронная почта"
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param  string $name
+ *
+ * @return array массив сообшений об ошибках
+ */
+function validateEmail(mysqli $con, ?string $name) : array
+{
+    $error = [];
+    $type = "Электронная почта.";
+    if (validateFilled($name)) {
+        $error['report'] = $type."Это поле должно быть заполнено.";
+        $error['header'] = "Это обязательно поле.";
+        $error['description'] = "Введите адрес электронной почты.";
+
+    } elseif (!filter_var($name, FILTER_VALIDATE_EMAIL)) {
+        $error['report'] = $type."Ошибка адреса электронной почты.";
+        $error['header'] = "Ошибочный email.";
+        $error['description'] = "Введите корректный адрес электронной почты.";
+    } elseif (dbFindEmail($con, $name)) {
+        $error['report'] = $type."Этот адрес электронной почты уже присутствует в нашей базе.";
+        $error['header'] = "Этот email уже используется.";
+        $error['description'] = "Введите другой адрес электронной почты.";
+    }
+    return $error;
+}
+
+/**
+ * Проверка поля формы "Логин"
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param  string $name
+ *
+ * @return array массив сообшений об ошибках
+ */
+function validateLogin(mysqli $con, ?string $name) : array
+{
+    $error = [];
+    $type = "Логин.";
+    if (validateFilled($name)) {
+        $error['report'] = $type."Это поле должно быть заполнено.";
+        $error['header'] = "Это обязательно поле.";
+        $error['description'] = "Введите ваш логин.";
+    } elseif (dbFindLogin($con, $name)) {
+        $error['report'] = $type."Этот логин уже присутствует в нашей базе.";
+        $error['header'] = "Этот логин уже используется.";
+        $error['description'] = "Введите другой логин.";
+    }
+    return $error;
+}
+
+/**
+ * Проверка поля формы "Пароль"
+ * @param  string $name
+ *
+ * @return array массив сообшений об ошибках
+ */
+function validatePassword(?string $name) : array
+{
+    $error = [];
+    $type = "Пароль.";
+    if (validateFilled($name)) {
+        $error['report'] = $type."Это поле должно быть заполнено.";
+        $error['header'] = "Это обязательно поле.";
+        $error['description'] = "Введите ваш пароль.";
+    }
+    return $error;
+}
+
+/**
+ * Проверка поля формы "Повтор пароля"
+ * @param  string $name строка для сравнения
+ * @param  string $nameOrigin строка оригинал
+ *
+ * @return array массив сообшений об ошибках
+ */
+function validatePasswordRepeat(?string $name, ?string $nameOrigin) : array
+{
+    $error = [];
+    $type = "Повтор пароля.";
+    if (validateFilled($name)) {
+        $error['report'] = $type."Это поле должно быть заполнено.";
+        $error['header'] = "Это обязательно поле.";
+        $error['description'] = "Введите ваш пароль.";
+    } elseif ($name !== $nameOrigin) {
+        $error['report'] = $type."Значение в этом поле не совпадает со значением в поле 'Пароль'.";
+        $error['header'] = "Ошибка ввода данных.";
+        $error['description'] = "Введите значение, идентичное значению в поле 'Пароль'.";
+    }
+    return $error;
+}
+
+/**
+ * Проверка поля формы "Выбор аватара"
+ * @param  array $files глобальный массив $_FILES
+ *
+ * @return array массив сообшений об ошибках
+ */
+function validateFileAvatar(array $files) : array
+{
+    $error = [];
+
+    $file = $files[key($files)];
+    if (!empty($file['name'])) {
+        $file_type = mime_content_type($file['tmp_name']);
+        $type = 'Выбор файла.';
+        if (!($file_type === 'image/jpeg' || $file_type === 'image/png' || $file_type === 'image/gif')) {
+            $error['report'] = $type."Допустимый тип файла JPEG, PNG, GIF.";
+            $error['header'] = "Выбран недопустимый тип файла.";
+            $error['description'] = "Выберите файл формата JPEG, PNG или GIF.";
+        }
+    }
+    return $error;
+}
 /*
 //Проверка длины
 function isCorrectLength($name, $min, $max) {

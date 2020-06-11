@@ -137,59 +137,6 @@ function dbGetPosts(mysqli $con, ?int $typeId, ?string $sort) : array
 }
 
 /**
- * Возвращает id типа контента из массива параметров запроса, если такой тип существует, иначе возвращает null
- *
- * @param $arr array массив параметров запроса
- *
- * @return int or null
- */
-function getTypeFromRequest(array $get, array $post = []) : ?int
-{
-    if (isset($get['type_id'])) {
-        return (int) $get['type_id'];
-    } elseif (isset($post['type_id'])) {
-        return (int) $post['type_id'];
-    }
-    return null;
-}
-
-/**
- * Возвращает id поста из массива параметров запроса, если id найден, иначе возвращает null
- *
- * @arr array массив параметров запроса
- *
- * @return int or null
- */
-function getPostIdFromRequest(array $arr) : ?int
-{
-    if (!isset($arr['post_id'])) {
-        return null;
-    }
-    if (!is_numeric($arr['post_id'])) {
-        exit('Некорректный параметр post_id');
-    }
-    return (int) $arr['post_id'];
-}
-
-/**
- * Возвращает признак сортировки из массива параметров запроса, если параметр найден, иначе возвращает null
- *
- * @arr array массив параметров запроса
- *
- * @return int or null
- */
-function getSortFromRequest(array $arr) : ?string
-{
-    if (!isset($arr['sort'])) {
-        return null;
-    }
-    if (!is_string($arr['sort'])) {
-        exit('Некорректный параметр sort');
-    }
-    return $arr['sort'];
-}
-
-/**
  * Отправляет запрос на чтение данных о конкретном посте, к таблицам post, user,content_type в текущей БД и возвращает Ассоциативный массив
  *
  * @param $con mysqli Объект-соединение с БД
@@ -219,19 +166,6 @@ function dbGetSinglePost(mysqli $con, ?int $postId) : array
         exit("Ошибка MySQL: " . mysqli_error($con));
     }
     return mysqli_fetch_assoc($result);
-}
-
-/**
- * Возвращает знавение массива по ключу $key, если такое существует, иначе - пустую строку
- *
- * @param  @arr array ассоциативный массив
- * @param  @key string ключ массива
- *
- * @return string
- */
-function getPostVal(array $arr, string $key) : string
-{
-    return $arr[$key] ?? "";
 }
 
 /**
@@ -507,4 +441,123 @@ function dbWriteTags(mysqli $con, string $input_tags, ?int $post_id ) : void
         }
     }
     return;
+}
+
+/**
+ * Отправляет запрос на поиск записи с полем $email к таблице user
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param string $email адрес электронной почты из формы регистрации
+ *
+ * @return  bool
+ */
+function dbFindEmail(mysqli $con, string $email) : bool
+{
+    $sql = "SELECT id FROM user WHERE email = ?";
+
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 's', $email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if (!$result) {
+        exit("Ошибка MySQL: " . mysqli_error($con));
+    }
+
+    $result_rows = mysqli_num_rows($result);
+
+    return $result_rows === 0 ? false : true;
+}
+
+/**
+ * Отправляет запрос на поиск записи с полем $login к таблице user
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param string $login логин пользователя из формы регистрации
+ *
+ * @return  bool
+ */
+function dbFindLogin(mysqli $con, string $login) : bool
+{
+    $sql = "SELECT id FROM user WHERE login = ?";
+
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 's', $login);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if (!$result) {
+        exit("Ошибка MySQL: " . mysqli_error($con));
+    }
+
+    $result_rows = mysqli_num_rows($result);
+
+    return $result_rows === 0 ? false : true;
+}
+
+/**
+ * Запись нового пользователя в БД
+ *
+ * @param  mysqli $con Объект-соединение с БД
+ * @param  array $post массив с данными создаваемого пользователя
+ * @param  array $files массив с данными о загружаемом аватаре пользователя
+ *
+ * @return array возвращает id добавленного пользователя либо null
+ */
+function dbAddUser(mysqli $con, array $post, array $files) : ?int
+{
+    $user_id = null;
+    if (empty($post)) {
+        return null;
+    }
+
+    $creation_time = date("Y-m-d H:i:s");
+    $email = $post['email'];
+    $login = $post['login'];
+    $password = password_hash($post['password'], PASSWORD_DEFAULT);
+
+    $avatar = savePicture($con, $files);
+
+    $sql = 'INSERT user (creation_time, email, `login`, `password`, avatar) VALUES (?,?,?,?,?)';
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 'sssss', $creation_time, $email, $login, $password, $avatar);
+    mysqli_stmt_execute($stmt);
+    $user_id = mysqli_stmt_insert_id($stmt);
+    mysqli_stmt_close($stmt);
+
+    return $user_id;
+}
+
+/**
+ * Сохранение аватара нового пользователя локально
+ *
+ * @param  mysqli $con Объект-соединение с БД
+ * @param  array $files массив с данными о загружаемом аватаре пользователя
+ *
+ * @return string возвращает относительный путь к загруженному файлу либо null
+ */
+function savePicture(mysqli $con, array $files) : ?string
+{
+    $file = $files[key($files)];
+
+    if (!empty($file['name'])) {
+        $file_path = 'uploads/';
+        //определяем следующий  id пользователя
+        $sql_user_id = 'SELECT max(id) as max_id FROM user';
+        $result = mysqli_query($con, $sql_user_id);
+        $user_id_max = mysqli_fetch_assoc($result);
+        $user_id_next = (int )$user_id_max['max_id'] + 1;
+
+        //формируем новое имя файла
+        $file_name = hash_hmac_file('md5', $file['tmp_name'], (string) $user_id_next);
+        $file_ext = mb_substr($file['type'], mb_strpos($file['type'], '/') + 1);
+        $file_ext = $file_ext === 'jpeg' ? 'jpg' : $file_ext;
+        $picture = $file_path.$file_name.'.'.$file_ext;
+
+        if (!move_uploaded_file($file['tmp_name'], $picture)) {
+            echo "Ошибка перемещения файла";
+            return null;
+        };
+    }
+    return $picture;
 }
