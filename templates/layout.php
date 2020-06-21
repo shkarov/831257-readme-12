@@ -4,7 +4,7 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title><?= $data['title'] ?></title>
+    <title><?= $title ?></title>
     <link rel="stylesheet" href="css/main.css">
 </head>
 <body class="page">
@@ -22,7 +22,7 @@
                 micro blogging
             </p>
         </div>
-        <?php if ($data['is_auth'] === 1) : ?>
+        <?php if ($is_auth === 1) : ?>
             <form class="header__search-form form" action="#" method="get">
                 <div class="header__search">
                     <label class="visually-hidden">Поиск</label>
@@ -40,7 +40,7 @@
 
             <nav class="header__nav">
 
-                <?php if ($data['is_auth'] === 1) : ?>
+                <?php if ($is_auth === 1) : ?>
 
                     <ul class="header__my-nav">
                         <li class="header__my-page header__my-page--popular">
@@ -63,11 +63,11 @@
                         <li class="header__profile">
                             <a class="header__profile-link" href="#">
                                 <div class="header__avatar-wrapper">
-                                    <img class="header__profile-avatar" src="img/userpic-medium.jpg" alt="Аватар профиля">
+                                    <img class="header__profile-avatar" src="<?=$avatar?>">
                                 </div>
                                 <div class="header__profile-name">
                                     <span>
-                                        <!--здесь должно быть имя пользователя-->
+                                        <?= $user ?>
                                     </span>
                                     <svg class="header__link-arrow" width="10" height="6">
                                         <use xlink:href="#icon-arrow-right-ad"></use>
@@ -88,7 +88,7 @@
                                             </a>
                                         </li>
                                         <li class="header__profile-nav-item">
-                                            <a class="header__profile-nav-link" href="#">
+                                            <a class="header__profile-nav-link" href="logout.php">
                                                 <span class="header__profile-nav-text">Выход</span>
                                             </a>
                                         </li>
@@ -101,13 +101,13 @@
                         </li>
                     </ul>
                 <?php endif; ?>
-                <?php if ($data['is_auth'] === 0) : ?>
+                <?php if ($is_auth === 0) : ?>
                     <ul class="header__user-nav">
                         <li class="header__authorization">
                             <a class="header__user-button header__authorization-button button" href="login.html">Вход</a>
                         </li>
                         <li>
-                            <a class="header__user-button header__register-button button <?= $data['title'] === 'readme: регистрация' ? 'header__user-button--active' : '' ?>" href="registration.php">Регистрация</a>
+                            <a class="header__user-button header__register-button button <?= $title === 'readme: регистрация' ? 'header__user-button--active' : '' ?>" href="registration.php">Регистрация</a>
                         </li>
                     </ul>
                 <?php endif; ?>
@@ -118,7 +118,7 @@
     </div>
 </header>
 
-<?= $data['content'] ?>
+<?= $content ?>
 
 <footer class="footer">
     <div class="footer__wrapper">

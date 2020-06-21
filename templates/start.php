@@ -59,25 +59,43 @@
         </section>
         <section class="authorization">
           <h2 class="visually-hidden">Авторизация</h2>
-          <form class="authorization__form form" action="#" method="post">
-            <div class="authorization__input-wrapper form__input-wrapper">
-              <input class="authorization__input authorization__input--login form__input" type="text" name="login" placeholder="Логин">
+          <form class="authorization__form form" action="index.php" method="post">
+            <div class="authorization__input-wrapper form__input-wrapper <?= isset($errors['email']) ? "form__input-section--error" : ""; ?>">
+              <input class="authorization__input authorization__input--login form__input" type="text" name="email" placeholder="Электронная почта" value="<?= getPostVal($_POST, 'email'); ?>">
               <svg class="form__input-icon" width="19" height="18">
                 <use xlink:href="#icon-input-user"></use>
               </svg>
+              <button class="form__error-button button" type="button">!<span class="visually-hidden">Информация об ошибке</span></button>
+<!--
               <label class="visually-hidden">Логин</label>
               <span class="form__error-label form__error-label--login">Неверный логин</span>
+-->
+              <div class="form__error-text">
+                <h3 class="form__error-title"><?= $errors['email']['header'] ?></h3>
+                <p class="form__error-desc"><?= $errors['email']['description'] ?></p>
+              </div>
             </div>
-            <div class="authorization__input-wrapper form__input-wrapper">
-              <input class="authorization__input authorization__input--password form__input" type="password" name="password" placeholder="Пароль">
+
+            <div class="authorization__input-wrapper form__input-wrapper <?= isset($errors['password']) ? "form__input-section--error" : ""; ?>">
+              <input class="authorization__input authorization__input--password form__input" type="password" name="password" placeholder="Пароль" value="<?= getPostVal($_POST, 'password'); ?>">
               <svg class="form__input-icon" width="16" height="20">
                 <use xlink:href="#icon-input-password"></use>
               </svg>
+              <button class="form__error-button button" type="button">!<span class="visually-hidden">Информация об ошибке</span></button>
+<!--
               <label class="visually-hidden">Пароль</label>
               <span class="form__error-label">Пароли не совпадают</span>
+-->
+              <div class="form__error-text">
+                <h3 class="form__error-title"><?= $errors['password']['header'] ?></h3>
+                <p class="form__error-desc"><?= $errors['password']['description'] ?></p>
+              </div>
             </div>
+
             <a class="authorization__recovery" href="#">Восстановить пароль</a>
+
             <button class="authorization__submit button button--main" type="submit">Войти</button>
+
           </form>
         </section>
       </div>

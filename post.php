@@ -2,9 +2,16 @@
 
 require_once 'bootstrap.php';
 
-$is_auth = rand(0, 1);
+session_start();
 
-$user_name = 'Boris';
+if (!isset($_SESSION['login'])) {
+    header('Location: index.php');
+}
+
+$is_auth = 1;
+
+$user_name = $_SESSION['login'];
+$user_avatar = $_SESSION['avatar'];
 
 $postId = getPostIdFromRequest($_GET);
 
@@ -17,6 +24,6 @@ if ($post === []) {
 
 $page_content = include_template("post-details.php", ['post' => $post]);
 
-$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user' => $user_name, 'is_auth' => $is_auth]);
+$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user' => $user_name, 'avatar' => $user_avatar, 'is_auth' => $is_auth]);
 
 print($layout_content);
