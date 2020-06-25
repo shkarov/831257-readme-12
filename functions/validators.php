@@ -661,7 +661,6 @@ function login(mysqli $con, array $post) : array
             $_SESSION['id'] = $user['id'];
             $_SESSION['login'] = $user['login'];
             $_SESSION['avatar'] = $user['avatar'];
-            //header('Location: index.php');
 
         } else {
             $errors['password']['header'] = "Неверный пароль.";

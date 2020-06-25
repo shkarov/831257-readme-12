@@ -22,7 +22,7 @@
                 micro blogging
             </p>
         </div>
-        <?php if ($is_auth === 1) : ?>
+        <?php if (isset($_SESSION['id'])) : ?>
             <form class="header__search-form form" action="#" method="get">
                 <div class="header__search">
                     <label class="visually-hidden">Поиск</label>
@@ -40,16 +40,16 @@
 
             <nav class="header__nav">
 
-                <?php if ($is_auth === 1) : ?>
+                <?php if (isset($_SESSION['id'])) : ?>
 
                     <ul class="header__my-nav">
                         <li class="header__my-page header__my-page--popular">
-                            <a class="header__page-link header__page-link--active" title="Популярный контент">
+                            <a class="header__page-link header__page-link--active" href="popular.php" title="Популярный контент">
                                 <span class="visually-hidden">Популярный контент</span>
                             </a>
                         </li>
                         <li class="header__my-page header__my-page--feed">
-                            <a class="header__page-link" href="feed.html" title="Моя лента">
+                            <a class="header__page-link" href="feed.php" title="Моя лента">
                                 <span class="visually-hidden">Моя лента</span>
                             </a>
                         </li>
@@ -101,7 +101,7 @@
                         </li>
                     </ul>
                 <?php endif; ?>
-                <?php if ($is_auth === 0) : ?>
+                <?php if (!isset($_SESSION['id'])) : ?>
                     <ul class="header__user-nav">
                         <li class="header__authorization">
                             <a class="header__user-button header__authorization-button button" href="login.html">Вход</a>

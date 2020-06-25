@@ -8,8 +8,6 @@ if (!isset($_SESSION['login'])) {
     header('Location: index.php');
 }
 
-$is_auth = 1;
-
 $user_id = $_SESSION['id'];
 $user_name = $_SESSION['login'];
 $user_avatar = $_SESSION['avatar'];
@@ -32,6 +30,6 @@ if ($errors === []) {
     }
 }
 
-$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user' => $user_name, 'avatar' => $user_avatar, 'is_auth' => $is_auth]);
+$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user' => $user_name, 'avatar' => $user_avatar]);
 
 print($layout_content);
