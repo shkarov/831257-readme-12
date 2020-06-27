@@ -529,40 +529,6 @@ function dbAddUser(mysqli $con, array $post, array $files) : ?int
 }
 
 /**
- * Сохранение аватара нового пользователя локально
- *
- * @param  mysqli $con Объект-соединение с БД
- * @param  array $files массив с данными о загружаемом аватаре пользователя
- *
- * @return string возвращает относительный путь к загруженному файлу либо null
- */
-function savePicture(mysqli $con, array $files) : ?string
-{
-    $file = $files[key($files)];
-
-    if (!empty($file['name'])) {
-        $file_path = 'uploads/';
-        //определяем следующий  id пользователя
-        $sql_user_id = 'SELECT max(id) as max_id FROM user';
-        $result = mysqli_query($con, $sql_user_id);
-        $user_id_max = mysqli_fetch_assoc($result);
-        $user_id_next = (int )$user_id_max['max_id'] + 1;
-
-        //формируем новое имя файла
-        $file_name = hash_hmac_file('md5', $file['tmp_name'], (string) $user_id_next);
-        $file_ext = mb_substr($file['type'], mb_strpos($file['type'], '/') + 1);
-        $file_ext = $file_ext === 'jpeg' ? 'jpg' : $file_ext;
-        $picture = $file_path.$file_name.'.'.$file_ext;
-
-        if (!move_uploaded_file($file['tmp_name'], $picture)) {
-            echo "Ошибка перемещения файла";
-            return null;
-        };
-    }
-    return $picture;
-}
-
-/**
  * Отправляет запрос на поиск записи с полем $email к таблице user
  *
  * @param mysqli $con   Объект-соединение с БД
