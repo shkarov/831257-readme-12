@@ -11,16 +11,15 @@ if (!isset($_SESSION['login'])) {
 $user_name = $_SESSION['login'];
 $user_avatar = $_SESSION['avatar'];
 
-$postId = getPostIdFromRequest($_GET);
+$types = dbGetTypes($connect);
 
-$post = dbGetSinglePost($connect, $postId);
+$typeId = getTypeFromRequest($_GET);
 
-if ($post === []) {
-    header("HTTP/1.0 404 Not Found");
-    exit;
-}
+$sort = getSortFromRequest($_GET);
 
-$page_content = include_template("post-details.php", ['post' => $post]);
+$posts = dbGetPosts($connect, $typeId, $sort);
+
+$page_content = include_template("main.php", ['types' => $types, 'posts' => $posts, 'type_id' => $typeId, 'sort' => $sort]);
 
 $layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user' => $user_name, 'avatar' => $user_avatar]);
 

@@ -561,3 +561,99 @@ function savePicture(mysqli $con, array $files) : ?string
     }
     return $picture;
 }
+
+/**
+ * Отправляет запрос на поиск записи с полем $email к таблице user
+ *
+ * @param mysqli $con   Объект-соединение с БД
+ * @param string $email адрес электронной почты из формы регистрации
+ *
+ * @return array ассоциативный массив
+ */
+function dbGetUser(mysqli $con, string $email) : array
+{
+    $sql = "SELECT id, `login`, `password`, avatar FROM user WHERE email = ?";
+
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 's', $email);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if (!$result) {
+        exit("Ошибка MySQL: " . mysqli_error($con));
+    }
+    return mysqli_fetch_assoc($result);
+}
+
+/**
+ * Возвращает список авторов, на которых подписан текущий пользователь
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int $user_id id авторизованного пользователя
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function dbGetSubscribCreatorsList(mysqli $con, int $user_id) : array
+{
+    $sql = "SELECT creator_user_id
+            FROM   subscription
+            WHERE  subscriber_user_id = $user_id";
+
+    $result = mysqli_query($con, $sql);
+    if (!$result) {
+        exit("Ошибка MySQL: " . mysqli_error($con));
+    }
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+/**
+ * Отправляет запрос на чтение к таблицам post, user,content_type в текущей БД и возвращает Ассоциативный массив,
+ * отсортированный по убыванию даты создания поста
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int $user_id id авторизованного пользователя
+ * @param int $type_id (может быть  null) id типа контента
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function dbGetPostsFeed(mysqli $con, int $user_id, ?int $type_id) : array
+{
+    //получаем список авторов, на которых подписан текущий пользователь
+    $subscrubCreators = dbGetSubscribCreatorsList($con, $user_id);
+
+    $arr = [];
+    foreach ($subscrubCreators as $value) {
+
+        $creator_user_id = $value['creator_user_id'];
+
+        $sql = "SELECT p.*, u.login, u.avatar, c.class
+                FROM   post AS p
+                       JOIN user AS u
+                       ON u.id = p.user_id
+                       JOIN content_type AS c
+                       ON c.id = p.content_type_id
+                WHERE  u.id = $creator_user_id";
+
+        if (!is_null($type_id)) {
+            $sql = $sql." && c.id = $type_id";
+        }
+
+        $result = mysqli_query($con, $sql);
+        if (!$result) {
+            exit("Ошибка MySQL: " . mysqli_error($con));
+        }
+
+        $arr[] = mysqli_fetch_all($result, MYSQLI_ASSOC);
+    }
+    //уменьшаем вложенность массива
+    $posts = [];
+    foreach ($arr as $value) {
+        foreach ($value as $item) {
+            $posts[] = $item;
+        }
+    }
+    //сортируем массив по убыванию даты создания поста
+    $postsSort = sortBubbleDescArray($posts, 'creation_time');
+
+    return $postsSort;
+}

@@ -2,8 +2,6 @@
 
 require_once 'bootstrap.php';
 
-$is_auth = 0;
-
 $errors = checkFormRegistration($connect, $_POST, $_FILES);
 
 if ($errors === []) {
@@ -16,6 +14,6 @@ if ($errors === []) {
 
 $page_content = include_template("adding-user.php", ['errors' => $errors]);
 
-$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: регистрация', 'is_auth' => $is_auth]);
+$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: регистрация']);
 
 print($layout_content);

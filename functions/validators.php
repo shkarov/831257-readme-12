@@ -498,7 +498,7 @@ function checkFormRegistration(mysqli $con, array $post, array $files) : array
     foreach ($post as $key => $value) {
         switch ($key) {
             case 'email':
-                $errors[$key] = validateEmail($con, $value);
+                $errors[$key] = validateEmail($con, $value, false);
                 break;
             case 'login':
                 $errors[$key] = validateLogin($con, $value);
@@ -521,7 +521,7 @@ function checkFormRegistration(mysqli $con, array $post, array $files) : array
  * Проверка поля формы "Электронная почта"
  *
  * @param mysqli $con Объект-соединение с БД
- * @param  string $name
+ * @param string $name
  *
  * @return array массив сообшений об ошибках
  */
@@ -550,6 +550,7 @@ function validateEmail(mysqli $con, ?string $name) : array
  * Проверка поля формы "Логин"
  *
  * @param mysqli $con Объект-соединение с БД
+ * @param string $name
  * @param  string $name
  *
  * @return array массив сообшений об ошибках
@@ -633,6 +634,68 @@ function validateFileAvatar(array $files) : array
     }
     return $error;
 }
+
+/**
+ * Аутентификация пользователя
+ *
+ * @param mysqli $con  Объект-соединение с БД*
+ * @param array  $post массив данных формы
+ *
+ * @return array  массив сообшений об ошибках
+ */
+function login(mysqli $con, array $post) : array
+{
+    if ($post === []) {
+        return $post;
+    }
+
+    $errors = validateEmailLogin($con, $post['email']);
+
+    //поле email заполнено без ошибок и такой  email есть в БД
+    if ($errors === []) {
+
+        $user = dbGetUser($con, $post['email']);
+        if (password_verify($post['password'], $user['password'])) {
+
+            session_start();
+
+            $_SESSION['id'] = $user['id'];
+            $_SESSION['login'] = $user['login'];
+            $_SESSION['avatar'] = $user['avatar'];
+
+        } else {
+            $errors['password']['header'] = "Неверный пароль.";
+            $errors['password']['description'] = "Вы ввели неверный пароль.";
+        }
+    }
+    return $errors;
+}
+
+/**
+ * Проверка поля формы "Электронная почта"
+ *
+ * @param mysqli $con  Объект-соединение с БД
+ * @param string $name поле формы
+ *
+ * @return array  массив сообшений об ошибках
+ */
+function validateEmailLogin(mysqli $con, ?string $name) : array
+{
+    $error = [];
+    if (validateFilled($name)) {
+        $error['email']['header'] = "Это обязательно поле.";
+        $error['email']['description'] = "Введите адрес электронной почты.";
+    } elseif (!filter_var($name, FILTER_VALIDATE_EMAIL)) {
+        $error['email']['header'] = "Ошибочный email.";
+        $error['email']['description'] = "Введите корректный адрес электронной почты.";
+    } elseif (!dbFindEmail($con, $name)) {
+        $error['email']['header'] = "Такой email не зарегистрирован.";
+        $error['email']['description'] = "Вы ввели неверный email.";
+    }
+    return $error;
+}
+
+
 /*
 //Проверка длины
 function isCorrectLength($name, $min, $max) {
