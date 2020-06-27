@@ -551,6 +551,7 @@ function validateEmail(mysqli $con, ?string $name) : array
  *
  * @param mysqli $con Объект-соединение с БД
  * @param string $name
+ * @param  string $name
  *
  * @return array массив сообшений об ошибках
  */
