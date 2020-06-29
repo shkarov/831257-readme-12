@@ -623,3 +623,93 @@ function dbGetPostsFeed(mysqli $con, int $user_id, ?int $type_id) : array
 
     return $postsSort;
 }
+
+/**
+ * Отправляет запрос на чтение к таблицам post, user,content_type в текущей БД и
+ * возвращает Ассоциативный массив как результат полнотекстового поиска
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param array  $arr массив параметров запроса
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function dbGetPostsSearch(mysqli $con, array $arr) : array
+{
+    if ($arr === [] || !isset($arr['search_string'])) {
+        return [];
+    }
+    $search_string = trim($arr['search_string']);
+
+    if (empty($search_string)) {
+        return [];
+    }
+
+    if (mb_substr($search_string, 0, 1) === '#') {
+        return dbGetPostsSearchHashtag($con, mb_substr($search_string, 1));
+    }
+
+    return dbGetPostsSearchFulltext($con, $search_string);
+}
+
+/**
+ * Отправляет запрос на чтение к таблицам post, user,content_type в текущей БД и
+ * возвращает Ассоциативный массив как результат полнотекстового поиска
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param string $str строка поиска
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function dbGetPostsSearchFulltext(mysqli $con, string $str) : array
+{
+    $sql = "SELECT p.*, u.login, u.avatar, c.class
+            FROM   post AS p
+                   JOIN user AS u
+                   ON u.id = p.user_id
+                   JOIN content_type AS c
+                   ON c.id = p.content_type_id
+            WHERE  MATCH(heading, `text`) AGAINST(?)";
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$str]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+/**
+ * Отправляет запрос на чтение к таблицам post, user,content_type в текущей БД и
+ * возвращает Ассоциативный массив как результат поиска по хэштегу
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param string $str строка поиска
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function dbGetPostsSearchHashtag(mysqli $con, string $str) : array
+{
+    $sql = "SELECT p.*, u.login, u.avatar, c.class
+            FROM   post AS p
+                   JOIN user AS u
+                   ON u.id = p.user_id
+                   JOIN content_type AS c
+                   ON c.id = p.content_type_id
+            WHERE  p.id IN (
+
+                   SELECT p.id
+                   FROM   post_hashtag AS ph
+                          JOIN hashtag AS h
+                          ON ph.hashtag_id = h.id
+                          JOIN post AS p
+                          ON ph.post_id = p.id
+                   WHERE  h.name = ?
+                  )
+
+            ORDER BY p.creation_time DESC";
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$str]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
