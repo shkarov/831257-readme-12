@@ -538,7 +538,7 @@ function dbAddUser(mysqli $con, array $post, array $files) : ?int
  */
 function dbGetUser(mysqli $con, string $email) : array
 {
-    $sql = "SELECT id, `login`, `password`, avatar FROM user WHERE email = ?";
+    $sql = "SELECT id, `login`, `password`, avatar, creation_time, subscribers, posts FROM user WHERE email = ?";
 
     $stmt = mysqli_prepare($con, $sql);
     mysqli_stmt_bind_param($stmt, 's', $email);
@@ -629,16 +629,13 @@ function dbGetPostsFeed(mysqli $con, int $user_id, ?int $type_id) : array
  * возвращает Ассоциативный массив как результат полнотекстового поиска
  *
  * @param mysqli $con Объект-соединение с БД
- * @param array  $arr массив параметров запроса
+ * @param string $search строка поиска
  *
  * @return array Ассоциативный массив Результат запроса
  */
-function dbGetPostsSearch(mysqli $con, array $arr) : array
+function dbGetPostsSearch(mysqli $con, string $search) : array
 {
-    if ($arr === [] || !isset($arr['search_string'])) {
-        return [];
-    }
-    $search_string = trim($arr['search_string']);
+    $search_string = trim($search);
 
     if (empty($search_string)) {
         return [];

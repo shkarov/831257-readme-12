@@ -11,7 +11,7 @@ if (!isset($_SESSION['login'])) {
 $user_name = $_SESSION['login'];
 $user_avatar = $_SESSION['avatar'];
 
-$posts = dbGetPostsSearch($connect, $_GET);
+$posts = isset($_GET['search_string']) ? dbGetPostsSearch($connect, $_GET['search_string']) : [];
 
 $template = ($posts === []) ? "no-results.php" : "search-results.php";
 
