@@ -94,6 +94,12 @@ CREATE TABLE IF NOT EXISTS `readme`.`post` (
 ENGINE = InnoDB
 COMMENT = 'Состоит из заголовка и содержимого. Набор полей, которые будут заполнены, зависит от выбранного типа.';
 
+-- -----------------------------------------------------
+-- Fulltext index, Table `readme`.`post`
+-- -----------------------------------------------------
+
+CREATE FULLTEXT INDEX ft_post_search ON post(heading, `text`);
+
 
 -- -----------------------------------------------------
 -- Table `readme`.`comment`

@@ -529,40 +529,6 @@ function dbAddUser(mysqli $con, array $post, array $files) : ?int
 }
 
 /**
- * Сохранение аватара нового пользователя локально
- *
- * @param  mysqli $con Объект-соединение с БД
- * @param  array $files массив с данными о загружаемом аватаре пользователя
- *
- * @return string возвращает относительный путь к загруженному файлу либо null
- */
-function savePicture(mysqli $con, array $files) : ?string
-{
-    $file = $files[key($files)];
-
-    if (!empty($file['name'])) {
-        $file_path = 'uploads/';
-        //определяем следующий  id пользователя
-        $sql_user_id = 'SELECT max(id) as max_id FROM user';
-        $result = mysqli_query($con, $sql_user_id);
-        $user_id_max = mysqli_fetch_assoc($result);
-        $user_id_next = (int )$user_id_max['max_id'] + 1;
-
-        //формируем новое имя файла
-        $file_name = hash_hmac_file('md5', $file['tmp_name'], (string) $user_id_next);
-        $file_ext = mb_substr($file['type'], mb_strpos($file['type'], '/') + 1);
-        $file_ext = $file_ext === 'jpeg' ? 'jpg' : $file_ext;
-        $picture = $file_path.$file_name.'.'.$file_ext;
-
-        if (!move_uploaded_file($file['tmp_name'], $picture)) {
-            echo "Ошибка перемещения файла";
-            return null;
-        };
-    }
-    return $picture;
-}
-
-/**
  * Отправляет запрос на поиск записи с полем $email к таблице user
  *
  * @param mysqli $con   Объект-соединение с БД
@@ -572,7 +538,7 @@ function savePicture(mysqli $con, array $files) : ?string
  */
 function dbGetUser(mysqli $con, string $email) : array
 {
-    $sql = "SELECT id, `login`, `password`, avatar FROM user WHERE email = ?";
+    $sql = "SELECT id, `login`, `password`, avatar, creation_time, subscribers, posts FROM user WHERE email = ?";
 
     $stmt = mysqli_prepare($con, $sql);
     mysqli_stmt_bind_param($stmt, 's', $email);
@@ -656,4 +622,91 @@ function dbGetPostsFeed(mysqli $con, int $user_id, ?int $type_id) : array
     $postsSort = sortBubbleDescArray($posts, 'creation_time');
 
     return $postsSort;
+}
+
+/**
+ * Отправляет запрос на чтение к таблицам post, user,content_type в текущей БД и
+ * возвращает Ассоциативный массив как результат полнотекстового поиска
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param string $search строка поиска
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function dbGetPostsSearch(mysqli $con, string $search) : array
+{
+    $search_string = trim($search);
+
+    if (empty($search_string)) {
+        return [];
+    }
+
+    if (mb_substr($search_string, 0, 1) === '#') {
+        return dbGetPostsSearchHashtag($con, mb_substr($search_string, 1));
+    }
+
+    return dbGetPostsSearchFulltext($con, $search_string);
+}
+
+/**
+ * Отправляет запрос на чтение к таблицам post, user,content_type в текущей БД и
+ * возвращает Ассоциативный массив как результат полнотекстового поиска
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param string $str строка поиска
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function dbGetPostsSearchFulltext(mysqli $con, string $str) : array
+{
+    $sql = "SELECT p.*, u.login, u.avatar, c.class
+            FROM   post AS p
+                   JOIN user AS u
+                   ON u.id = p.user_id
+                   JOIN content_type AS c
+                   ON c.id = p.content_type_id
+            WHERE  MATCH(heading, `text`) AGAINST(?)";
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$str]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+/**
+ * Отправляет запрос на чтение к таблицам post, user,content_type в текущей БД и
+ * возвращает Ассоциативный массив как результат поиска по хэштегу
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param string $str строка поиска
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function dbGetPostsSearchHashtag(mysqli $con, string $str) : array
+{
+    $sql = "SELECT p.*, u.login, u.avatar, c.class
+            FROM   post AS p
+                   JOIN user AS u
+                   ON u.id = p.user_id
+                   JOIN content_type AS c
+                   ON c.id = p.content_type_id
+            WHERE  p.id IN (
+
+                   SELECT p.id
+                   FROM   post_hashtag AS ph
+                          JOIN hashtag AS h
+                          ON ph.hashtag_id = h.id
+                          JOIN post AS p
+                          ON ph.post_id = p.id
+                   WHERE  h.name = ?
+                  )
+
+            ORDER BY p.creation_time DESC";
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$str]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
