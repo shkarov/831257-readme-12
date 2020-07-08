@@ -2,76 +2,69 @@
 
 require_once 'bootstrap.php';
 
-session_start();
-
 if (!isset($_SESSION['login'])) {
     header('Location: /');
 }
 
-$user_name = $_SESSION['login'];
-$user_avatar = $_SESSION['avatar'];
-$user_creatin_time = $_SESSION['creation_time'];
-$user_posts_count = $_SESSION['posts'];
-$user_subscribers = $_SESSION['subscribers'];
+$user_id_login = $_SESSION['id'];
+$user_name_login = $_SESSION['login'];
+$user_avatar_login = $_SESSION['avatar'];
 
-$types = dbGetTypes($connect);
+$user = dbGetUserById($connect, (int) $_GET['user_id']);
 
-$typeId = getTypeFromRequest($_GET);
+//профиль текущего пользователя
+if ($user['id'] === $user_id_login) {
+    $user_id = $_SESSION['id'];
+    $user_name = $_SESSION['login'];
+    $user_avatar = $_SESSION['avatar'];
+    $user_creation_time = $_SESSION['creation_time_user'];
+    $user_posts_count = $_SESSION['posts'];
+    $user_subscribers = $_SESSION['subscribers'];
+    $subscribe = false;
+} else {
+    //профиль НЕ текущего пользователя
+    $user_id = $user['id'];
+    $user_name = $user['login'];
+    $user_avatar = $user['avatar'];
+    $user_creation_time = $user['creation_time'];
+    $user_posts_count = $user['posts'];
+    $user_subscribers = $user['subscribers'];
 
-//$sort = getSortFromRequest($_GET);
+    // проверка наличия подписки
+    $subscribe = dbFindSubscribe($connect, $user_id, $user_id_login);
+}
 
-//$posts = dbGetPostsUser($connect, $typeId, $sort);
+// кликнута иконка лайк и профиль НЕ текущего пользователя
+if (isset($_GET['like_onClick']) && $user_id != $user_id_login) {
+    $post_id = (int) $_GET['post_id'];
+    // нет такого лайка в БД
+    if (!dbFindLike($connect, $post_id, $user_id)) {
+        if (dbAddLike($connect, $post_id, $user_id)) {
+            $referer = $_SERVER['HTTP_REFERER'];
+            header('Location: '.$referer);
+        }
+    }
+}
 
-//$page_content = include_template("profile-details.php", ['types' => $types, 'posts' => $posts, 'type_id' => $typeId, 'sort' => $sort]);
-$page_content = '';
+// Нажата кнопка Подписаться/Отписаться
+if (isset($_GET['subscribeButton_onClick'])) {
+    //профиль НЕ текущего пользователя
+    if ($user_id != $user_id_login) {
+        if ($subscribe) {
+            dbDelSubscribe($connect, $user_id, $user_id_login);
+        } else {
+            dbAddSubscribe($connect, $user_id, $user_id_login);
+        }
+        $url = "profile.php?user_id="."$user_id";
+        header('Location: '.$url);
+    }
+}
 
-$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: профиль', 'user' => $user_name, 'avatar' => $user_avatar,
-                                    'creatin_time' => $user_creatin_time, 'user_posts_count' => $user_posts_count, 'user_subscribers' => $user_subscribers]);
+$posts = dbGetUserPosts($connect, $user_id);
+
+$page_content = include_template("profile-posts.php", ['posts' => $posts, 'user_id' => $user_id, 'user' => $user_name, 'avatar' => $user_avatar,
+                                'user_creation_time' => $user_creation_time, 'posts_count' => $user_posts_count, 'subscribers' => $user_subscribers, 'subscribe' => $subscribe]);
+
+$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: профиль', 'user_id' => $user_id_login, 'user' => $user_name_login, 'avatar' => $user_avatar_login]);
 
 print($layout_content);
-
-
-
-/**
- * Отправляет запрос на чтение к таблицам post, user,content_type в текущей БД и возвращает Ассоциативный массив
- *
- * @param $con mysqli Объект-соединение с БД
- * @param $typeId int (может быть  null) id типа контента
- * @param $sort string (может быть  null) вид сортировки
- *
- * @return array Ассоциативный массив Результат запроса
- */
-function dbGetPostsUser(mysqli $con, ?int $typeId, ?string $sort) : array
-{
-    $sql = "SELECT p.*, u.*, c.class
-            FROM   post AS p
-                   JOIN user AS u
-                   ON u.id = p.user_id
-                   JOIN content_type AS c
-                   ON c.id = p.content_type_id";
-
-
-    if (!is_null($typeId)) {
-        $sql = $sql." WHERE c.id = ?";
-    }
-
-    if (is_null($sort)) {
-        $sort = 'views';
-    }
-
-    $sql = $sql." ORDER BY p.".$sort." DESC";
-
-    if (!is_null($typeId)) {
-        $stmt = db_get_prepare_stmt($con, $sql, [$typeId]);
-        mysqli_stmt_execute($stmt);
-        $result = mysqli_stmt_get_result($stmt);
-    } else {
-        $result = mysqli_query($con, $sql);
-    }
-
-    if (!$result) {
-        exit("Ошибка MySQL: " . mysqli_error($con));
-    }
-
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
-}

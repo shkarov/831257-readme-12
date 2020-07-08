@@ -175,12 +175,13 @@ function textTrim(string $text, int $lengthMax = 300) : string
 /**
  * Возращает строку, соответствующую временному промежутку между параметром и текущей датой
  *
- * @param string $date - Дата в текстовом представлении
+ * @param string $date Дата в текстовом представлении
+ * @param string $phraseEnding Окончание фразы
  *
  * @return string - Строка вида “% месяцев назад”
  *
  */
-function dateDifferent(string $date) : string
+function dateDifferent(string $date, string $phraseEnding = "назад") : string
 {
     $markPost = strtotime($date);
     $markNow = time();
@@ -195,24 +196,27 @@ function dateDifferent(string $date) : string
     if ($markDiff/60 < 60) {
         //если до текущего времени прошло меньше 60 минут, то формат будет вида “% минут назад”;
         $numDiff = round($markDiff/60);
-        $interval = "$numDiff ".get_noun_plural_form($numDiff, "минута", "минуты", "минут")." назад";
+        $interval = "$numDiff ".get_noun_plural_form($numDiff, "минута", "минуты", "минут");
     } elseif ($markDiff/3600 < 24) {
         //если до текущего времени прошло больше 60 минут, но меньше 24 часов, то формат будет вида “% часов назад”;
         $numDiff = round($markDiff/3600);
-        $interval = "$numDiff ".get_noun_plural_form($numDiff, "час", "часа", "часов")." назад";
+        $interval = "$numDiff ".get_noun_plural_form($numDiff, "час", "часа", "часов");
     } elseif ($markDiff/86400 < 7) {
         //если до текущего времени прошло больше 24 часов, но меньше 7 дней, то формат будет вида “% дней назад”;
         $numDiff = round($markDiff/86400);
-        $interval = "$numDiff ".get_noun_plural_form($numDiff, "день", "дня", "дней")." назад";
+        $interval = "$numDiff ".get_noun_plural_form($numDiff, "день", "дня", "дней");
     } elseif ($markDiff/(86400*7) < 5) {
         //если до текущего времени прошло больше 7 дней, но меньше 5 недель, то формат будет вида “% недель назад”;
         $numDiff = round($markDiff/(86400*7));
-        $interval = "$numDiff ".get_noun_plural_form($numDiff, "неделя", "недели", "недель")." назад";
+        $interval = "$numDiff ".get_noun_plural_form($numDiff, "неделя", "недели", "недель");
+    } elseif ($markDiff/(86400*7*4) < 12) {
+        //если до текущего времени прошло больше 4 недель, то формат будет вида “% месяцев назад”.
+        $interval = $dateDiff->format('%m')." ".get_noun_plural_form((int) $dateDiff->format('%m'), "месяц", "месяца", "месяцев");
     } else {
-        //если до текущего времени прошло больше 5 недель, то формат будет вида “% месяцев назад”.
-        $interval = $dateDiff->format('%m')." ".get_noun_plural_form((int) $dateDiff->format('%m'), "месяц", "месяца", "месяцев")." назад";
+        //если до текущего времени прошло больше 12 месяцев, то формат будет вида “% лет назад”.
+        $interval = $dateDiff->format('%y')." ".get_noun_plural_form((int) $dateDiff->format('%y'), "год", "года", "лет");
     }
-    return $interval;
+    return $interval." ".$phraseEnding;
 }
 
 /**

@@ -2,10 +2,8 @@
 
 require_once 'bootstrap.php';
 
-session_start();
-
 if (!isset($_SESSION['login'])) {
-    header('Location: index.php');
+    header('Location: /');
 }
 
 $user_id = $_SESSION['id'];
@@ -30,6 +28,6 @@ if ($errors === []) {
     }
 }
 
-$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user' => $user_name, 'avatar' => $user_avatar]);
+$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user_id' => $user_id, 'user' => $user_name, 'avatar' => $user_avatar]);
 
 print($layout_content);

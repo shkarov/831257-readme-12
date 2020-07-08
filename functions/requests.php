@@ -2,7 +2,7 @@
 
 /**
  * Возвращает id типа контента из массива параметров запроса, если такой тип существует, иначе возвращает null
- *
+ * ('type_id' == 0  равноценно null)
  * @param array $get массив параметров запроса
  * @param array $post массив параметров запроса
  *
@@ -11,7 +11,7 @@
 function getTypeFromRequest(array $get, array $post = []) : ?int
 {
     if (isset($get['type_id'])) {
-        return (int) $get['type_id'];
+        return empty($get['type_id']) ? null : (int) $get['type_id'];
     } elseif (isset($post['type_id'])) {
         return (int) $post['type_id'];
     }
@@ -21,20 +21,21 @@ function getTypeFromRequest(array $get, array $post = []) : ?int
 /**
  * Возвращает id поста из массива параметров запроса, если id найден, иначе возвращает null
  *
- * @param array $arr массив параметров запроса
+ * @param array $get массив параметров запроса
+ * @param array $post массив параметров запроса
  *
  * @return int or null
  */
-function getPostIdFromRequest(array $arr) : ?int
+function getPostIdFromRequest(array $get, array $post = []) : ?int
 {
-    if (!isset($arr['post_id'])) {
-        return null;
+    if (isset($get['post_id'])) {
+        return (int) $get['post_id'];
+    } elseif (isset($post['post_id'])) {
+        return (int) $post['post_id'];
     }
-    if (!is_numeric($arr['post_id'])) {
-        exit('Некорректный параметр post_id');
-    }
-    return (int) $arr['post_id'];
+    return null;
 }
+
 
 /**
  * Возвращает признак сортировки из массива параметров запроса, если параметр найден, иначе возвращает null
@@ -45,13 +46,7 @@ function getPostIdFromRequest(array $arr) : ?int
  */
 function getSortFromRequest(array $arr) : ?string
 {
-    if (!isset($arr['sort'])) {
-        return null;
-    }
-    if (!is_string($arr['sort'])) {
-        exit('Некорректный параметр sort');
-    }
-    return $arr['sort'];
+    return empty($arr['sort']) ? null : $arr['sort'];
 }
 
 /**

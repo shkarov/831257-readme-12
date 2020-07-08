@@ -19,3 +19,5 @@ if (!file_exists('config.php')) {
 $config = require 'config.php';
 
 $connect =  dbConnect($config);
+
+session_start();

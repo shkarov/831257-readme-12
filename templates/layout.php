@@ -78,7 +78,7 @@
                                 <div class="header__profile-tooltip">
                                     <ul class="header__profile-nav">
                                         <li class="header__profile-nav-item">
-                                            <a class="header__profile-nav-link" href="profile.php">
+                                            <a class="header__profile-nav-link" href="profile.php?user_id=<?= $user_id ?>">
                                                 <span class="header__profile-nav-text">Мой профиль</span>
                                             </a>
                                         </li>
@@ -104,7 +104,7 @@
                 <?php if (!isset($_SESSION['id'])) : ?>
                     <ul class="header__user-nav">
                         <li class="header__authorization">
-                            <a class="header__user-button header__authorization-button button" href="login.html">Вход</a>
+                            <a class="header__user-button header__authorization-button button" href="/">Вход</a>
                         </li>
                         <li>
                             <a class="header__user-button header__register-button button <?= $title === 'readme: регистрация' ? 'header__user-button--active' : '' ?>" href="registration.php">Регистрация</a>

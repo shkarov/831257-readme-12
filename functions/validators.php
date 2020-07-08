@@ -65,66 +65,6 @@ function embed_youtube_video(?string $youtube_url) : bool
 }
 
 /**
- * Валидация полей формы
- * @param  array $arr Ассоциативный массив, переданный из формы методом post
- *
- * @return array массив сообшений об ошибоках
- */
-/*
-function checkForm(array $arr) : array
-{
-    if ($arr === []) {
-        return $arr;
-    }
-
-    $errors = [];
-    $rules = [
-        'photo-heading' => function($arr) {
-            return validateHeading($arr['photo-heading']);
-        },
-        'video-heading' => function($arr) {
-            return validateHeading($arr['video-heading']);
-        },
-        'video-url' => function($arr) {
-            return validateYoutubeLink($arr['video-url']);
-        },
-        'text-heading' => function($arr) {
-            return validateHeading($arr['text-heading']);
-        },
-        'text-text' => function($arr) {
-            return validateText($arr['text-text']);
-        },
-        'quote-heading' => function($arr) {
-            return validateHeading($arr['quote-heading']);
-        },
-        'quote-text' => function($arr) {
-            return validateText($arr['quote-text']);
-        },
-        'quote-author' => function($arr) {
-            return validateAuthor($arr['quote-author']);
-        },
-        'link-heading' => function($arr) {
-            return validateHeading($arr['link-heading']);
-        },
-        'link-url' => function($arr) {
-            return validateUrl($arr['link-url']);
-        }
-    ];
-
-    foreach ($arr as $key => $value) {
-        if (isset($rules[$key])) {
-            $rule = $rules[$key];
-            $errors[$key] = $rule($arr);
-        }
-    }
-
-    $errors = array_filter($errors);
-
-    return $errors;
-}
-*/
-
-/**
  * Валидация полей формы, перенаправление к валидации формы конкретного типа контента
  *
  * @param  array $post глобальный массив $_POST
@@ -654,15 +594,13 @@ function login(mysqli $con, array $post) : array
     //поле email заполнено без ошибок и такой  email есть в БД
     if ($errors === []) {
 
-        $user = dbGetUser($con, $post['email']);
+        $user = dbGetUserByEmail($con, $post['email']);
         if (password_verify($post['password'], $user['password'])) {
-
-            session_start();
 
             $_SESSION['id'] = $user['id'];
             $_SESSION['login'] = $user['login'];
             $_SESSION['avatar'] = $user['avatar'];
-            $_SESSION['creation_time'] = $user['creation_time'];
+            $_SESSION['creation_time_user'] = $user['creation_time'];
             $_SESSION['posts'] = $user['posts'];
             $_SESSION['subscribers'] = $user['subscribers'];
 
@@ -699,19 +637,43 @@ function validateEmailLogin(mysqli $con, ?string $name) : array
 }
 
 
-/*
+/**
+ * Валидация поля формы Комментарий
+ * @param  array $arr Ассоциативный массив, переданный из формы методом post
+ *
+ * @return array массив ошибок
+ */
+function checkFormComment(array $arr) : array
+{
+    $error = [];
+    // min и max длина текста
+    $minlength = 4;
+    $maxlength = 70;
+
+    if (isset($arr['comment'])) {
+        if (validateFilled($arr['comment'])) {
+            $error['comment']['header'] = "Это обязательно поле.";
+            $error['comment']['description'] = "Введите текст сообщения.";
+        } elseif (!isCorrectLength($arr['comment'], $minlength, $maxlength)) {
+            $error['comment']['header'] = "Длина текста не соответствует требованиям.";
+            $error['comment']['description'] = "Допустимая длина текста от 4 до 70 знаков.";
+        }
+    }
+    return $error;
+}
+
+/**
+ * Проверка длины поля
+ *
+ * @param string $name Проверяемая строка
+ * @param int $min Минимальная длина
+ * @param int $max Максимальная длина
+ *
+ * @return bool
+ */
 //Проверка длины
-function isCorrectLength($name, $min, $max) {
-    $len = strlen($_POST[$name]);
-
-    if ($len < $min or $len > $max) {
-        return "Значение должно быть от $min до $max символов";
-    }
+function isCorrectLength(string $name, int $min, int $max) : bool
+{
+    $len = strlen(trim($name));
+    return ($len >= $min && $len <= $max);
 }
-
-function validateEmail($name) {
-    if (!filter_input(INPUT_POST, $name, FILTER_VALIDATE_EMAIL)) {
-        return "Введите корректный email";
-    }
-}
-*/
