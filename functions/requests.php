@@ -36,17 +36,20 @@ function getPostIdFromRequest(array $get, array $post = []) : ?int
     return null;
 }
 
-
 /**
- * Возвращает признак сортировки из массива параметров запроса, если параметр найден, иначе возвращает null
+ * Возвращает имя поля в БД, по которому будет производится сортировка данных в запросе
  *
  * @param array $arr массив параметров запроса
  *
- * @return int or null
+ * @return string
  */
-function getSortFromRequest(array $arr) : ?string
+function getSortFromRequest(array $arr) : string
 {
-    return empty($arr['sort']) ? null : $arr['sort'];
+    if (!isSortValid($arr)) {
+        exit('Некорректный параметр sort');
+    }
+
+    return empty($arr['sort']) ? 'views' : $arr['sort'];
 }
 
 /**

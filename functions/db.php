@@ -103,7 +103,7 @@ function dbGetTypes(mysqli $con) : array
  *
  * @return array Ассоциативный массив Результат запроса
  */
-function dbGetPostsPopular(mysqli $con, ?int $typeId, ?string $sort, int $page, int $limit) : array
+function dbGetPostsPopular(mysqli $con, ?int $typeId, string $sort, int $page, int $limit) : array
 {
     $offset = ($page - 1) * $limit;
 
@@ -119,9 +119,9 @@ function dbGetPostsPopular(mysqli $con, ?int $typeId, ?string $sort, int $page, 
         $sql = $sql." WHERE c.id = ?";
     }
 
-    if (is_null($sort)) {
-        $sort = 'views';
-    }
+//    if (is_null($sort)) {
+//        $sort = 'views';
+//    }
 
     $sql = $sql." ORDER BY p.".$sort." DESC";
     $sql = $sql." LIMIT ".$limit." OFFSET ".$offset;
@@ -151,7 +151,7 @@ function dbGetPostsPopular(mysqli $con, ?int $typeId, ?string $sort, int $page, 
  * @return int
  *
  */
-function dbGetPostsPopularCount(mysqli $con, ?int $typeId, ?string $sort) : int
+function dbGetPostsPopularCount(mysqli $con, ?int $typeId, string $sort) : int
 {
     $sql = "SELECT COUNT(*) AS count_posts
             FROM   post AS p
@@ -164,9 +164,9 @@ function dbGetPostsPopularCount(mysqli $con, ?int $typeId, ?string $sort) : int
         $sql = $sql." WHERE c.id = ?";
     }
 
-    if (is_null($sort)) {
-        $sort = 'views';
-    }
+//    if (is_null($sort)) {
+//        $sort = 'views';
+//    }
 
     $sql = $sql." ORDER BY p.".$sort." DESC";
 

@@ -671,9 +671,22 @@ function checkFormComment(array $arr) : array
  *
  * @return bool
  */
-//Проверка длины
 function isCorrectLength(string $name, int $min, int $max) : bool
 {
     $len = strlen(trim($name));
     return ($len >= $min && $len <= $max);
+}
+
+/**
+ * Проверка соответствия типа сортировки допустимому значению
+ *
+ * @param  array $arr Ассоциативный массив, переданный из формы методом get
+ *
+ * @return bool
+ */
+function isSortValid(array $arr) : bool
+{
+    $sort_types = [null, '', 'likes', 'creation_time'];
+
+    return (isset($arr['sort']) && !in_array($arr['sort'], $sort_types)) ? false : true;
 }
