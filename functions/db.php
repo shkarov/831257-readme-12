@@ -97,7 +97,7 @@ function dbGetTypes(mysqli $con) : array
  *
  * @param mysqli $con  Объект-соединение с БД
  * @param int    $typeId  (может быть  null) id типа контента
- * @param string $sort  (может быть  null) вид сортировки
+ * @param string $sort вид сортировки
  * @param int    $page  номер страницы для вывода результатов запросв
  * @param int    $limit количество постов на странице
  *
@@ -118,10 +118,6 @@ function dbGetPostsPopular(mysqli $con, ?int $typeId, string $sort, int $page, i
     if (!is_null($typeId)) {
         $sql = $sql." WHERE c.id = ?";
     }
-
-//    if (is_null($sort)) {
-//        $sort = 'views';
-//    }
 
     $sql = $sql." ORDER BY p.".$sort." DESC";
     $sql = $sql." LIMIT ".$limit." OFFSET ".$offset;
@@ -146,7 +142,7 @@ function dbGetPostsPopular(mysqli $con, ?int $typeId, string $sort, int $page, i
  *
  * @param mysqli $con  Объект-соединение с БД
  * @param int    $typeId  (может быть  null) id типа контента
- * @param string $sort  (может быть  null) вид сортировки
+ * @param string $sort вид сортировки
  *
  * @return int
  *
@@ -163,10 +159,6 @@ function dbGetPostsPopularCount(mysqli $con, ?int $typeId, string $sort) : int
     if (!is_null($typeId)) {
         $sql = $sql." WHERE c.id = ?";
     }
-
-//    if (is_null($sort)) {
-//        $sort = 'views';
-//    }
 
     $sql = $sql." ORDER BY p.".$sort." DESC";
 
