@@ -47,7 +47,7 @@
               <form class="comments__form form" action="post.php" method="post">
                 <input type="hidden" name="post_id" value="<?=$post['id'];?>">
                 <div class="comments__my-avatar">
-                  <img class="comments__picture" src="<?=$user_login_avatar;?>" alt="Аватар пользователя">
+                  <img class="comments__picture <?=empty($user_login_avatar) ? 'visually-hidden' : '' ?>" src="<?=$user_login_avatar;?>" alt="Аватар пользователя">
                 </div>
                 <div class="form__input-section <?= isset($errors['comment']) ? "form__input-section--error" : ""; ?>">
                   <textarea class="comments__textarea form__textarea form__input" name="comment" placeholder="Ваш комментарий"><?= getPostVal($_POST, 'comment'); ?></textarea>
@@ -67,7 +67,7 @@
                   <li class="comments__item user">
                     <div class="comments__avatar">
                       <a class="user__avatar-link" href="#">
-                        <img class="comments__picture" src="<?= $comment['avatar'] ?>" alt="Аватар пользователя">
+                        <img class="comments__picture <?=empty($comment['avatar']) ? 'visually-hidden' : '' ?>" src="<?= $comment['avatar'] ?>" alt="Аватар пользователя">
                       </a>
                     </div>
                     <div class="comments__info">
@@ -102,7 +102,7 @@
             <div class="post-details__user-info user__info">
               <div class="post-details__avatar user__avatar">
                 <a class="post-details__avatar-link user__avatar-link" href="profile.php?user_id=<?= $post['user_id'] ?>">
-                  <img class="post-details__picture user__picture" src="<?= $post['avatar'] ?>" alt="Аватар пользователя">
+                  <img class="post-details__picture user__picture <?=empty($post['avatar']) ? 'visually-hidden' : '' ?>" src="<?= $post['avatar'] ?>" alt="Аватар пользователя">
                 </a>
               </div>
               <div class="post-details__name-wrapper user__name-wrapper">
