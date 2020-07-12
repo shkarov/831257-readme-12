@@ -12,7 +12,7 @@
 
             <div class="post__indicators">
               <div class="post__buttons">
-                <a class="post__indicator post__indicator--likes button" href="#" title="Лайк">
+                <a class="post__indicator post__indicator--likes button" href="post.php?post_id=<?= $post['id'];?> & like_onClick" title="Лайк">
                   <svg class="post__indicator-icon" width="20" height="17">
                     <use xlink:href="#icon-heart"></use>
                   </svg>
@@ -42,65 +42,58 @@
               ?>
               <span class="post__view"><?= $views;?></span>
             </div>
+
             <div class="comments">
-              <form class="comments__form form" action="#" method="post">
+              <form class="comments__form form" action="post.php" method="post">
+                <input type="hidden" name="post_id" value="<?=$post['id'];?>">
                 <div class="comments__my-avatar">
-                  <img class="comments__picture" src="img/userpic-medium.jpg" alt="Аватар пользователя">
+                  <img class="comments__picture <?=empty($user_login_avatar) ? 'visually-hidden' : '' ?>" src="<?=$user_login_avatar;?>" alt="Аватар пользователя">
                 </div>
-                <div class="form__input-section form__input-section--error">
-                  <textarea class="comments__textarea form__textarea form__input" placeholder="Ваш комментарий"></textarea>
+                <div class="form__input-section <?= isset($errors['comment']) ? "form__input-section--error" : ""; ?>">
+                  <textarea class="comments__textarea form__textarea form__input" name="comment" placeholder="Ваш комментарий"><?= getPostVal($_POST, 'comment'); ?></textarea>
                   <label class="visually-hidden">Ваш комментарий</label>
                   <button class="form__error-button button" type="button">!</button>
                   <div class="form__error-text">
-                    <h3 class="form__error-title">Ошибка валидации</h3>
-                    <p class="form__error-desc">Это поле обязательно к заполнению</p>
+                    <h3 class="form__error-title"><?= $errors['comment']['header'] ?></h3>
+                    <p class="form__error-desc"><?= $errors['comment']['description'] ?></p>
                   </div>
                 </div>
                 <button class="comments__submit button button--green" type="submit">Отправить</button>
               </form>
               <div class="comments__list-wrapper">
                 <ul class="comments__list">
+
+                 <?php foreach ($comments as $comment) : ?>
                   <li class="comments__item user">
                     <div class="comments__avatar">
                       <a class="user__avatar-link" href="#">
-                        <img class="comments__picture" src="img/userpic-larisa.jpg" alt="Аватар пользователя">
+                        <img class="comments__picture <?=empty($comment['avatar']) ? 'visually-hidden' : '' ?>" src="<?= $comment['avatar'] ?>" alt="Аватар пользователя">
                       </a>
                     </div>
                     <div class="comments__info">
                       <div class="comments__name-wrapper">
                         <a class="comments__user-name" href="#">
-                          <span>Лариса Роговая</span>
+                          <span><?= htmlspecialchars($comment['login']) ?></span>
                         </a>
-                        <time class="comments__time" datetime="2019-03-20">1 ч назад</time>
+                        <?php
+                            $dateView = dateDifferent($comment['creation_time']);
+                        ?>
+                        <time class="comments__time" datetime="<?= $comment['creation_time'] ?>"><?= $dateView ?></time>
                       </div>
                       <p class="comments__text">
-                        Красота!!!1!
+                        <?= htmlspecialchars($comment['text']) ?>
                       </p>
                     </div>
                   </li>
-                  <li class="comments__item user">
-                    <div class="comments__avatar">
-                      <a class="user__avatar-link" href="#">
-                        <img class="comments__picture" src="img/userpic-larisa.jpg" alt="Аватар пользователя">
-                      </a>
-                    </div>
-                    <div class="comments__info">
-                      <div class="comments__name-wrapper">
-                        <a class="comments__user-name" href="#">
-                          <span>Лариса Роговая</span>
-                        </a>
-                        <time class="comments__time" datetime="2019-03-18">2 дня назад</time>
-                      </div>
-                      <p class="comments__text">
-                        Озеро Байкал – огромное древнее озеро в горах Сибири к северу от монгольской границы. Байкал считается самым глубоким озером в мире. Он окружен сетью пешеходных маршрутов, называемых Большой байкальской тропой. Деревня Листвянка, расположенная на западном берегу озера, – популярная отправная точка для летних экскурсий. Зимой здесь можно кататься на коньках и собачьих упряжках.
-                      </p>
-                    </div>
-                  </li>
+                 <?php endforeach; ?>
+
                 </ul>
+<!--
                 <a class="comments__more-link" href="#">
                   <span>Показать все комментарии</span>
                   <sup class="comments__amount">45</sup>
                 </a>
+-->
               </div>
             </div>
           </div>
@@ -108,15 +101,18 @@
           <div class="post-details__user user">
             <div class="post-details__user-info user__info">
               <div class="post-details__avatar user__avatar">
-                <a class="post-details__avatar-link user__avatar-link" href="#">
-                  <img class="post-details__picture user__picture" src="<?= $post['avatar'] ?>" alt="Аватар пользователя">
+                <a class="post-details__avatar-link user__avatar-link" href="profile.php?user_id=<?= $post['user_id'] ?>">
+                  <img class="post-details__picture user__picture <?=empty($post['avatar']) ? 'visually-hidden' : '' ?>" src="<?= $post['avatar'] ?>" alt="Аватар пользователя">
                 </a>
               </div>
               <div class="post-details__name-wrapper user__name-wrapper">
-                <a class="post-details__name user__name" href="#">
+                <a class="post-details__name user__name" href="profile.php?user_id=<?= $post['user_id'] ?>">
                   <span><?= $post['login'] ?></span>
                 </a>
-                <time class="post-details__time user__time" datetime="2014-03-20">5 лет на сайте</time>
+                <?php
+                    $dateView = dateDifferent($post['user_creation_time'], 'на сайте');
+                ?>
+                <time class="post-details__time user__time" datetime="<?= $post['user_creation_time'] ?>"><?= $dateView ?></time>
               </div>
             </div>
             <div class="post-details__rating user__rating">

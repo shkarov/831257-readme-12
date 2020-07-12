@@ -7,8 +7,7 @@ $errors = checkFormRegistration($connect, $_POST, $_FILES);
 if ($errors === []) {
     $userId = dbAddUser($connect, $_POST, $_FILES);
     if (!is_null($userId)) {
-        header('Location: index.php');
-        exit();
+        header('Location: /');
     }
 }
 

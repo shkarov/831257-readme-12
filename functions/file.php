@@ -10,6 +10,7 @@
  */
 function savePicture(mysqli $con, array $files) : ?string
 {
+    $picture = '';
     $file = $files[key($files)];
 
     if (!empty($file['name'])) {

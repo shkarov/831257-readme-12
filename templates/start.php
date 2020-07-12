@@ -66,10 +66,6 @@
                 <use xlink:href="#icon-input-user"></use>
               </svg>
               <button class="form__error-button button" type="button">!<span class="visually-hidden">Информация об ошибке</span></button>
-<!--
-              <label class="visually-hidden">Логин</label>
-              <span class="form__error-label form__error-label--login">Неверный логин</span>
--->
               <div class="form__error-text">
                 <h3 class="form__error-title"><?= $errors['email']['header'] ?></h3>
                 <p class="form__error-desc"><?= $errors['email']['description'] ?></p>
@@ -82,10 +78,6 @@
                 <use xlink:href="#icon-input-password"></use>
               </svg>
               <button class="form__error-button button" type="button">!<span class="visually-hidden">Информация об ошибке</span></button>
-<!--
-              <label class="visually-hidden">Пароль</label>
-              <span class="form__error-label">Пароли не совпадают</span>
--->
               <div class="form__error-text">
                 <h3 class="form__error-title"><?= $errors['password']['header'] ?></h3>
                 <p class="form__error-desc"><?= $errors['password']['description'] ?></p>
@@ -134,13 +126,13 @@
           <div class="footer__my-info">
             <ul class="footer__my-pages">
               <li class="footer__my-page footer__my-page--feed">
-                <a class="footer__page-link" href="feed.html">Моя лента</a>
+                <a class="footer__page-link" href="#">Моя лента</a>
               </li>
               <li class="footer__my-page footer__my-page--popular">
-                <a class="footer__page-link" href="popular.html">Популярный контент</a>
+                <a class="footer__page-link" href="#">Популярный контент</a>
               </li>
               <li class="footer__my-page footer__my-page--messages">
-                <a class="footer__page-link" href="messages.html">Личные сообщения</a>
+                <a class="footer__page-link" href="#">Личные сообщения</a>
               </li>
             </ul>
             <div class="footer__copyright">
