@@ -60,13 +60,25 @@ if (isset($_GET['subscribeButton_onClick'])) {
     }
 }
 
+$tab = getTabFromRequest($_GET);
+
+if ($tab === 'posts') {
 $posts = dbGetUserPosts($connect, $user_id);
+$page_content = include_template("profile-posts.php", ['posts' => $posts, 'user_id' => $user_id]);
+}
 
-//$page_content = include_template("profile-posts.php", ['posts' => $posts, 'user_id' => $user_id, 'user' => $user_name, 'avatar' => $user_avatar,
-//                                'user_creation_time' => $user_creation_time, 'posts_count' => $user_posts_count, 'subscribers' => $user_subscribers, 'subscribe' => $subscribe]);
+if ($tab === 'likes') {
+    $posts = dbGetUserPostsWithLikes($connect, $user_id);
+    $page_content = include_template("profile-likes.php", ['posts' => $posts, 'user_id' => $user_id]);
+}
 
-$page_stats = include_template("profile-stats.php", ['user_id' => $user_id, 'user' => $user_name, 'avatar' => $user_avatar, 'user_creation_time' => $user_creation_time,
-                                'posts_count' => $user_posts_count, 'subscribers' => $user_subscribers, 'subscribe' => $subscribe]);
+if ($tab === 'subscribes') {
+    $posts = dbGetUserSubscriptions($connect, $user_id);
+    $page_content = include_template("profile-subscriptions.php", ['posts' => $posts, 'user_id' => $user_id]);
+}
+
+$page_stats = include_template("profile-stats.php", ['content' => $page_content, 'user_id' => $user_id, 'user' => $user_name, 'avatar' => $user_avatar, 'user_creation_time' => $user_creation_time,
+                                'posts_count' => $user_posts_count, 'subscribers' => $user_subscribers, 'subscribe' => $subscribe, 'tab' => $tab]);
 
 $layout_content = include_template("layout.php", ['content' => $page_stats, 'title' => 'readme: профиль', 'user_id' => $user_id_login, 'user' => $user_name_login, 'avatar' => $user_avatar_login]);
 

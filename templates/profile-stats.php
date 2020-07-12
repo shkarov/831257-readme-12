@@ -42,13 +42,13 @@
               <b class="profile__tabs-caption filters__caption">Показать:</b>
               <ul class="profile__tabs-list filters__list tabs__list">
                 <li class="profile__tabs-item filters__item tabs__item">
-                  <a class="profile__tabs-link filters__button filters__button--active button">Посты</a>
+                  <a class="profile__tabs-link filters__button <?= ($tab === 'posts') ? 'filters__button--active button' : '' ?>" href="profile.php?user_id=<?=$user_id?>">Посты</a>
                 </li>
                 <li class="profile__tabs-item filters__item tabs__item">
-                  <a class="profile__tabs-link filters__button button" href="#">Лайки</a>
+                  <a class="profile__tabs-link filters__button button <?= ($tab === 'likes') ? 'filters__button--active button' : '' ?>" href="profile.php?user_id=<?=$user_id?>&tab=likes">Лайки</a>
                 </li>
                 <li class="profile__tabs-item filters__item tabs__item">
-                  <a class="profile__tabs-link filters__button button" href="#">Подписки</a>
+                  <a class="profile__tabs-link filters__button button <?= ($tab === 'subscribes') ? 'filters__button--active button' : '' ?>" href="profile.php?user_id=<?=$user_id?>&tab=subscribes">Подписки</a>
                 </li>
               </ul>
             </div>

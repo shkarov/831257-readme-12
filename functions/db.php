@@ -780,7 +780,7 @@ function dbGetPostsSearchHashtag(mysqli $con, string $str) : array
  * Отправляет запрос на чтение к таблицам post, user,content_type, hashtag в текущей БД и возвращает Ассоциативный массив
  *
  * @param mysqli $con Объект-соединение с БД
- * @param int    $user_id id залогиненого пользователя
+ * @param int    $user_id id пользователя
  *
  * @return array Ассоциативный массив Результат запроса
  */
@@ -802,6 +802,60 @@ function dbGetUserPosts(mysqli $con, int $user_id) : array
             WHERE         u.id = ?
             GROUP BY p.id
             ORDER BY p.creation_time DESC";
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$user_id]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+/**
+ * Отправляет запрос на чтение к таблицам post, user,content_type, hashtag в текущей БД и возвращает Ассоциативный массив
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $user_id id пользователя
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function dbGetUserPostsWithLikes(mysqli $con, int $user_id) : array
+{
+    $sql = "SELECT   p.id, p.creation_time, p.picture, p.class, u.id AS user_id_subscriber, u.login, u.avatar
+            FROM     `like` AS l
+                     JOIN user AS u
+                     ON   u.id = l.user_id
+                     JOIN (
+                           SELECT post.*, c.class
+                           FROM   post
+                                  JOIN content_type AS c
+                                  ON   c.id = post.content_type_id
+	                       WHERE  post.user_id = ? AND  post.likes > 0
+                          ) AS p
+                     ON   p.id = l.post_id
+            ORDER BY p.creation_time DESC";
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$user_id]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+/**
+ * Выборка подписчиков текущего пользователя
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $user_id id пользователя
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function dbGetUserSubscriptions(mysqli $con, int $user_id) : array
+{
+    $sql = "SELECT   u.id, u.creation_time AS creation_time_user, u.login, u.avatar, u.subscribers, u.posts
+            FROM     subscription AS s
+                     JOIN user AS u
+                     ON   u.id = s.creator_user_id
+            WHERE    s.subscriber_user_id = ?";
 
     $stmt = db_get_prepare_stmt($con, $sql, [$user_id]);
     mysqli_stmt_execute($stmt);

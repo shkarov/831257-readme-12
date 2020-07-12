@@ -690,3 +690,38 @@ function isSortValid(array $arr) : bool
 
     return (isset($arr['sort']) && !in_array($arr['sort'], $sort_types)) ? false : true;
 }
+
+/**
+ * Проверка соответствия типа вкладок допустимому значению
+ *
+ * @param  array $arr Ассоциативный массив, переданный из формы методом get
+ *
+ * @return bool
+ */
+function isTabValid(array $arr) : bool
+{
+    $tab_types = [null, '', 'likes', 'subscribes'];
+
+    return (isset($arr['tab']) && !in_array($arr['tab'], $tab_types)) ? false : true;
+}
+
+/**
+ * Проверка соответствия значения параметра запроса допустимому значению
+ *
+ * @param  array $arr Ассоциативный массив, переданный из формы методом get
+ *
+ * @return bool
+ */
+function isParameterValid(array $arr, $name) : bool
+{
+    $types = [null, '', 'likes'];
+
+    if ($name === 'sort') {
+        $types[] = 'creation_time';
+    }
+    if ($name === 'tab') {
+        $types[] = 'subscribes';
+    }
+
+    return (isset($arr[$name]) && !in_array($arr[$name], $types)) ? false : true;
+}

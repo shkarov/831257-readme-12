@@ -53,6 +53,22 @@ function getSortFromRequest(array $arr) : string
 }
 
 /**
+ * Возвращает имя вкладки в профиле пользователя, по которому будет производится выборка данных в запросе
+ *
+ * @param array $arr массив параметров запроса
+ *
+ * @return string
+ */
+function getTabFromRequest(array $arr) : string
+{
+    if (!isParameterValid($arr, 'tab')) {
+        exit('Некорректный параметр tab');
+    }
+
+    return empty($arr['tab']) ? 'posts' : $arr['tab'];
+}
+
+/**
  * Возвращает значение массива по ключу $key, если такое существует, иначе - пустую строку
  *
  * @param  array $arr ассоциативный массив
