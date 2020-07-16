@@ -820,7 +820,7 @@ function dbGetUserPosts(mysqli $con, int $user_id) : array
  */
 function dbGetUserPostsWithLikes(mysqli $con, int $user_id) : array
 {
-    $sql = "SELECT   p.id, p.creation_time, p.picture, p.class, u.id AS user_id_subscriber, u.login, u.avatar
+    $sql = "SELECT   p.id, p.picture, p.class, u.id AS user_id_who_liked_post, u.login, u.avatar, l.creation_time AS creation_time_like
             FROM     `like` AS l
                      JOIN user AS u
                      ON   u.id = l.user_id
@@ -832,7 +832,7 @@ function dbGetUserPostsWithLikes(mysqli $con, int $user_id) : array
 	                       WHERE  post.user_id = ? AND  post.likes > 0
                           ) AS p
                      ON   p.id = l.post_id
-            ORDER BY p.creation_time DESC";
+            ORDER BY l.creation_time DESC";
 
     $stmt = db_get_prepare_stmt($con, $sql, [$user_id]);
     mysqli_stmt_execute($stmt);
@@ -842,22 +842,47 @@ function dbGetUserPostsWithLikes(mysqli $con, int $user_id) : array
 }
 
 /**
- * Выборка подписчиков текущего пользователя
+ * Выборка подписчиков пользователя + поле наличия подписки на него залогиненого пользователя
  *
  * @param mysqli $con Объект-соединение с БД
  * @param int    $user_id id пользователя
+ * @param int    $user_id_login id залогиненого пользователя
  *
  * @return array Ассоциативный массив Результат запроса
  */
-function dbGetUserSubscriptions(mysqli $con, int $user_id) : array
+function dbGetUserSubscriptions(mysqli $con, int $user_id, int $user_id_login) : array
 {
-    $sql = "SELECT   u.id, u.creation_time AS creation_time_user, u.login, u.avatar, u.subscribers, u.posts
+
+    $sql = "SELECT sele1.*, if(sele2.id IS NULL, false, true) AS mutual_subscribe
+
+            FROM
+                  (SELECT   u.id AS user_id_subscriber, u.creation_time AS creation_time_user, u.login, u.avatar, u.subscribers, u.posts
+                   FROM     subscription AS s
+                            JOIN user AS u
+                            ON   u.id = s.subscriber_user_id
+                   WHERE    s.creator_user_id = ?)
+                   AS sele1
+
+                   LEFT JOIN
+
+                  (SELECT   u2.id
+                   FROM     subscription AS s2
+                            JOIN user AS u2
+                            ON   u2.id = s2.creator_user_id
+                   WHERE    s2.subscriber_user_id = ?)
+                   AS sele2
+
+            ON sele1.user_id_subscriber = sele2.id";
+
+/*
+    $sql = "SELECT   u.id AS user_id_subscriber, u.creation_time AS creation_time_user, u.login, u.avatar, u.subscribers, u.posts
             FROM     subscription AS s
                      JOIN user AS u
-                     ON   u.id = s.creator_user_id
-            WHERE    s.subscriber_user_id = ?";
+                     ON   u.id = s.subscriber_user_id
+            WHERE    s.creator_user_id = ?";
+*/
 
-    $stmt = db_get_prepare_stmt($con, $sql, [$user_id]);
+    $stmt = db_get_prepare_stmt($con, $sql, [$user_id, $user_id_login]);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 
@@ -940,9 +965,11 @@ function dbAddComment(mysqli $con, int $user_id, array $post) : bool
  */
 function dbAddLike(mysqli $con, int $post_id, int $user_id) : bool
 {
-    $sql1 = 'INSERT `like` (post_id, user_id) VALUES (?,?)';
+    $creation_time = date("Y-m-d H:i:s");
+
+    $sql1 = 'INSERT `like` (post_id, user_id, creation_time) VALUES (?,?,?)';
     $stmt1 = mysqli_prepare($con, $sql1);
-    mysqli_stmt_bind_param($stmt1, 'ii', $post_id, $user_id);
+    mysqli_stmt_bind_param($stmt1, 'iis', $post_id, $user_id, $creation_time);
 
     $sql2 = 'UPDATE post
              SET    likes = likes + 1
@@ -1090,4 +1117,76 @@ function dbFindSubscribe(mysqli $con, int $user_id_creator, int $user_id_subscri
     $result_arraw = mysqli_fetch_assoc($result);
 
     return ($result_arraw['is_subsribe'] == 0) ? false : true;
+}
+
+/**
+ * Отправляет запрос на поиск записи с $post_id к таблице post
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $post_id логин пользователя из формы регистрации
+ *
+ * @return int id пользователя, создателя поста
+ */
+function dbGetUserIdFromPost(mysqli $con, int $post_id) : int
+{
+    $sql = "SELECT user_id FROM post WHERE id = ?";
+
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $post_id);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if (!$result) {
+        exit("Ошибка MySQL: " . mysqli_error($con));
+    }
+
+    $result_arraw = mysqli_fetch_assoc($result);
+
+    return (int) $result_arraw['user_id'];
+}
+
+/**
+ * Проверяет условия и отправляет запрос на добавление лайка к посту
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $post_id id поста
+ * @param int    $user_id_login id пользователя, открывшего текущую сессию
+ *
+ * @return bool
+ */
+
+function addLike(mysqli $con, int $post_id, int $user_id_login) : bool
+{
+    // залогиненый пользователь лайкает не свой пост
+    if (dbGetUserIdFromPost($con, $post_id) != $user_id_login) {
+
+        // нет такого лайка в БД
+        if (!dbFindLike($con, $post_id, $user_id_login)) {
+            return dbAddLike($con, $post_id, $user_id_login);
+        }
+    }
+    return false;
+}
+
+/**
+ * Проверяет условия и отправляет запрос на добавление подписки на пользователя
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $user_id id пользователя, на которого подписываются
+ * @param int    $user_id_login id пользователя, открывшего текущую сессию
+ *
+ * @return bool
+ */
+
+function addSubscribe(mysqli $con, int $user_id, int $user_id_login) : bool
+{
+    // залогиненый пользователь подписывается НЕ на себя
+    if ($user_id != $user_id_login) {
+
+        // нет такой подписки в БД
+        if (!dbFindSubscribe($con, $user_id, $user_id_login)) {
+            return dbAddSubscribe($con, $user_id, $user_id_login);
+        }
+    }
+    return false;
 }

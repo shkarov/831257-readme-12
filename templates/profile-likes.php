@@ -1,4 +1,3 @@
-
 <section class="profile__likes tabs__content tabs__content--active">
     <h2 class="visually-hidden">Лайки</h2>
     <ul class="profile__likes-list">
@@ -8,20 +7,20 @@
             <li class="post-mini post-mini--<?= $classOfPost; ?> post user">
                 <div class="post-mini__user-info user__info">
                     <div class="post-mini__avatar user__avatar">
-                        <a class="user__avatar-link" href="profile.php?user_id=<?= $post['user_id_subscriber']; ?>">
+                        <a class="user__avatar-link" href="profile.php?user_id=<?= $post['user_id_who_liked_post']; ?>">
                             <img class="post-mini__picture user__picture <?=empty($post['avatar']) ? 'visually-hidden' : '' ?>" src="<?= $post['avatar']; ?>" alt="Аватар пользователя">
                         </a>
                     </div>
                     <div class="post-mini__name-wrapper user__name-wrapper">
-                        <a class="post-mini__name user__name" href="profile.php?user_id=<?= $post['user_id_subscriber']; ?>">
+                        <a class="post-mini__name user__name" href="profile.php?user_id=<?= $post['user_id_who_liked_post']; ?>">
                             <span><?= $post['login']; ?></span>
                         </a>
                         <div class="post-mini__action">
                             <span class="post-mini__activity user__additional">Лайкнул вашу публикацию</span>
                             <?php
-                                $dateView = dateDifferent($post['creation_time']);
+                                $dateView = dateDifferent($post['creation_time_like']);
                             ?>
-                            <time class="post-mini__time user__additional" datetime="<?= $post['creation_time'] ?>"><?= $dateView ?></time>
+                            <time class="post-mini__time user__additional" datetime="<?= $post['creation_time_like'] ?>"><?= $dateView ?></time>
                         </div>
                     </div>
                 </div>

@@ -686,7 +686,7 @@ function isCorrectLength(string $name, int $min, int $max) : bool
  */
 function isSortValid(array $arr) : bool
 {
-    $sort_types = [null, '', 'likes', 'creation_time'];
+    $sort_types = [null, '', 'views', 'likes', 'creation_time'];
 
     return (isset($arr['sort']) && !in_array($arr['sort'], $sort_types)) ? false : true;
 }
@@ -725,3 +725,4 @@ function isParameterValid(array $arr, $name) : bool
 
     return (isset($arr[$name]) && !in_array($arr[$name], $types)) ? false : true;
 }
+

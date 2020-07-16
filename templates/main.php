@@ -172,7 +172,7 @@
                     </div>
                     <div class="post__indicators">
                         <div class="post__buttons">
-                            <a class="post__indicator post__indicator--likes button" href="popular.php?post_id=<?= $post['id'];?> & like_onClick" title="Лайк">
+                            <a class="post__indicator post__indicator--likes button" href="popular.php?post_id=<?= $post['id'];?>&sort=<?=$sort_current?>&type_id=<?=$type_id_current?>&like_onClick" title="Лайк">
                                 <svg class="post__indicator-icon" width="20" height="17">
                                     <use xlink:href="#icon-heart"></use>
                                 </svg>
