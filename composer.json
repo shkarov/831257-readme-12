@@ -1,0 +1,15 @@
+{
+    "name": "shkarov/831257-readme-12",
+    "description": "Website for blog",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Boris Shkarov",
+            "email": "b.shkarov@gmail.com"
+        }
+    ],
+    "require": {
+        "swiftmailer/swiftmailer": "^6.2"
+    }
+}

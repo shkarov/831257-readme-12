@@ -21,6 +21,13 @@ $page_content = include_template("adding-post.php", ['types' => $types, 'type_id
 if ($errors === []) {
     $postId = dbAddPost($connect, $user_id_login, $_POST, $_FILES);
     if (!is_null($postId)) {
+
+        $post_header = dbGetPostHeader($connect,$postId);
+
+        $subscribers_list = dbGetUserSubscribers($connect, $user_id_login);
+
+        sendEmail($config, 'post', $subscribers_list, ['id' => $user_id_login, 'login' => $user_name_login], $post_header);
+
         $url = "post.php?post_id="."$postId";
         header("HTTP/1.1 301 Moved Permanently");
         header('Location: '.$url);

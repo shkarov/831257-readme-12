@@ -25,6 +25,7 @@ if ($user['id'] === $user_id_login) {
     //профиль НЕ текущего пользователя
     $user_id = $user['id'];
     $user_name = $user['login'];
+    $user_email = $user['email'];
     $user_avatar = $user['avatar'];
     $user_creation_time = $user['creation_time'];
     $user_posts_count = $user['posts'];
@@ -39,7 +40,7 @@ if (isset($_GET['like_onClick'])) {
     addLike($connect, (int) $_GET['post_id'], $user_id_login);
     $referer = $_SERVER['HTTP_REFERER'];
     header('Location: '.$referer);
-};
+}
 
 // Нажата кнопка Подписаться/Отписаться на пользователя, профиль которого просматривается
 if (isset($_GET['subscribeButton_onClick'])) {
@@ -48,7 +49,9 @@ if (isset($_GET['subscribeButton_onClick'])) {
         if ($subscribe) {
             dbDelSubscribe($connect, $user_id, $user_id_login);
         } else {
-            dbAddSubscribe($connect, $user_id, $user_id_login);
+            if (dbAddSubscribe($connect, $user_id, $user_id_login)) {
+                sendEmail($config, 'subscribe', [['email' => $user_email, 'login' => $user_name]], ['id' => $user_id_login, 'login' => $user_name_login]);
+            };
         }
         $url = "profile.php?user_id="."$user_id";
         header('Location: '.$url);
@@ -65,7 +68,10 @@ if (isset($_GET['subscribeButtonMutual_onClick'])) {
             dbDelSubscribe($connect, $user_id_for_subscribe, $user_id_login);
         }
         if ($_GET['subscribeButtonMutual_onClick'] === 'add') {
-            addSubscribe($connect, $user_id_for_subscribe, $user_id_login);
+            if (addSubscribe($connect, $user_id_for_subscribe, $user_id_login)) {
+                $user_for_subscribe = dbGetUserById($connect, $user_id_for_subscribe);
+                sendEmail($config, 'subscribe', [['email' => $user_for_subscribe, 'login' => $user_for_subscribe]], ['id' => $user_id_login, 'login' => $user_name_login]);
+            }
         }
         $url = "profile.php?user_id="."$user_id_for_subscribe";
         header('Location: '.$url);
@@ -75,8 +81,8 @@ if (isset($_GET['subscribeButtonMutual_onClick'])) {
 $tab = getTabFromRequest($_GET);
 
 if ($tab === 'posts') {
-$posts = dbGetUserPosts($connect, $user_id);
-$page_content = include_template("profile-posts.php", ['posts' => $posts, 'user_id' => $user_id]);
+    $posts = dbGetUserPosts($connect, $user_id);
+    $page_content = include_template("profile-posts.php", ['posts' => $posts, 'user_id' => $user_id]);
 }
 
 if ($tab === 'likes') {
@@ -85,7 +91,7 @@ if ($tab === 'likes') {
 }
 
 if ($tab === 'subscribes') {
-    $posts = dbGetUserSubscriptions($connect, $user_id, $user_id_login);
+    $posts = dbGetUserSubscribersWithMutualSubscription($connect, $user_id, $user_id_login);
     $page_content = include_template("profile-subscriptions.php", ['posts' => $posts, 'user_id' => $user_id, 'user_id_login' => $user_id_login]);
 }
 

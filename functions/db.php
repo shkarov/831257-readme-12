@@ -60,7 +60,7 @@ function db_get_prepare_stmt($link, $sql, $data = [])
 /**
  * Устанавливает соединение с базой данных(БД) и возвращает объект соединения
  *
- * @param $conf array Массив с параматрами для подключения к БД
+ * @param array $conf Массив с параматрами для подключения к БД
  *
  * @return mysqli Объект-соединение с БД
 */
@@ -208,6 +208,32 @@ function dbGetSinglePost(mysqli $con, ?int $postId) : array
         exit("Ошибка MySQL: " . mysqli_error($con));
     }
     return mysqli_fetch_assoc($result);
+}
+
+/**
+ * Запрос на получение заголовка поста
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $postId id выбранного поста
+ *
+ * @return string заголовок поста
+ */
+function dbGetPostHeader(mysqli $con, int $postId) : string
+{
+    $sql = "SELECT post.heading
+            FROM   post
+            WHERE  post.id = ?";
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$postId]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if (!$result) {
+        exit("Ошибка MySQL: " . mysqli_error($con));
+    }
+    $arr = mysqli_fetch_assoc($result);
+
+    return $arr['heading'];
 }
 
 /**
@@ -603,7 +629,7 @@ function dbGetUserByEmail(mysqli $con, string $email) : array
  */
 function dbGetUserById(mysqli $con, int $user_id) : array
 {
-    $sql = "SELECT id, `login`, `password`, avatar, creation_time, posts, subscribers FROM user WHERE id = ?";
+    $sql = "SELECT id, `login`, `password`, email, avatar, creation_time, posts, subscribers FROM user WHERE id = ?";
 
     $stmt = mysqli_prepare($con, $sql);
     mysqli_stmt_bind_param($stmt, 'i', $user_id);
@@ -624,7 +650,7 @@ function dbGetUserById(mysqli $con, int $user_id) : array
  *
  * @return array Ассоциативный массив Результат запроса
  */
-function dbGetSubscribCreatorsList(mysqli $con, int $user_id) : array
+function dbGetSubscribeCreatorsList(mysqli $con, int $user_id) : array
 {
     $sql = "SELECT creator_user_id
             FROM   subscription
@@ -650,7 +676,7 @@ function dbGetSubscribCreatorsList(mysqli $con, int $user_id) : array
 function dbGetPostsFeed(mysqli $con, int $user_id, ?int $type_id) : array
 {
     //получаем список авторов, на которых подписан текущий пользователь
-    $subscrubCreators = dbGetSubscribCreatorsList($con, $user_id);
+    $subscrubCreators = dbGetSubscribeCreatorsList($con, $user_id);
 
     $arr = [];
     foreach ($subscrubCreators as $value) {
@@ -842,6 +868,29 @@ function dbGetUserPostsWithLikes(mysqli $con, int $user_id) : array
 }
 
 /**
+ * Выборка подписчиков пользователя
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $user_id id пользователя
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function dbGetUserSubscribers(mysqli $con, int $user_id) : array
+{
+    $sql = "SELECT  u.id, u.login, u.email
+                    FROM subscription AS s
+                    JOIN user AS u
+                    ON   u.id = s.subscriber_user_id
+            WHERE   s.creator_user_id = ?";
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$user_id]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+/**
  * Выборка подписчиков пользователя + поле наличия подписки на него залогиненого пользователя
  *
  * @param mysqli $con Объект-соединение с БД
@@ -850,7 +899,7 @@ function dbGetUserPostsWithLikes(mysqli $con, int $user_id) : array
  *
  * @return array Ассоциативный массив Результат запроса
  */
-function dbGetUserSubscriptions(mysqli $con, int $user_id, int $user_id_login) : array
+function dbGetUserSubscribersWithMutualSubscription(mysqli $con, int $user_id, int $user_id_login) : array
 {
 
     $sql = "SELECT sele1.*, if(sele2.id IS NULL, false, true) AS mutual_subscribe
@@ -873,14 +922,6 @@ function dbGetUserSubscriptions(mysqli $con, int $user_id, int $user_id_login) :
                    AS sele2
 
             ON sele1.user_id_subscriber = sele2.id";
-
-/*
-    $sql = "SELECT   u.id AS user_id_subscriber, u.creation_time AS creation_time_user, u.login, u.avatar, u.subscribers, u.posts
-            FROM     subscription AS s
-                     JOIN user AS u
-                     ON   u.id = s.subscriber_user_id
-            WHERE    s.creator_user_id = ?";
-*/
 
     $stmt = db_get_prepare_stmt($con, $sql, [$user_id, $user_id_login]);
     mysqli_stmt_execute($stmt);

@@ -7,4 +7,10 @@ return [
         'password' => '',
         'database' => ''
     ],
+    'smtp' => [
+        'host' => 'phpdemo.ru',
+        'port' => 25,
+        'user' => 'keks@phpdemo.ru',
+        'password' => 'htmlacademy'
+    ]
 ];
