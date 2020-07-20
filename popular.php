@@ -12,10 +12,11 @@ $user_avatar_login = $_SESSION['avatar'];
 
 // кликнута иконка лайк
 if (isset($_GET['like_onClick'])) {
-    addLike($connect, (int) $_GET['post_id'], $user_id_login);
+    $post_id = getPostIdFromRequest($_GET);
+    addLike($connect, $post_id, $user_id_login);
     $referer = $_SERVER['HTTP_REFERER'];
     header('Location: '.$referer);
-};
+}
 
 $types = dbGetTypes($connect);
 

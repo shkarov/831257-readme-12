@@ -12,7 +12,7 @@ $user_avatar_login = $_SESSION['avatar'];
 
 $post_id = getPostIdFromRequest($_GET, $_POST);
 
-$post = dbGetSinglePost($connect, $post_id);
+$post = dbGetPostWithUserInfo($connect, $post_id);
 
 if ($post === []) {
     header("HTTP/1.0 404 Not Found");
@@ -37,7 +37,14 @@ if (isset($_GET['like_onClick'])) {
     addLike($connect, (int) $_GET['post_id'], $user_id_login);
     $referer = $_SERVER['HTTP_REFERER'];
     header('Location: '.$referer);
-};
+}
+
+// кликнута иконка repost
+if (isset($_GET['repost_onClick'])) {
+    addRepost($connect, $post_id, $user_id_login);
+    $url = "profile.php?user_id=$user_id_login";
+    header('Location: '.$url);
+}
 
 $page_content = include_template("post-details.php", ['post' => $post, 'comments' => $comments, 'user_login_id' => $user_id_login, 'user_login_avatar' => $user_avatar_login, 'errors' => $errors]);
 

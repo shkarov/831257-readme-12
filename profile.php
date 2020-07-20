@@ -35,11 +35,20 @@ if ($user['id'] === $user_id_login) {
     $subscribe = dbFindSubscribe($connect, $user_id, $user_id_login);
 }
 
+$post_id = getPostIdFromRequest($_GET);
+
 // кликнута иконка лайк
 if (isset($_GET['like_onClick'])) {
-    addLike($connect, (int) $_GET['post_id'], $user_id_login);
+    addLike($connect, $post_id, $user_id_login);
     $referer = $_SERVER['HTTP_REFERER'];
     header('Location: '.$referer);
+}
+
+// кликнута иконка repost
+if (isset($_GET['repost_onClick'])) {
+    addRepost($connect, $post_id, $user_id_login);
+    $url = "profile.php?user_id=$user_id_login";
+    header('Location: '.$url);
 }
 
 // Нажата кнопка Подписаться/Отписаться на пользователя, профиль которого просматривается

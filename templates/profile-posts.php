@@ -72,7 +72,7 @@
             <footer class="post__footer">
                 <div class="post__indicators">
                     <div class="post__buttons">
-                        <a class="post__indicator post__indicator--likes button" href="profile.php?post_id=<?= $post['id'];?> & user_id=<?= $user_id;?> & like_onClick" title="Лайк">
+                        <a class="post__indicator post__indicator--likes button" href="profile.php?post_id=<?= $post['id'];?>&user_id=<?= $user_id;?>&like_onClick" title="Лайк">
                             <svg class="post__indicator-icon" width="20" height="17">
                                 <use xlink:href="#icon-heart"></use>
                             </svg>
@@ -82,7 +82,7 @@
                             <span><?= $post['likes'] ?></span>
                             <span class="visually-hidden">количество лайков</span>
                         </a>
-                        <a class="post__indicator post__indicator--repost button" href="#" title="Репост">
+                        <a class="post__indicator post__indicator--repost button" href="profile.php?post_id=<?= $post['id'];?>&user_id=<?= $user_id;?>&repost_onClick" title="Репост">
                             <svg class="post__indicator-icon" width="19" height="17">
                               <use xlink:href="#icon-repost"></use>
                             </svg>

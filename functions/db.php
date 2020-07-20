@@ -186,7 +186,7 @@ function dbGetPostsPopularCount(mysqli $con, ?int $typeId, string $sort) : int
  *
  * @return  array Ассоциативный массив Информация о посте
  */
-function dbGetSinglePost(mysqli $con, ?int $postId) : array
+function dbGetPostWithUserInfo(mysqli $con, ?int $postId) : array
 {
     if (is_null($postId)) {
         return [];
@@ -999,8 +999,8 @@ function dbAddComment(mysqli $con, int $user_id, array $post) : bool
  * Запись нового лайка в БД
  *
  * @param  mysqli $con Объект-соединение с БД
- * @param  int $$post_id id поста
- * @param  int $$user_id id пользователя, добавившего лайк
+ * @param  int $post_id id поста
+ * @param  int $user_id id пользователя, добавившего лайк
  *
  * @return bool
  */
@@ -1195,7 +1195,6 @@ function dbGetUserIdFromPost(mysqli $con, int $post_id) : int
  *
  * @return bool
  */
-
 function addLike(mysqli $con, int $post_id, int $user_id_login) : bool
 {
     // залогиненый пользователь лайкает не свой пост
@@ -1218,7 +1217,6 @@ function addLike(mysqli $con, int $post_id, int $user_id_login) : bool
  *
  * @return bool
  */
-
 function addSubscribe(mysqli $con, int $user_id, int $user_id_login) : bool
 {
     // залогиненый пользователь подписывается НЕ на себя
@@ -1229,5 +1227,90 @@ function addSubscribe(mysqli $con, int $user_id, int $user_id_login) : bool
             return dbAddSubscribe($con, $user_id, $user_id_login);
         }
     }
+    return false;
+}
+
+/**
+ * Проверяет условия и отправляет запрос на добавление лайка к посту
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $post_id id поста
+ * @param int    $user_id_login id пользователя, открывшего текущую сессию
+ *
+ * @return bool
+ */
+function addRepost(mysqli $con, int $post_id, int $user_id_login) : bool
+{
+    $post = dbGetPost($con, $post_id);
+
+    // пост найден
+    if (!empty($post)) {
+        // залогиненый пользователь репостит не свой пост
+        if ($post['user_id'] != $user_id_login) {
+            return dbAddRepost($con, $post, $user_id_login);
+        }
+    }
+    return false;
+}
+
+/**
+ * Отправляет запрос на чтение данных о конкретном посте
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $post_id id поста
+ *
+ * @return array Ассоциативный массив Информация о посте
+ */
+function dbGetPost(mysqli $con, int $post_id) : array
+{
+    $sql = "SELECT *
+            FROM   post
+            WHERE  post.id = ?";
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$post_id]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if (!$result) {
+        exit("Ошибка MySQL: " . mysqli_error($con));
+    }
+    return mysqli_fetch_assoc($result);
+}
+
+/**
+ * Запись репоста в БД
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param array  $post массив данных поста
+ * @param int    $user_id id пользователя, делающего репост
+ *
+ * @return bool
+ */
+function dbAddRepost(mysqli $con, array $post, int $user_id) : bool
+{
+    $creation_time = date("Y-m-d H:i:s");
+    $repost = 1;
+
+    $sql1 = 'INSERT post (creation_time, heading, `text`, author_quote, picture, video, link, repost, original_user_id, user_id, content_type_id) VALUES (?,?,?,?,?,?,?,?,?,?,?)';
+    $stmt1 = mysqli_prepare($con, $sql1);
+    mysqli_stmt_bind_param($stmt1, 'sssssssiiii', $creation_time, $post['heading'], $post['text'], $post['author_quote'], $post['picture'], $post['video'], $post['link'], $repost, $post['user_id'], $user_id, $post['content_type_id']);
+
+    $sql2 = 'UPDATE post
+             SET    reposts = reposts + 1
+             WHERE  id = ?';
+    $stmt2 = mysqli_prepare($con, $sql2);
+    mysqli_stmt_bind_param($stmt2, 'i', $post['id']);
+
+    mysqli_begin_transaction($con);
+
+    $result1 = mysqli_stmt_execute($stmt1);
+    //$post_id_new = mysqli_stmt_insert_id($stmt1);
+    $result2 = mysqli_stmt_execute($stmt2);
+
+    if ($result1 && $result2) {
+        mysqli_commit($con);
+        return true;
+      }
+    mysqli_rollback($con);
     return false;
 }
