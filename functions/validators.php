@@ -636,32 +636,6 @@ function validateEmailLogin(mysqli $con, ?string $name) : array
     return $error;
 }
 
-
-/**
- * Валидация поля формы Комментарий
- * @param  array $arr Ассоциативный массив, переданный из формы методом post
- *
- * @return array массив ошибок
- */
-function checkFormComment(array $arr) : array
-{
-    $error = [];
-    // min и max длина текста
-    $minlength = 4;
-    $maxlength = 70;
-
-    if (isset($arr['comment'])) {
-        if (validateFilled($arr['comment'])) {
-            $error['comment']['header'] = "Это обязательно поле.";
-            $error['comment']['description'] = "Введите текст сообщения.";
-        } elseif (!isCorrectLength($arr['comment'], $minlength, $maxlength)) {
-            $error['comment']['header'] = "Длина текста не соответствует требованиям.";
-            $error['comment']['description'] = "Допустимая длина текста от 4 до 70 знаков.";
-        }
-    }
-    return $error;
-}
-
 /**
  * Проверка длины поля
  *
@@ -726,3 +700,82 @@ function isParameterValid(array $arr, $name) : bool
     return (isset($arr[$name]) && !in_array($arr[$name], $types)) ? false : true;
 }
 
+/**
+ * Валидация поля формы сообщения
+ * @param array  $arr Ассоциативный массив, переданный из формы методом post
+ *
+ * @return array массив ошибок
+ */
+function checkFormComment(array $arr) : array
+{
+    $error = [];
+    // min и max длина текста
+    $minlength = 4;
+    $maxlength = 70;
+
+    $name_field = 'comment';
+
+    if (isset($arr[$name_field])) {
+        if (validateFilled($arr[$name_field])) {
+            $error[$name_field]['header'] = "Это обязательно поле.";
+            $error[$name_field]['description'] = "Введите текст сообщения.";
+        } elseif (!isCorrectLength($arr[$name_field], $minlength, $maxlength)) {
+            $error[$name_field]['header'] = "Длина текста не соответствует требованиям.";
+            $error[$name_field]['description'] = "Допустимая длина текста от 4 до 70 знаков.";
+        }
+    }
+    return $error;
+}
+
+/**
+ * Валидация поля формы сообщения
+ * @param array  $arr Ассоциативный массив, переданный из формы методом post
+ *
+ * @return array массив ошибок
+ */
+function checkFormMessage(array $arr) : array
+{
+    $error = [];
+    $name_field = 'message';
+
+    if (isset($arr[$name_field])) {
+        if (validateFilled($arr[$name_field])) {
+            $error[$name_field]['header'] = "Это обязательно поле.";
+            $error[$name_field]['description'] = "Введите текст сообщения.";
+        }
+    }
+    return $error;
+}
+
+/**
+ * Проверка условий перед отправкой сообщения
+ * Адресат должен существовать и не может быть отправлено сообщение самому себе
+ *
+ * @param mysqli $con   Объект-соединение с БД
+ * @param int    $user_id id пользователя адресата
+ * @param int    $user_id_login id залогиненого пользователя
+ *
+ * @return bool
+ */
+function isValidUser(mysqli $con, ?int $user_id, int $user_id_login) : bool
+{
+    return !empty(dbGetUserById($con, $user_id)) && ($user_id != $user_id_login);
+}
+
+/**
+ * Проверка наличия пользователя в списке
+ *
+ * @param array $contacts список пользователей
+ * @param int   $user_id id пользователя
+ *
+ * @return bool
+ */
+function isUserPresentInList(array $contacts, int $user_id) : bool
+{
+    foreach ($contacts as $contact) {
+        if ($contact['user_id'] === $user_id) {
+            return true;
+        }
+    }
+    return false;
+}

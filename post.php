@@ -18,7 +18,6 @@ if ($post === []) {
     header("HTTP/1.0 404 Not Found");
     exit;
 }
-
 $errors = checkFormComment($_POST);
 
 if (isset($_POST['comment']) && $errors === []) {

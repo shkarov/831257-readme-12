@@ -32,7 +32,7 @@
                     </a>
                 </button>
 
-                <a class="profile__user-button user__button user__button--writing button button--green" href="#">Сообщение</a>
+                <a class="profile__user-button user__button user__button--writing button button--green" href="messages.php?user_id=<?=$user_id?>">Сообщение</a>
             </div>
           </div>
         </div>

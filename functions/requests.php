@@ -69,6 +69,24 @@ function getTabFromRequest(array $arr) : string
 }
 
 /**
+ * Возвращает id пользователя из массива параметров запроса, если id найден, иначе возвращает null
+ *
+ * @param array $get массив параметров запроса
+ * @param array $post массив параметров запроса
+ *
+ * @return int or null
+ */
+function getUserIdFromRequest(array $get, array $post = []) : ?int
+{
+    if (isset($get['user_id'])) {
+        return (int) $get['user_id'];
+    } elseif (isset($post['user_id'])) {
+        return (int) $post['user_id'];
+    }
+    return null;
+}
+
+/**
  * Возвращает значение массива по ключу $key, если такое существует, иначе - пустую строку
  *
  * @param  array $arr ассоциативный массив

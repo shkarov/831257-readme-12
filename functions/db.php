@@ -623,7 +623,7 @@ function dbGetUserByEmail(mysqli $con, string $email) : array
  * Отправляет запрос на поиск записи с полем $user_id к таблице user
  *
  * @param mysqli $con   Объект-соединение с БД
- * @param int $user_id адрес электронной почты из формы регистрации
+ * @param int    $user_id id пользователя
  *
  * @return array ассоциативный массив
  */
@@ -1313,4 +1313,140 @@ function dbAddRepost(mysqli $con, array $post, int $user_id) : bool
       }
     mysqli_rollback($con);
     return false;
+}
+
+/**
+ * Получение списка пользователей, имеющих сообщения с текущим пользователем
+ * Список отсортирован по дате создания сообщения
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $user_id id пользователя
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function getContactsMessages(mysqli $con, int $user_id) : array
+{
+    $contacts = dbGetContactsMessages($con, $user_id);
+
+    // отфильтровываются уникальные значения $user_id
+    $contacts_uniq = [];
+    $user_id = 0;
+    foreach ($contacts as $value) {
+        if ($user_id != $value['user_id']) {
+            $contacts_uniq[] = $value;
+        }
+        $user_id = $value['user_id'];
+    }
+    //сортировка
+    $contacts_sort = sortBubbleDescArray($contacts_uniq, 'creation_time');
+
+    return $contacts_sort;
+}
+
+/**
+ * Получение списка пользователей, имеющих сообщения с текущим пользователем
+ * Список отсортирован по дате создания сообщения, с неуникальным полем user_id (требуется приведение массива к уникальным значениям)
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $user_id id пользователя
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function dbGetContactsMessages(mysqli $con, int $user_id) : array
+{
+    $sql = "SELECT sele1.*, u.login, u.avatar
+            FROM   user AS u
+                   JOIN (
+                         (SELECT m1.recipient_user_id AS user_id, m1.creation_time, CONCAT(SUBSTRING(m1.text, 1, 10), '...') AS `text`
+                          FROM   message AS m1
+                          WHERE  m1.sender_user_id = ?)
+
+                          UNION ALL
+
+                         (SELECT m2.sender_user_id AS user_id, m2.creation_time, CONCAT(SUBSTRING(m2.text, 1, 10), '...') AS `text`
+                          FROM   message AS m2
+                          WHERE m2.recipient_user_id = ?)
+
+                          ORDER BY user_id, creation_time DESC
+                         ) AS sele1
+
+                   ON u.id = sele1.user_id";
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$user_id, $user_id]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+/**
+ * Получение сообщений пользователя с залогиненым пользователем
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $user_id id пользователя
+ * @param int    $user_id_login id залогиненого пользователя
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function dbGetMessages(mysqli $con, int $user_id, int $user_id_login) : array
+{
+    $sql = "SELECT u.id AS user_id, u.login, u.avatar, m.creation_time, `text`
+	        FROM   message AS m
+                   JOIN user AS u
+                   ON   u.id = m.sender_user_id
+            WHERE  (m.sender_user_id = ? and m.recipient_user_id = ?) or (m.sender_user_id = ? and m.recipient_user_id = ?)
+            ORDER BY m.creation_time";
+
+    $stmt = db_get_prepare_stmt($con, $sql, [$user_id, $user_id_login, $user_id_login, $user_id]);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    return mysqli_fetch_all($result, MYSQLI_ASSOC);
+}
+
+/**
+ * Добавление пользователя в начало списка
+ *
+ * @param mysqli $con   Объект-соединение с БД
+ * @param array  $contacts список пользователей
+ * @param int    $user_id id пользователя
+ *
+ * @return array
+ */
+function addUserInList(mysqli $con, array $contacts, int $user_id) : array
+{
+    $user = dbGetUserById($con, $user_id);
+
+    $arr = ['user_id' => $user_id,
+            'creation_time' => date("Y-m-d H:i:s"),
+            'text' => "",
+            'login' => $user['login'],
+            'avatar' => $user['avatar']
+           ];
+
+    array_unshift($contacts, $arr);
+
+    return $contacts;
+}
+
+/**
+ * Запись нового комментария в БД
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param array  $post глобальный массив $_POST
+ * @param int    $user_id_login id залогиненого пользователя
+ *
+ * @return bool
+ */
+function dbAddMessage(mysqli $con, array $post, int $user_id_login) : bool
+{
+    $creation_time = date("Y-m-d H:i:s");
+    $user_id = $post['user_id'];
+    $text = $post['message'];
+
+    $sql = 'INSERT message (creation_time, `text`, recipient_user_id, sender_user_id) VALUES (?,?,?,?)';
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 'ssii', $creation_time, $text, $user_id, $user_id_login);
+
+    return mysqli_stmt_execute($stmt);
 }

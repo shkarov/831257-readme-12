@@ -54,7 +54,7 @@
                             </a>
                         </li>
                         <li class="header__my-page header__my-page--messages">
-                            <a class="header__page-link" href="#" title="Личные сообщения">
+                            <a class="header__page-link" href="messages.php" title="Личные сообщения">
                                 <span class="visually-hidden">Личные сообщения</span>
                             </a>
                         </li>
@@ -83,7 +83,7 @@
                                             </a>
                                         </li>
                                         <li class="header__profile-nav-item">
-                                            <a class="header__profile-nav-link" href="#">
+                                            <a class="header__profile-nav-link" href="messages.php">
                                                 <span class="header__profile-nav-text">Сообщения<i class="header__profile-indicator">2</i></span>
                                             </a>
                                         </li>
@@ -159,7 +159,7 @@
                         <a class="footer__page-link" href="popular.php">Популярный контент</a>
                     </li>
                     <li class="footer__my-page footer__my-page--messages">
-                        <a class="footer__page-link" href="#">Личные сообщения</a>
+                        <a class="footer__page-link" href="messages.php">Личные сообщения</a>
                     </li>
                 </ul>
                 <div class="footer__copyright">
