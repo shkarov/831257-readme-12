@@ -13,7 +13,6 @@
  */
 function sendEmail(array $conf, string $type_message, array $to, array $from, string $post_header = "") : void
 {
-//var_dump($from);
     $smtp_conf = $conf['smtp'];
 
     // Конфигурация траспорта
@@ -33,8 +32,8 @@ function sendEmail(array $conf, string $type_message, array $to, array $from, st
     $link_profile = "http://readme.local/profile.php?user_id=".$from['id'];
 
     // Отправка сообщения
-    foreach ($to as $address)
-    {
+    foreach ($to as $address) {
+
         $message->setTo([$address['email'] => $address['login']]);
 
         $message_body = "Здравствуйте, ".$address['login'].".";

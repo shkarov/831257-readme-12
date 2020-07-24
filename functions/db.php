@@ -1245,8 +1245,8 @@ function addRepost(mysqli $con, int $post_id, int $user_id_login) : bool
 
     // пост найден
     if (!empty($post)) {
-        // залогиненый пользователь репостит не свой пост
-        if ($post['user_id'] != $user_id_login) {
+        // пользователь найден и залогиненый пользователь репостит не свой пост
+        if (isValidUser($con, $post['user_id'], $user_id_login)) {
             return dbAddRepost($con, $post, $user_id_login);
         }
     }
