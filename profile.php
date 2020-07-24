@@ -53,8 +53,9 @@ if (isset($_GET['repost_onClick'])) {
 
 // Нажата кнопка Подписаться/Отписаться на пользователя, профиль которого просматривается
 if (isset($_GET['subscribeButton_onClick'])) {
-    //профиль НЕ текущего пользователя
-    if ($user_id != $user_id_login) {
+
+    //пользователь существует и профиль НЕ текущего пользователя
+    if (isValidUser($connect, $user_id, $user_id_login)) {
         if ($subscribe) {
             dbDelSubscribe($connect, $user_id, $user_id_login);
         } else {
@@ -71,15 +72,15 @@ if (isset($_GET['subscribeButton_onClick'])) {
 if (isset($_GET['subscribeButtonMutual_onClick'])) {
     $user_id_for_subscribe = (int) $_GET['user_id_subscriber'];
 
-    //профиль НЕ текущего пользователя
-    if ($user_id_for_subscribe != $user_id_login) {
+    //пользователь существует и профиль НЕ текущего пользователя
+    if (isValidUser($connect, $user_id_for_subscribe, $user_id_login)) {
         if ($_GET['subscribeButtonMutual_onClick'] === 'del') {
             dbDelSubscribe($connect, $user_id_for_subscribe, $user_id_login);
         }
         if ($_GET['subscribeButtonMutual_onClick'] === 'add') {
             if (addSubscribe($connect, $user_id_for_subscribe, $user_id_login)) {
                 $user_for_subscribe = dbGetUserById($connect, $user_id_for_subscribe);
-                sendEmail($config, 'subscribe', [['email' => $user_for_subscribe, 'login' => $user_for_subscribe]], ['id' => $user_id_login, 'login' => $user_name_login]);
+                sendEmail($config, 'subscribe', [['email' => $user_for_subscribe['email'], 'login' => $user_for_subscribe['login']]], ['id' => $user_id_login, 'login' => $user_name_login]);
             }
         }
         $url = "profile.php?user_id="."$user_id_for_subscribe";
@@ -89,19 +90,19 @@ if (isset($_GET['subscribeButtonMutual_onClick'])) {
 
 $tab = getTabFromRequest($_GET);
 
-if ($tab === 'posts') {
-    $posts = dbGetUserPosts($connect, $user_id);
-    $page_content = include_template("profile-posts.php", ['posts' => $posts, 'user_id' => $user_id]);
-}
-
-if ($tab === 'likes') {
-    $posts = dbGetUserPostsWithLikes($connect, $user_id);
-    $page_content = include_template("profile-likes.php", ['posts' => $posts, 'user_id' => $user_id]);
-}
-
-if ($tab === 'subscribes') {
-    $posts = dbGetUserSubscribersWithMutualSubscription($connect, $user_id, $user_id_login);
-    $page_content = include_template("profile-subscriptions.php", ['posts' => $posts, 'user_id' => $user_id, 'user_id_login' => $user_id_login]);
+switch ($tab) {
+    case 'posts':
+        $posts = dbGetUserPosts($connect, $user_id);
+        $page_content = include_template("profile-posts.php", ['posts' => $posts, 'user_id' => $user_id]);
+        break;
+    case 'likes':
+        $posts = dbGetUserPostsWithLikes($connect, $user_id);
+        $page_content = include_template("profile-likes.php", ['posts' => $posts, 'user_id' => $user_id]);
+        break;
+    case 'subscribes':
+        $posts = dbGetUserSubscribersWithMutualSubscription($connect, $user_id, $user_id_login);
+        $page_content = include_template("profile-subscriptions.php", ['posts' => $posts, 'user_id' => $user_id, 'user_id_login' => $user_id_login]);
+        break;
 }
 
 $page_stats = include_template("profile-stats.php", ['content' => $page_content, 'user_id' => $user_id, 'user' => $user_name, 'avatar' => $user_avatar, 'user_creation_time' => $user_creation_time,
