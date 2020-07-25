@@ -26,7 +26,7 @@ if ($errors === []) {
 
         $subscribers_list = dbGetUserSubscribers($connect, $user_id_login);
 
-        sendEmail($config, 'post', $subscribers_list, ['id' => $user_id_login, 'login' => $user_name_login], $post_header);
+        sendEmail($config['smtp'], 'post', $subscribers_list, ['id' => $user_id_login, 'login' => $user_name_login], $post_header);
 
         $url = "post.php?post_id="."$postId";
         header("HTTP/1.1 301 Moved Permanently");

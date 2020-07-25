@@ -60,7 +60,7 @@ if (isset($_GET['subscribeButton_onClick'])) {
             dbDelSubscribe($connect, $user_id, $user_id_login);
         } else {
             if (dbAddSubscribe($connect, $user_id, $user_id_login)) {
-                sendEmail($config, 'subscribe', [['email' => $user_email, 'login' => $user_name]], ['id' => $user_id_login, 'login' => $user_name_login]);
+                sendEmail($config['smtp'], 'subscribe', [['email' => $user_email, 'login' => $user_name]], ['id' => $user_id_login, 'login' => $user_name_login]);
             };
         }
         $url = "profile.php?user_id="."$user_id";
@@ -80,7 +80,7 @@ if (isset($_GET['subscribeButtonMutual_onClick'])) {
         if ($_GET['subscribeButtonMutual_onClick'] === 'add') {
             if (addSubscribe($connect, $user_id_for_subscribe, $user_id_login)) {
                 $user_for_subscribe = dbGetUserById($connect, $user_id_for_subscribe);
-                sendEmail($config, 'subscribe', [['email' => $user_for_subscribe['email'], 'login' => $user_for_subscribe['login']]], ['id' => $user_id_login, 'login' => $user_name_login]);
+                sendEmail($config['smtp'], 'subscribe', [['email' => $user_for_subscribe['email'], 'login' => $user_for_subscribe['login']]], ['id' => $user_id_login, 'login' => $user_name_login]);
             }
         }
         $url = "profile.php?user_id="."$user_id_for_subscribe";

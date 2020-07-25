@@ -1,9 +1,9 @@
 <?php
 
 /**
- * Отправка email-уведомления
+ * Подготовка заголовка и тела email-уведомления и последующая его отправка
  *
- * @param array  $conf массив c данными для подключения к smtp серверу
+ * @param array  $smtp_conf массив c данными для подключения к smtp серверу
  * @param string $type_message тип передаваемого сообщения
  * @param array  $to   массив c данными адресата
  * @param array  $from массив c данными отправителя
@@ -11,10 +11,33 @@
  *
  * @return void
  */
-function sendEmail(array $conf, string $type_message, array $to, array $from, string $post_header = "") : void
+function sendEmail(array $smtp_conf, string $type_message, array $to, array $from, string $post_header = "") : void
 {
-    $smtp_conf = $conf['smtp'];
+    $link_profile = $smtp_conf['base_url']."profile.php?user_id=".$from['id'];
 
+    if ($type_message === 'subscribe') {
+        $message_title = "У вас новый подписчик";
+        $message_body = "На вас подписался новый пользователь ".$from['login'].". Вот ссылка на его профиль: $link_profile";
+    }
+    if ($type_message === 'post') {
+        $message_title = "Новая публикация от пользователя ".$from['login'];
+        $message_body = "Пользователь ".$from['login']." только что опубликовал новую запись ".htmlspecialchars($post_header).". Посмотрите её на странице пользователя: $link_profile";
+    }
+    transferEmail($smtp_conf, $to, $message_title, $message_body);
+}
+
+/**
+ * Отправка email-уведомления
+ *
+ * @param array  $smtp_conf массив c данными для подключения к smtp серверу
+ * @param array  $to   массив c данными адресата
+ * @param string $title заголовок передаваемого сообщения
+ * @param string $body тело сообщения
+ *
+ * @return void
+ */
+function transferEmail(array $smtp_conf, array $to, string $title, string $body) : void
+{
     // Конфигурация траспорта
     $transport = new Swift_SmtpTransport($smtp_conf['host'], $smtp_conf['port']);
     $transport->setUsername($smtp_conf['user']);
@@ -23,26 +46,17 @@ function sendEmail(array $conf, string $type_message, array $to, array $from, st
     // Create the Mailer using your created Transport
     $mailer = new Swift_Mailer($transport);
 
-    $message_title = ($type_message === 'subscribe') ? "У вас новый подписчик" : "Новая публикация от пользователя ".$from['login'];
-
-    // Формирование сообщения
-    $message = new Swift_Message($message_title);
+     // Формирование сообщения
+    $message = new Swift_Message($title);
     $message->setFrom([$smtp_conf['user'] => 'Readme']);
-
-    $link_profile = "http://readme.local/profile.php?user_id=".$from['id'];
 
     // Отправка сообщения
     foreach ($to as $address) {
 
         $message->setTo([$address['email'] => $address['login']]);
 
-        $message_body = "Здравствуйте, ".$address['login'].".";
-        if ($type_message === 'subscribe') {
-            $message_body = $message_body." На вас подписался новый пользователь ".$from['login'].". Вот ссылка на его профиль: $link_profile";
-        }
-        if ($type_message === 'post') {
-            $message_body = $message_body." Пользователь ".$from['login']." только что опубликовал новую запись $post_header. Посмотрите её на странице пользователя: $link_profile";
-        }
+        $message_body = "Здравствуйте, ".$address['login'].". ".$body;
+
         $message->setBody($message_body);
         $mailer->send($message);
     }
