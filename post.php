@@ -12,16 +12,21 @@ $user_avatar_login = $_SESSION['avatar'];
 
 $post_id = getPostIdFromRequest($_GET, $_POST);
 
-$post = dbGetPostWithUserInfo($connect, $post_id);
-
-if ($post === []) {
+if (!dbFindPost($connect, $post_id)) {
     header("HTTP/1.0 404 Not Found");
     exit;
 }
+
+// повторный просмотр страницы
+if (!isset($_GET['review']) && !isset($_POST['review'])) {
+    addView($connect, $post_id, $user_id_login);
+}
+
+$post = dbGetPostWithUserInfo($connect, $post_id);
+
 $errors = checkFormComment($_POST);
 
 if (isset($_POST['comment']) && $errors === []) {
-
     if (dbAddComment($connect, $user_id_login, $_POST)) {
         $url = "profile.php?user_id=".$post['user_id'];
         header("HTTP/1.1 301 Moved Permanently");

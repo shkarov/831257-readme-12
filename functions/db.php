@@ -181,17 +181,13 @@ function dbGetPostsPopularCount(mysqli $con, ?int $typeId, string $sort) : int
 /**
  * Отправляет запрос на чтение данных о конкретном посте, к таблицам post, user,content_type в текущей БД и возвращает Ассоциативный массив
  *
- * @param $con mysqli Объект-соединение с БД
- * @param $postId int or null, id выбранного поста
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $postId, id выбранного поста
  *
  * @return  array Ассоциативный массив Информация о посте
  */
-function dbGetPostWithUserInfo(mysqli $con, ?int $postId) : array
+function dbGetPostWithUserInfo(mysqli $con, int $postId) : array
 {
-    if (is_null($postId)) {
-        return [];
-    }
-
     $sql = "SELECT p.*, u.login, u.avatar, u.subscribers, u.posts, u.creation_time AS user_creation_time, c.class
             FROM   post AS p
                    JOIN user AS u
@@ -551,6 +547,32 @@ function dbFindLogin(mysqli $con, string $login) : bool
 
     $stmt = mysqli_prepare($con, $sql);
     mysqli_stmt_bind_param($stmt, 's', $login);
+    mysqli_stmt_execute($stmt);
+    $result = mysqli_stmt_get_result($stmt);
+
+    if (!$result) {
+        exit("Ошибка MySQL: " . mysqli_error($con));
+    }
+
+    $result_rows = mysqli_num_rows($result);
+
+    return $result_rows === 0 ? false : true;
+}
+
+/**
+ * Отправляет запрос на поиск записи с полем $id к таблице post
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $post_id id поста
+ *
+ * @return bool
+ */
+function dbFindPost(mysqli $con, int $post_id) : bool
+{
+    $sql = "SELECT id FROM post WHERE id = ?";
+
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $post_id);
     mysqli_stmt_execute($stmt);
     $result = mysqli_stmt_get_result($stmt);
 
@@ -940,7 +962,7 @@ function dbGetUserSubscribersWithMutualSubscription(mysqli $con, int $user_id, i
  */
 function dbGetPostComments(mysqli $con, int $post_id) : array
 {
-    $sql = "SELECT   c.creation_time, c.text, u.login, u.avatar
+    $sql = "SELECT   c.creation_time, c.text, u.id AS user_id, u.login, u.avatar
             FROM     comment AS c
                      JOIN user AS u
                      ON   u.id = c.user_id
@@ -993,6 +1015,26 @@ function dbAddComment(mysqli $con, int $user_id, array $post) : bool
       }
     mysqli_rollback($con);
     return false;
+}
+
+/**
+ * Увеличение счетчика просмотров поста
+ *
+ * @param  mysqli $con Объект-соединение с БД
+ * @param  int $post_id id поста
+ *
+ * @return bool
+ */
+function dbAddView(mysqli $con, int $post_id) : bool
+{
+    $sql = 'UPDATE post
+            SET    views = views + 1
+            WHERE  id = ?';
+
+    $stmt = mysqli_prepare($con, $sql);
+    mysqli_stmt_bind_param($stmt, 'i', $post_id);
+
+    return mysqli_stmt_execute($stmt);
 }
 
 /**
@@ -1162,6 +1204,7 @@ function dbFindSubscribe(mysqli $con, int $user_id_creator, int $user_id_subscri
 
 /**
  * Отправляет запрос на поиск записи с $post_id к таблице post
+ * (если поста с таким id нет в БД, функция вернет 0)
  *
  * @param mysqli $con Объект-соединение с БД
  * @param int    $post_id логин пользователя из формы регистрации
@@ -1197,12 +1240,36 @@ function dbGetUserIdFromPost(mysqli $con, int $post_id) : int
  */
 function addLike(mysqli $con, int $post_id, int $user_id_login) : bool
 {
-    // залогиненый пользователь лайкает не свой пост
-    if (dbGetUserIdFromPost($con, $post_id) != $user_id_login) {
+    // пост существует
+    if (dbFindPost($con, $post_id)) {
+        // залогиненый пользователь лайкает не свой пост
+        if (dbGetUserIdFromPost($con, $post_id) != $user_id_login) {
 
-        // нет такого лайка в БД
-        if (!dbFindLike($con, $post_id, $user_id_login)) {
-            return dbAddLike($con, $post_id, $user_id_login);
+            // нет такого лайка в БД
+            if (!dbFindLike($con, $post_id, $user_id_login)) {
+                return dbAddLike($con, $post_id, $user_id_login);
+            }
+        }
+    }
+    return false;
+}
+
+/**
+ * Проверяет условия и отправляет запрос на прирост счетчика просмотра поста
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $post_id id поста
+ * @param int    $user_id_login id пользователя, открывшего текущую сессию
+ *
+ * @return bool
+ */
+function addView(mysqli $con, int $post_id, int $user_id_login) : bool
+{
+    // пост существует
+    if (dbFindPost($con, $post_id)) {
+        // залогиненый пользователь смотрит не свой пост
+        if (dbGetUserIdFromPost($con, $post_id) != $user_id_login) {
+            return dbAddView($con, $post_id);
         }
     }
     return false;
