@@ -22,7 +22,7 @@ if ($errors === []) {
     $postId = dbAddPost($connect, $user_id_login, $_POST, $_FILES);
     if (!is_null($postId)) {
 
-        $post_header = dbGetPostHeader($connect,$postId);
+        $post_header = dbGetPostHeader($connect, $postId);
 
         $subscribers_list = dbGetUserSubscribers($connect, $user_id_login);
 

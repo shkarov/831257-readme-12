@@ -176,7 +176,6 @@ CREATE TABLE IF NOT EXISTS `readme`.`message` (
   `text` TINYTEXT NULL DEFAULT NULL,
   `sender_user_id` INT UNSIGNED NOT NULL,
   `recipient_user_id` INT UNSIGNED NOT NULL,
-  `read` TINYINT(1) UNSIGNED NOT NULL DEFAULT 0,
   PRIMARY KEY (`id`),
   INDEX `fk_message_user1_idx` (`sender_user_id` ASC),
   INDEX `fk_message_user2_idx` (`recipient_user_id` ASC),

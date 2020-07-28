@@ -26,7 +26,8 @@
             <form class="header__search-form form" action="search.php" method="get">
                 <div class="header__search">
                     <label class="visually-hidden">Поиск</label>
-                    <input class="header__search-input form__input" name='search_string' type="search" value="<?= getPostVal($_GET, 'search_string'); ?>">
+                    <?php $search_string =  getPostVal($_GET, 'search_string');?>
+                    <input class="header__search-input form__input" name='search_string' type="search" value="<?= (mb_substr($search_string, 0, 1) === '#') ? "" : $search_string; ?>">
                     <button class="header__search-button button" type="submit">
                         <svg class="header__search-icon" width="18" height="18">
                             <use xlink:href="#icon-search"></use>
@@ -84,7 +85,7 @@
                                         </li>
                                         <li class="header__profile-nav-item">
                                             <a class="header__profile-nav-link" href="messages.php">
-                                                <span class="header__profile-nav-text">Сообщения<i class="header__profile-indicator">2</i></span>
+                                                <span class="header__profile-nav-text">Сообщения<i"></i></span>
                                             </a>
                                         </li>
                                         <li class="header__profile-nav-item">

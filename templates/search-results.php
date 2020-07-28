@@ -16,9 +16,9 @@
 
               <article class="search__post post <?= $post['class']; ?>">
                 <header class="post__header post__author">
-                  <a class="post__author-link" href="#" title="Автор">
+                  <a class="post__author-link" href="profile.php?user_id=<?=$post['user_id']?>" title="Автор">
                     <div class="post__avatar-wrapper">
-                      <img class="post__author-avatar" src="<?= $post['avatar']; ?>" alt="Аватар пользователя" width="60" height="60">
+                      <img class="post__author-avatar <?=empty($post['avatar']) ? 'visually-hidden' : '' ?>" src="<?= $post['avatar']; ?>" alt="Аватар пользователя" width="60" height="60">
                     </div>
                     <div class="post__info">
                       <b class="post__author-name"><?= htmlspecialchars($post['login']); ?></b>
@@ -42,9 +42,10 @@
                             <?= htmlspecialchars(textTrim($post['text'])); ?>
                         </p>
                         <?php if (substr(textTrim($post['text']), -3) === "...") : ?>
-                            <a class="post-text__more-link" href="#">Читать далее</a>
+                            <a class="post-text__more-link" href="post.php?post_id=<?= $post['id'] ?>">Читать далее</a>
                         <?php endif; ?>
                     <?php elseif ($post['class'] === "post-quote") : ?>
+                        <h2><a href="post.php?post_id=<?= $post['id'] ?>"><?= htmlspecialchars($post['heading']); ?></a></h2>
                         <blockquote>
                             <p>
                                 <?= htmlspecialchars($post['text']); ?>
@@ -94,7 +95,7 @@
                 </div>
                 <footer class="post__footer post__indicators">
                   <div class="post__buttons">
-                    <a class="post__indicator post__indicator--likes button" href="#" title="Лайк">
+                    <a class="post__indicator post__indicator--likes button" href="search.php?search_string=<?= urlencode($search_string); ?>&like_onClick&post_id=<?=$post['id']?>" title="Лайк">
                       <svg class="post__indicator-icon" width="20" height="17">
                         <use xlink:href="#icon-heart"></use>
                       </svg>
@@ -104,7 +105,7 @@
                       <span><?= $post['likes'] ?></span>
                       <span class="visually-hidden">количество лайков</span>
                     </a>
-                    <a class="post__indicator post__indicator--comments button" href="#" title="Комментарии">
+                    <a class="post__indicator post__indicator--comments button" href="post.php?post_id=<?= $post['id'] ?>" title="Комментарии">
                       <svg class="post__indicator-icon" width="19" height="17">
                         <use xlink:href="#icon-comment"></use>
                       </svg>

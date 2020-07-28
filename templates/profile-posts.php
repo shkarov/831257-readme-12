@@ -99,7 +99,11 @@
                 <?php $hashtags = explode(' ', $post['hashtags']); ?>
                     <ul class="post__tags">
                         <?php foreach ($hashtags as $hashtag) : ?>
-                            <li><a href="#">#<?= htmlspecialchars($hashtag) ?></a></li>
+                            <li>
+                                <a href="search.php?search_string=<?=urlencode('#'.$hashtag)?>">
+                                    <?=empty($hashtag) ? '' : '#'.htmlspecialchars($hashtag) ?>
+                                </a>
+                            </li>
                         <?php endforeach; ?>
                     </ul>
 

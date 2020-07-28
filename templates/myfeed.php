@@ -116,6 +116,21 @@
                     </a>
                   </div>
                 </footer>
+
+                <!-- класс выбран мной -->
+                <div class="post__footer">
+                    <?php $hashtags = explode(' ', $post['hashtags']); ?>
+                    <ul class="post__tags">
+                        <?php foreach ($hashtags as $hashtag) : ?>
+                            <li>
+                                <a href="search.php?search_string=<?=urlencode('#'.$hashtag)?>">
+                                    <?=empty($hashtag) ? '' : '#'.htmlspecialchars($hashtag) ?>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+
               </article>
 
             <?php endforeach ?>

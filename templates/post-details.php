@@ -43,6 +43,20 @@
               <span class="post__view"><?= $views;?></span>
             </div>
 
+            <!-- класс выбран мной -->
+            <div class="post__footer">
+                <?php $hashtags = explode(' ', $post['hashtags']); ?>
+                    <ul class="post__tags">
+                        <?php foreach ($hashtags as $hashtag) : ?>
+                            <li>
+                                <a href="search.php?search_string=<?=urlencode('#'.$hashtag)?>">
+                                    <?=empty($hashtag) ? '' : '#'.htmlspecialchars($hashtag) ?>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+            </div>
+
             <div class="comments">
               <form class="comments__form form" action="post.php?review" method="post">
                 <input type="hidden" name="post_id" value="<?=$post['id'];?>">
