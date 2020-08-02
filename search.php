@@ -6,8 +6,17 @@ if (!isset($_SESSION['login'])) {
     header('Location: /');
 }
 
-$user_name = $_SESSION['login'];
-$user_avatar = $_SESSION['avatar'];
+$user_id_login = $_SESSION['id'];
+$user_name_login = $_SESSION['login'];
+$user_avatar_login = $_SESSION['avatar'];
+
+// кликнута иконка лайк
+if (isset($_GET['like_onClick'])) {
+    $post_id = getPostIdFromRequest($_GET);
+    addLike($connect, $post_id, $user_id_login);
+    $referer = $_SERVER['HTTP_REFERER'];
+    header('Location: '.$referer);
+}
 
 $posts = isset($_GET['search_string']) ? dbGetPostsSearch($connect, $_GET['search_string']) : [];
 
@@ -15,6 +24,6 @@ $template = ($posts === []) ? "no-results.php" : "search-results.php";
 
 $page_content = include_template($template, ['posts' => $posts, 'search_string' => $_GET['search_string']]);
 
-$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: страница результатов поиска', 'user' => $user_name, 'avatar' => $user_avatar]);
+$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: страница результатов поиска', 'user_id' => $user_id_login, 'user' => $user_name_login, 'avatar' => $user_avatar_login]);
 
 print($layout_content);

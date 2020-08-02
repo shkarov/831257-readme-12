@@ -116,34 +116,6 @@ function extract_youtube_id($youtube_url)
 }
 
 /**
- * @param $index
- * @return false|string
- */
-/*
-function generate_random_date($index)
-{
-    $deltas = [['minutes' => 59], ['hours' => 23], ['days' => 6], ['weeks' => 4], ['months' => 11]];
-    $dcnt = count($deltas);
-
-    if ($index < 0) {
-        $index = 0;
-    }
-
-    if ($index >= $dcnt) {
-        $index = $dcnt - 1;
-    }
-
-    $delta = $deltas[$index];
-    $timeval = rand(1, current($delta));
-    $timename = key($delta);
-
-    $ts = strtotime("$timeval $timename ago");
-    $dt = date('Y-m-d H:i:s', $ts);
-
-    return $dt;
-}
-*/
-/**
  * Обрезает строку
  *
  * @param string $text - Строка текста

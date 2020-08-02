@@ -90,7 +90,7 @@
 
                 <footer class="post__footer post__indicators">
                   <div class="post__buttons">
-                    <a class="post__indicator post__indicator--likes button" href="feed.php?post_id=<?= $post['id'];?> & like_onClick" title="Лайк">
+                    <a class="post__indicator post__indicator--likes button" href="feed.php?post_id=<?= $post['id'];?>&like_onClick" title="Лайк">
                       <svg class="post__indicator-icon" width="20" height="17">
                         <use xlink:href="#icon-heart"></use>
                       </svg>
@@ -107,7 +107,7 @@
                       <span><?= $post['comments'] ?></span>
                       <span class="visually-hidden">количество комментариев</span>
                     </a>
-                    <a class="post__indicator post__indicator--repost button" href="#" title="Репост">
+                    <a class="post__indicator post__indicator--repost button" href="feed.php?post_id=<?= $post['id'];?>&repost_onClick" title="Репост">
                       <svg class="post__indicator-icon" width="19" height="17">
                         <use xlink:href="#icon-repost"></use>
                       </svg>
@@ -116,6 +116,21 @@
                     </a>
                   </div>
                 </footer>
+
+                <!-- класс выбран мной -->
+                <div class="post__footer">
+                    <?php $hashtags = explode(' ', $post['hashtags']); ?>
+                    <ul class="post__tags">
+                        <?php foreach ($hashtags as $hashtag) : ?>
+                            <li>
+                                <a href="search.php?search_string=<?=urlencode('#'.$hashtag)?>">
+                                    <?=empty($hashtag) ? '' : '#'.htmlspecialchars($hashtag) ?>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+                </div>
+
               </article>
 
             <?php endforeach ?>

@@ -26,7 +26,8 @@
             <form class="header__search-form form" action="search.php" method="get">
                 <div class="header__search">
                     <label class="visually-hidden">Поиск</label>
-                    <input class="header__search-input form__input" name='search_string' type="search" value="<?= getPostVal($_GET, 'search_string'); ?>">
+                    <?php $search_string =  getPostVal($_GET, 'search_string');?>
+                    <input class="header__search-input form__input" name='search_string' type="search" value="<?= (mb_substr($search_string, 0, 1) === '#') ? "" : $search_string; ?>">
                     <button class="header__search-button button" type="submit">
                         <svg class="header__search-icon" width="18" height="18">
                             <use xlink:href="#icon-search"></use>
@@ -54,7 +55,7 @@
                             </a>
                         </li>
                         <li class="header__my-page header__my-page--messages">
-                            <a class="header__page-link" href="#" title="Личные сообщения">
+                            <a class="header__page-link" href="messages.php" title="Личные сообщения">
                                 <span class="visually-hidden">Личные сообщения</span>
                             </a>
                         </li>
@@ -83,8 +84,8 @@
                                             </a>
                                         </li>
                                         <li class="header__profile-nav-item">
-                                            <a class="header__profile-nav-link" href="#">
-                                                <span class="header__profile-nav-text">Сообщения<i class="header__profile-indicator">2</i></span>
+                                            <a class="header__profile-nav-link" href="messages.php">
+                                                <span class="header__profile-nav-text">Сообщения<i"></i></span>
                                             </a>
                                         </li>
                                         <li class="header__profile-nav-item">
@@ -159,7 +160,7 @@
                         <a class="footer__page-link" href="popular.php">Популярный контент</a>
                     </li>
                     <li class="footer__my-page footer__my-page--messages">
-                        <a class="footer__page-link" href="#">Личные сообщения</a>
+                        <a class="footer__page-link" href="messages.php">Личные сообщения</a>
                     </li>
                 </ul>
                 <div class="footer__copyright">

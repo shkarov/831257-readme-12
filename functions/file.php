@@ -3,8 +3,8 @@
 /**
  * Сохранение аватара нового пользователя локально
  *
- * @param  mysqli $con Объект-соединение с БД
- * @param  array $files массив с данными о загружаемом аватаре пользователя
+ * @param mysqli $con Объект-соединение с БД
+ * @param array $files массив с данными о загружаемом аватаре пользователя
  *
  * @return string возвращает относительный путь к загруженному файлу либо null
  */
@@ -33,12 +33,12 @@ function savePicture(mysqli $con, array $files) : ?string
 /**
  * Возвращает массив, отсортированный по убыванию (пузырьковый метод)
  *
- * @param array $arr Массим данных
- * @param $user_id int поле, по которому сортируется массив
+ * @param array  $arr Массим данных
+ * @param string $field поле, по которому сортируется массив
  *
  * @return array Отсортированный массив
  */
-function sortBubbleDescArray($arr, $field)
+function sortBubbleDescArray(array $arr, string $field) : array
 {
     $size = count($arr);
 

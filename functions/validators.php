@@ -24,7 +24,9 @@ function is_date_valid(string $date): bool
 
 /**
  * Проверяет, что переданная ссылка ведет на публично доступное видео с youtube
+ *
  * @param string $youtube_url Ссылка на youtube видео
+ *
  * @return bool
  */
 function check_youtube_url(?string $youtube_url) : bool
@@ -48,7 +50,9 @@ function check_youtube_url(?string $youtube_url) : bool
 
 /**
  * Возвращает код iframe для вставки youtube видео на страницу
+ *
  * @param string $youtube_url Ссылка на youtube видео
+ *
  * @return string
  */
 function embed_youtube_video(?string $youtube_url) : bool
@@ -60,15 +64,14 @@ function embed_youtube_video(?string $youtube_url) : bool
         $src = "https://www.youtube.com/embed/" . $id;
         $res = '<iframe width="760" height="400" src="' . $src . '" frameborder="0"></iframe>';
     }
-
     return $res;
 }
 
 /**
  * Валидация полей формы, перенаправление к валидации формы конкретного типа контента
  *
- * @param  array $post глобальный массив $_POST
- * @param  array $files глобальный массив $_FILES
+ * @param array $post глобальный массив $_POST
+ * @param array $files глобальный массив $_FILES
  *
  * @return array вызов функции для проверки формы данного типа контента, возвращающей массив ошибок
  */
@@ -97,8 +100,9 @@ function checkForm(array $post, array $files) : array
 
 /**
  * Валидация полей формы, контент Фото
- * @param  array $post глобальный массив $_POST
- * @param  array $files глобальный массив $_FILES
+ *
+ * @param array $post глобальный массив $_POST
+ * @param array $files глобальный массив $_FILES
  *
  * @return array массив ошибок
  */
@@ -123,7 +127,8 @@ function checkPhotoForm(array $post, array $files = []) : array
 
 /**
  * Валидация полей формы, контент Видео
- * @param  array $arr Ассоциативный массив, переданный из формы методом post
+ *
+ * @param array $arr Ассоциативный массив, переданный из формы методом post
  *
  * @return array массив ошибок
  */
@@ -148,7 +153,8 @@ function checkVideoForm(array $arr) : array
 
 /**
  * Валидация полей формы, контент Текст
- * @param  array $arr Ассоциативный массив, переданный из формы методом post
+ *
+ * @param array $arr Ассоциативный массив, переданный из формы методом post
  *
  * @return array массив ошибок
  */
@@ -173,7 +179,8 @@ function checkTextForm(array $arr) : array
 
 /**
  * Валидация полей формы, контент Цитата
- * @param  array $arr Ассоциативный массив, переданный из формы методом post
+ *
+ * @param array $arr Ассоциативный массив, переданный из формы методом post
  *
  * @return array массив ошибок
  */
@@ -201,7 +208,8 @@ function checkQuoteForm(array $arr) : array
 
 /**
  * Валидация полей формы, контент Ссылка
- * @param  array $arr Ассоциативный массив, переданный из формы методом post
+ *
+ * @param array $arr Ассоциативный массив, переданный из формы методом post
  *
  * @return array массив ошибок
  */
@@ -237,7 +245,8 @@ function validateFilled(?string $name) : bool
 
 /**
  * Проверка поля формы "Заголовок"
- * @param  string $name
+ *
+ * @param string $name
  *
  * @return array массив сообшений об ошибках
  */
@@ -255,7 +264,8 @@ function validateHeading(?string $name) : array
 
 /**
  * Проверка поля формы "Теги"
- * @param  string $name
+ *
+ * @param string $name
  *
  * @return array массив сообшений об ошибках
  */
@@ -281,8 +291,9 @@ function validateTag(?string $name) : array
 
 /**
  * Проверка поля формы "Файл и Ссылка из интернета"
- * @param  string $url ссылка на файл в сети
- * @param  array $files глобальный массив $_FILES
+ *
+ * @param string $url ссылка на файл в сети
+ * @param array $files глобальный массив $_FILES
  *
  * @return array массив сообшений об ошибках
  */
@@ -382,7 +393,8 @@ function validateText(?string $name) : array
 
 /**
  * Проверка поля формы "Автор цитаты"
- * @param  string $name
+ *
+ * @param string $name
  *
  * @return array массив сообшений об ошибках
  */
@@ -400,7 +412,8 @@ function validateAuthor(?string $name) : array
 
 /**
  * Проверка поля формы "URL ссылка"
- * @param  string $name
+ *
+ * @param string $name
  *
  * @return array массив сообшений об ошибках
  */
@@ -424,8 +437,8 @@ function validateUrl(?string $name) : array
  * Валидация полей формы, перенаправление к валидации формы конкретного типа контента
  *
  * @param mysqli $con Объект-соединение с БД
- * @param  array $post глобальный массив $_POST
- * @param  array $files глобальный массив $_FILES
+ * @param array $post глобальный массив $_POST
+ * @param array $files глобальный массив $_FILES
  *
  * @return array вызов функции для проверки формы данного типа контента, возвращающей массив ошибок
  */
@@ -491,7 +504,7 @@ function validateEmail(mysqli $con, ?string $name) : array
  *
  * @param mysqli $con Объект-соединение с БД
  * @param string $name
- * @param  string $name
+ * @param string $name
  *
  * @return array массив сообшений об ошибках
  */
@@ -513,7 +526,8 @@ function validateLogin(mysqli $con, ?string $name) : array
 
 /**
  * Проверка поля формы "Пароль"
- * @param  string $name
+ *
+ * @param string $name
  *
  * @return array массив сообшений об ошибках
  */
@@ -531,8 +545,9 @@ function validatePassword(?string $name) : array
 
 /**
  * Проверка поля формы "Повтор пароля"
- * @param  string $name строка для сравнения
- * @param  string $nameOrigin строка оригинал
+ *
+ * @param string $name строка для сравнения
+ * @param string $nameOrigin строка оригинал
  *
  * @return array массив сообшений об ошибках
  */
@@ -636,32 +651,6 @@ function validateEmailLogin(mysqli $con, ?string $name) : array
     return $error;
 }
 
-
-/**
- * Валидация поля формы Комментарий
- * @param  array $arr Ассоциативный массив, переданный из формы методом post
- *
- * @return array массив ошибок
- */
-function checkFormComment(array $arr) : array
-{
-    $error = [];
-    // min и max длина текста
-    $minlength = 4;
-    $maxlength = 70;
-
-    if (isset($arr['comment'])) {
-        if (validateFilled($arr['comment'])) {
-            $error['comment']['header'] = "Это обязательно поле.";
-            $error['comment']['description'] = "Введите текст сообщения.";
-        } elseif (!isCorrectLength($arr['comment'], $minlength, $maxlength)) {
-            $error['comment']['header'] = "Длина текста не соответствует требованиям.";
-            $error['comment']['description'] = "Допустимая длина текста от 4 до 70 знаков.";
-        }
-    }
-    return $error;
-}
-
 /**
  * Проверка длины поля
  *
@@ -680,13 +669,127 @@ function isCorrectLength(string $name, int $min, int $max) : bool
 /**
  * Проверка соответствия типа сортировки допустимому значению
  *
- * @param  array $arr Ассоциативный массив, переданный из формы методом get
+ * @param array $arr Ассоциативный массив, переданный из формы методом get
  *
  * @return bool
  */
 function isSortValid(array $arr) : bool
 {
-    $sort_types = [null, '', 'likes', 'creation_time'];
+    $sort_types = [null, '', 'views', 'likes', 'creation_time'];
 
     return (isset($arr['sort']) && !in_array($arr['sort'], $sort_types)) ? false : true;
+}
+
+/**
+ * Проверка соответствия типа вкладок допустимому значению
+ *
+ * @param array $arr Ассоциативный массив, переданный из формы методом get
+ *
+ * @return bool
+ */
+function isTabValid(array $arr) : bool
+{
+    $tab_types = [null, '', 'likes', 'subscribes'];
+
+    return (isset($arr['tab']) && !in_array($arr['tab'], $tab_types)) ? false : true;
+}
+
+/**
+ * Проверка соответствия значения параметра запроса допустимому значению
+ *
+ * @param array $arr Ассоциативный массив, переданный из формы методом get
+ *
+ * @return bool
+ */
+function isParameterValid(array $arr, $name) : bool
+{
+    $types = [null, '', 'likes'];
+
+    if ($name === 'sort') {
+        $types[] = 'creation_time';
+    }
+    if ($name === 'tab') {
+        $types[] = 'subscribes';
+    }
+
+    return (isset($arr[$name]) && !in_array($arr[$name], $types)) ? false : true;
+}
+
+/**
+ * Валидация поля формы сообщения
+ * @param array  $arr Ассоциативный массив, переданный из формы методом post
+ *
+ * @return array массив ошибок
+ */
+function checkFormComment(array $arr) : array
+{
+    $error = [];
+    // min и max длина текста
+    $minlength = 4;
+    $maxlength = 70;
+
+    $name_field = 'comment';
+
+    if (isset($arr[$name_field])) {
+        if (validateFilled($arr[$name_field])) {
+            $error[$name_field]['header'] = "Это обязательно поле.";
+            $error[$name_field]['description'] = "Введите текст сообщения.";
+        } elseif (!isCorrectLength($arr[$name_field], $minlength, $maxlength)) {
+            $error[$name_field]['header'] = "Длина текста не соответствует требованиям.";
+            $error[$name_field]['description'] = "Допустимая длина текста от 4 до 70 знаков.";
+        }
+    }
+    return $error;
+}
+
+/**
+ * Валидация поля формы сообщения
+ * @param array  $arr Ассоциативный массив, переданный из формы методом post
+ *
+ * @return array массив ошибок
+ */
+function checkFormMessage(array $arr) : array
+{
+    $error = [];
+    $name_field = 'message';
+
+    if (isset($arr[$name_field])) {
+        if (validateFilled($arr[$name_field])) {
+            $error[$name_field]['header'] = "Это обязательно поле.";
+            $error[$name_field]['description'] = "Введите текст сообщения.";
+        }
+    }
+    return $error;
+}
+
+/**
+ * Проверка существования пользователя и его отличия от залогиненого пользователя
+ *
+ * @param mysqli $con   Объект-соединение с БД
+ * @param int    $user_id id пользователя адресата
+ * @param int    $user_id_login id залогиненого пользователя
+ *
+ * @return bool
+ */
+function isValidUser(mysqli $con, ?int $user_id, int $user_id_login) : bool
+{
+    return !empty(dbGetUserById($con, $user_id)) && ($user_id != $user_id_login);
+}
+
+/**
+ * Проверка наличия пользователя в списке
+ *
+ * @param array $contacts список пользователей
+ * @param int   $user_id id пользователя
+ *
+ * @return bool
+ */
+function isUserPresentInList(array $contacts, int $user_id) : bool
+{
+    foreach ($contacts as $contact) {
+        if ($contact['user_id'] === $user_id) {
+            return true;
+        }
+    }
+    return false;
 }

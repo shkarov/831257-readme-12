@@ -12,7 +12,7 @@
 
             <div class="post__indicators">
               <div class="post__buttons">
-                <a class="post__indicator post__indicator--likes button" href="post.php?post_id=<?= $post['id'];?> & like_onClick" title="Лайк">
+                <a class="post__indicator post__indicator--likes button" href="post.php?post_id=<?= $post['id'];?>&like_onClick&review" title="Лайк">
                   <svg class="post__indicator-icon" width="20" height="17">
                     <use xlink:href="#icon-heart"></use>
                   </svg>
@@ -29,7 +29,7 @@
                   <span><?=$post['comments'];?></span>
                   <span class="visually-hidden">количество комментариев</span>
                 </a>
-                <a class="post__indicator post__indicator--repost button" href="#" title="Репост">
+                <a class="post__indicator post__indicator--repost button" href="post.php?post_id=<?= $post['id'];?>&repost_onClick&review" title="Репост">
                   <svg class="post__indicator-icon" width="19" height="17">
                     <use xlink:href="#icon-repost"></use>
                   </svg>
@@ -43,8 +43,22 @@
               <span class="post__view"><?= $views;?></span>
             </div>
 
+            <!-- класс выбран мной -->
+            <div class="post__footer">
+                <?php $hashtags = explode(' ', $post['hashtags']); ?>
+                    <ul class="post__tags">
+                        <?php foreach ($hashtags as $hashtag) : ?>
+                            <li>
+                                <a href="search.php?search_string=<?=urlencode('#'.$hashtag)?>">
+                                    <?=empty($hashtag) ? '' : '#'.htmlspecialchars($hashtag) ?>
+                                </a>
+                            </li>
+                        <?php endforeach; ?>
+                    </ul>
+            </div>
+
             <div class="comments">
-              <form class="comments__form form" action="post.php" method="post">
+              <form class="comments__form form" action="post.php?review" method="post">
                 <input type="hidden" name="post_id" value="<?=$post['id'];?>">
                 <div class="comments__my-avatar">
                   <img class="comments__picture <?=empty($user_login_avatar) ? 'visually-hidden' : '' ?>" src="<?=$user_login_avatar;?>" alt="Аватар пользователя">
@@ -66,13 +80,13 @@
                  <?php foreach ($comments as $comment) : ?>
                   <li class="comments__item user">
                     <div class="comments__avatar">
-                      <a class="user__avatar-link" href="#">
+                      <a class="user__avatar-link" href="profile.php?user_id=<?= $comment['user_id'] ?>">
                         <img class="comments__picture <?=empty($comment['avatar']) ? 'visually-hidden' : '' ?>" src="<?= $comment['avatar'] ?>" alt="Аватар пользователя">
                       </a>
                     </div>
                     <div class="comments__info">
                       <div class="comments__name-wrapper">
-                        <a class="comments__user-name" href="#">
+                        <a class="comments__user-name" href="profile.php?user_id=<?= $comment['user_id'] ?>">
                           <span><?= htmlspecialchars($comment['login']) ?></span>
                         </a>
                         <?php
@@ -88,12 +102,6 @@
                  <?php endforeach; ?>
 
                 </ul>
-<!--
-                <a class="comments__more-link" href="#">
-                  <span>Показать все комментарии</span>
-                  <sup class="comments__amount">45</sup>
-                </a>
--->
               </div>
             </div>
           </div>
