@@ -49,6 +49,27 @@ function check_youtube_url(?string $youtube_url) : bool
 }
 
 /**
+ * Функция проверяет доступно ли видео по ссылке на youtube
+ * @param string $url ссылка на видео
+ *
+ * @return bool
+ */
+function check_youtube_link($url)
+{
+    $result = true;
+    $id = extract_youtube_id($url);
+    $headers = get_headers('https://www.youtube.com/oembed?format=json&url=http://www.youtube.com/watch?v=' . $id);
+    if (!is_array($headers)) {
+        $result = false;
+    }
+    $err_flag = strpos($headers[0], '200') ? 200 : 404;
+    if ($err_flag !== 200) {
+        $result = false;
+    }
+    return $result;
+}
+
+/**
  * Возвращает код iframe для вставки youtube видео на страницу
  *
  * @param string $youtube_url Ссылка на youtube видео
@@ -365,7 +386,7 @@ function validateYoutubeLink(?string $name) : array
         $error['report'] = $type."Ошибка URL.";
         $error['header'] = "Ошибочная ссылка.";
         $error['description'] = "Введите корректный адрес ссылки на видеоролик.";
-    } elseif (!check_youtube_url($name)) {
+    } elseif (!check_youtube_link($name)) {
         $error['report'] = $type."Видео не доступно.";
         $error['header'] = "Ошибка доступа.";
         $error['description'] = "Указанный видеоролик недоступен. Укажите ссылку на видеоролик с публичным доступом";

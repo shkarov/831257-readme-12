@@ -25,14 +25,14 @@
                 <span class="profile__rating-text user__rating-text">подписчиков</span>
               </p>
             </div>
-            <div class="profile__user-buttons user__buttons">
+            <div class="profile__user-buttons user__buttons <?=$user_id === $user_id_login ? 'visually-hidden' : '' ?>">
                 <button class="profile__user-button user__button user__button--subscription button button--main" type="button">
                     <a href="profile.php?user_id=<?=$user_id?>&subscribeButton_onClick">
                         <?= ($subscribe) ? 'Отписаться' : 'Подписаться'?>
                     </a>
                 </button>
 
-                <a class="profile__user-button user__button user__button--writing button button--green" href="messages.php?user_id=<?=$user_id?>">Сообщение</a>
+                <a class="profile__user-button user__button user__button--writing button button--green <?= !$subscribe ? 'visually-hidden' : '' ?>" href="messages.php?user_id=<?=$user_id?>">Сообщение</a>
             </div>
           </div>
         </div>

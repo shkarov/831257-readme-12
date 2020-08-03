@@ -58,10 +58,10 @@
             </div>
 
             <div class="comments">
-              <form class="comments__form form" action="post.php?review" method="post">
+              <form class="comments__form form <?=($post['user_id'] === $user_id_login) ? 'visually-hidden' : '' ?>" action="post.php?review" method="post">
                 <input type="hidden" name="post_id" value="<?=$post['id'];?>">
                 <div class="comments__my-avatar">
-                  <img class="comments__picture <?=empty($user_login_avatar) ? 'visually-hidden' : '' ?>" src="<?=$user_login_avatar;?>" alt="Аватар пользователя">
+                  <img class="comments__picture <?=empty($user_avatar_login) ? 'visually-hidden' : '' ?>" src="<?=$user_avatar_login;?>" alt="Аватар пользователя">
                 </div>
                 <div class="form__input-section <?= isset($errors['comment']) ? "form__input-section--error" : ""; ?>">
                   <textarea class="comments__textarea form__textarea form__input" name="comment" placeholder="Ваш комментарий"><?= getPostVal($_POST, 'comment'); ?></textarea>
@@ -133,9 +133,13 @@
                 <span class="post-details__rating-text user__rating-text">публикаций</span>
               </p>
             </div>
-            <div class="post-details__user-buttons user__buttons">
-              <button class="user__button user__button--subscription button button--main" type="button">Подписаться</button>
-              <a class="user__button user__button--writing button button--green" href="add.php">Сообщение</a>
+            <div class="post-details__user-buttons user__button <?=$post['user_id'] === $user_id_login ? 'visually-hidden' : '' ?>">
+                <button class="user__button user__button--subscription button button--main" type="button">
+                    <a href="post.php?post_id=<?=$post['id']?>&subscribeButton_onClick">
+                        <?= ($subscribe) ? 'Отписаться' : 'Подписаться'?>
+                    </a>
+                </button>
+              <a class="user__button user__button--writing button button--green <?= !$subscribe ? 'visually-hidden' : '' ?>" href="messages.php?user_id=<?=$post['user_id']?>">Сообщение</a>
             </div>
           </div>
 

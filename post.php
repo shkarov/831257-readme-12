@@ -27,31 +27,56 @@ $post = dbGetPostWithUserInfo($connect, $post_id);
 $errors = checkFormComment($_POST);
 
 if (isset($_POST['comment']) && $errors === []) {
-    if (dbAddComment($connect, $user_id_login, $_POST)) {
+    if (addComment($connect, $_POST['post_id'], $user_id_login, $_POST['comment'])) {
         $url = "profile.php?user_id=".$post['user_id'];
         header("HTTP/1.1 301 Moved Permanently");
         header('Location: '.$url);
     }
 }
 
-$comments = dbGetPostComments($connect, $post_id);
-
 // кликнута иконка лайк
 if (isset($_GET['like_onClick'])) {
-    addLike($connect, (int) $_GET['post_id'], $user_id_login);
-    $referer = $_SERVER['HTTP_REFERER'];
-    header('Location: '.$referer);
+    if (addLike($connect, (int) $_GET['post_id'], $user_id_login)) {
+        $referer = $_SERVER['HTTP_REFERER'];
+        header('Location: '.$referer);
+    }
 }
 
 // кликнута иконка repost
 if (isset($_GET['repost_onClick'])) {
-    addRepost($connect, $post_id, $user_id_login);
-    $url = "profile.php?user_id=$user_id_login";
-    header('Location: '.$url);
+    if (addRepost($connect, $post_id, $user_id_login)) {
+        $url = "profile.php?user_id=$user_id_login";
+        header('Location: '.$url);
+    }
 }
 
-$page_content = include_template("post-details.php", ['post' => $post, 'comments' => $comments, 'user_login_id' => $user_id_login, 'user_login_avatar' => $user_avatar_login, 'errors' => $errors]);
+// автор поста
+$user_id = $post['user_id'];
 
-$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user_id' => $user_id_login, 'user' => $user_name_login, 'avatar' => $user_avatar_login]);
+// проверка наличия подписки
+$subscribe = dbFindSubscribe($connect, $user_id, $user_id_login);
+
+// Нажата кнопка Подписаться/Отписаться на пользователя, профиль которого просматривается
+if (isset($_GET['subscribeButton_onClick'])) {
+
+    //пользователь существует и профиль НЕ текущего пользователя
+    if (isValidUser($connect, $user_id, $user_id_login)) {
+        if ($subscribe) {
+            dbDelSubscribe($connect, $user_id, $user_id_login);
+        } else {
+            if (dbAddSubscribe($connect, $user_id, $user_id_login)) {
+                sendEmail($config['smtp'], 'subscribe', [['email' => $post['email'], 'login' => $post['login']]], ['id' => $user_id_login, 'login' => $user_name_login]);
+            };
+        }
+        $url = "profile.php?user_id="."$user_id";
+        header('Location: '.$url);
+    }
+}
+
+$comments = dbGetPostComments($connect, $post_id);
+
+$page_content = include_template("post-details.php", ['post' => $post, 'comments' => $comments, 'user_id_login' => $user_id_login, 'user_avatar_login' => $user_avatar_login, 'errors' => $errors, 'subscribe' => $subscribe]);
+
+$layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: публикация', 'user_id' => $user_id_login, 'user' => $user_name_login, 'avatar' => $user_avatar_login]);
 
 print($layout_content);

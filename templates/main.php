@@ -11,7 +11,7 @@
                 <b class="popular__sorting-caption sorting__caption">Сортировка:</b>
                 <ul class="popular__sorting-list sorting__list">
                     <li class="sorting__item sorting__item--popular">
-                        <a class="sorting__link <?= is_null($sort) ? "sorting__link--active" : ""; ?>" href="popular.php?type_id=<?=$type_id_current?>">
+                        <a class="sorting__link <?= $sort === 'views' ? "sorting__link--active" : ""; ?>" href="popular.php?type_id=<?=$type_id_current?>">
                             <span>Популярность</span>
                             <svg class="sorting__icon" width="10" height="12">
                                 <use xlink:href="#icon-sort"></use>
@@ -196,7 +196,7 @@
 
             <?php endforeach; ?>
         </div>
-        <div class="popular__page-links">
+        <div class="popular__page-links <?=$count_pages < 2 ? 'visually-hidden' : '' ?>">
             <a class="popular__page-link popular__page-link--prev button button--gray" href="popular.php?page=<?=$page-1;?>&type_id=<?=$type_id_current?>&sort=<?=$sort_current?>">Предыдущая страница</a>
             <a class="popular__page-link popular__page-link--next button button--gray" href="popular.php?page=<?=$page+1;?>&type_id=<?=$type_id_current?>&sort=<?=$sort_current?>">Следующая страница</a>
         </div>

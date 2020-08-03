@@ -39,16 +39,18 @@ $post_id = getPostIdFromRequest($_GET);
 
 // кликнута иконка лайк
 if (isset($_GET['like_onClick'])) {
-    addLike($connect, $post_id, $user_id_login);
-    $referer = $_SERVER['HTTP_REFERER'];
-    header('Location: '.$referer);
+    if (addLike($connect, $post_id, $user_id_login)) {
+        $referer = $_SERVER['HTTP_REFERER'];
+        header('Location: '.$referer);
+    }
 }
 
 // кликнута иконка repost
 if (isset($_GET['repost_onClick'])) {
-    addRepost($connect, $post_id, $user_id_login);
-    $url = "profile.php?user_id=$user_id_login";
-    header('Location: '.$url);
+    if (addRepost($connect, $post_id, $user_id_login)) {
+        $url = "profile.php?user_id=$user_id_login";
+        header('Location: '.$url);
+    }
 }
 
 // Нажата кнопка Подписаться/Отписаться на пользователя, профиль которого просматривается
@@ -106,7 +108,7 @@ switch ($tab) {
 }
 
 $page_stats = include_template("profile-stats.php", ['content' => $page_content, 'user_id' => $user_id, 'user' => $user_name, 'avatar' => $user_avatar, 'user_creation_time' => $user_creation_time,
-                                'posts_count' => $user_posts_count, 'subscribers' => $user_subscribers, 'subscribe' => $subscribe, 'tab' => $tab]);
+                                'posts_count' => $user_posts_count, 'subscribers' => $user_subscribers, 'subscribe' => $subscribe, 'tab' => $tab, 'user_id_login' => $user_id_login]);
 
 $layout_content = include_template("layout.php", ['content' => $page_stats, 'title' => 'readme: профиль', 'user_id' => $user_id_login, 'user' => $user_name_login, 'avatar' => $user_avatar_login]);
 

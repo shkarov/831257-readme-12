@@ -13,9 +13,10 @@ $user_avatar_login = $_SESSION['avatar'];
 // кликнута иконка лайк
 if (isset($_GET['like_onClick'])) {
     $post_id = getPostIdFromRequest($_GET);
-    addLike($connect, $post_id, $user_id_login);
-    $referer = $_SERVER['HTTP_REFERER'];
-    header('Location: '.$referer);
+    if (addLike($connect, $post_id, $user_id_login)) {
+        $referer = $_SERVER['HTTP_REFERER'];
+        header('Location: '.$referer);
+    }
 }
 
 $posts = isset($_GET['search_string']) ? dbGetPostsSearch($connect, $_GET['search_string']) : [];

@@ -188,7 +188,7 @@ function dbGetPostsPopularCount(mysqli $con, ?int $typeId, string $sort) : int
  */
 function dbGetPostWithUserInfo(mysqli $con, int $postId) : array
 {
-    $sql = "SELECT p.*, u.login, u.avatar, u.subscribers, u.posts, u.creation_time AS user_creation_time, c.class, GROUP_CONCAT(DISTINCT tags.name ORDER BY tags.name ASC SEPARATOR ' ') AS hashtags
+    $sql = "SELECT p.*, u.login, u.avatar, u.email, u.subscribers, u.posts, u.creation_time AS user_creation_time, c.class, GROUP_CONCAT(DISTINCT tags.name ORDER BY tags.name ASC SEPARATOR ' ') AS hashtags
             FROM   post AS p
                    JOIN user AS u
                    ON u.id = p.user_id
@@ -1004,23 +1004,46 @@ function dbGetPostComments(mysqli $con, int $post_id) : array
 }
 
 /**
- * Запись нового комментария в БД
+ * Проверяет условия и отправляет запрос на добавление комментария к посту
  *
  * @param mysqli $con Объект-соединение с БД
- * @param int    $$user_id id пользователя, добавившего комментарий
- * @param array  $post глобальный массив $_POST
+ * @param int    $post_id id поста
+ * @param int    $user_id_login id пользователя, открывшего текущую сессию
+ * @param string $comment текст комментария
  *
  * @return bool
  */
-function dbAddComment(mysqli $con, int $user_id, array $post) : bool
+function addComment(mysqli $con, int $post_id, int $user_id_login, string $comment) : bool
+{
+    // пост существует
+    if (dbFindPost($con, $post_id)) {
+        //автор поста
+        $user_id = dbGetUserIdFromPost($con, $post_id);
+        // залогиненый пользователь комментирует не свой пост
+        if ($user_id != $user_id_login) {
+            return dbAddComment($con, $post_id, $user_id_login, $comment);
+        }
+    }
+    return false;
+}
+
+/**
+ * Запись нового комментария в БД
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $post_id id поста
+ * @param int    $$user_id id пользователя, добавившего комментарий
+ * @param string $comment текст комментария
+ *
+ * @return bool
+ */
+function dbAddComment(mysqli $con, int $post_id, int $user_id, string $comment) : bool
 {
     $creation_time = date("Y-m-d H:i:s");
-    $post_id = $post['post_id'];
-    $text = $post['comment'];
 
     $sql1 = 'INSERT comment (creation_time, `text`, user_id, post_id) VALUES (?,?,?,?)';
     $stmt1 = mysqli_prepare($con, $sql1);
-    mysqli_stmt_bind_param($stmt1, 'ssii', $creation_time, $text, $user_id, $post_id);
+    mysqli_stmt_bind_param($stmt1, 'ssii', $creation_time, $comment, $user_id, $post_id);
 
     $sql2 = 'UPDATE post
              SET    comments = comments + 1
