@@ -10,9 +10,9 @@
               <div class="profile__name-wrapper user__name-wrapper">
                 <span class="profile__name user__name"><?= $user ?></span>
                 <?php
-                    $dateView = dateDifferent($user_creation_time, 'на сайте');
+                    $date_view = dateDifferent($user_creation_time, 'на сайте');
                 ?>
-                <time class="profile__user-time user__time" datetime="<?= $user_creation_time ?>"><?= $dateView ?></time>
+                <time class="profile__user-time user__time" datetime="<?= $user_creation_time ?>"><?= $date_view ?></time>
               </div>
             </div>
             <div class="profile__rating user__rating">

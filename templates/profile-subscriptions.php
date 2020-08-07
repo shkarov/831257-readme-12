@@ -15,9 +15,9 @@
                             <span><?= $post['login']; ?></span>
                         </a>
                         <?php
-                            $dateView = dateDifferent($post['creation_time_user']);
+                            $date_view = dateDifferent($post['creation_time_user']);
                         ?>
-                        <time class="post-mini__time user__additional" datetime="<?= $post['creation_time_user'] ?>"><?= $dateView ?></time>
+                        <time class="post-mini__time user__additional" datetime="<?= $post['creation_time_user'] ?>"><?= $date_view ?></time>
                     </div>
                 </div>
                 <div class="post-mini__rating user__rating">

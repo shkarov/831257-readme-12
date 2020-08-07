@@ -90,9 +90,9 @@
                           <span><?= htmlspecialchars($comment['login']) ?></span>
                         </a>
                         <?php
-                            $dateView = dateDifferent($comment['creation_time']);
+                            $date_view = dateDifferent($comment['creation_time']);
                         ?>
-                        <time class="comments__time" datetime="<?= $comment['creation_time'] ?>"><?= $dateView ?></time>
+                        <time class="comments__time" datetime="<?= $comment['creation_time'] ?>"><?= $date_view ?></time>
                       </div>
                       <p class="comments__text">
                         <?= htmlspecialchars($comment['text']) ?>
@@ -118,9 +118,9 @@
                   <span><?= $post['login'] ?></span>
                 </a>
                 <?php
-                    $dateView = dateDifferent($post['user_creation_time'], 'на сайте');
+                    $date_view = dateDifferent($post['user_creation_time'], 'на сайте');
                 ?>
-                <time class="post-details__time user__time" datetime="<?= $post['user_creation_time'] ?>"><?= $dateView ?></time>
+                <time class="post-details__time user__time" datetime="<?= $post['user_creation_time'] ?>"><?= $date_view ?></time>
               </div>
             </div>
             <div class="post-details__rating user__rating">

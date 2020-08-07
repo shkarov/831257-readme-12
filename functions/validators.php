@@ -23,32 +23,6 @@ function is_date_valid(string $date): bool
 }
 
 /**
- * Проверяет, что переданная ссылка ведет на публично доступное видео с youtube
- *
- * @param string $youtube_url Ссылка на youtube видео
- *
- * @return bool
- */
-function check_youtube_url(?string $youtube_url) : bool
-{
-    $res = false;
-    $id = extract_youtube_id($youtube_url);
-
-    if ($id) {
-        $api_data = ['id' => $id, 'part' => 'id,status', 'key' => 'AIzaSyBN-AXBnCPxO3HJfZZdZEHMybVfIgt16PQ'];
-        $url = "https://www.googleapis.com/youtube/v3/videos?" . http_build_query($api_data);
-
-        $resp = file_get_contents($url);
-
-        if ($resp && $json = json_decode($resp, true)) {
-            $res = $json['pageInfo']['totalResults'] > 0 && $json['items'][0]['status']['privacyStatus'] == 'public';
-        }
-    }
-
-    return $res;
-}
-
-/**
  * Функция проверяет доступно ли видео по ссылке на youtube
  * @param string $url ссылка на видео
  *
@@ -76,7 +50,8 @@ function check_youtube_link($url)
  *
  * @return string
  */
-function embed_youtube_video(?string $youtube_url) : bool
+/*
+ function embed_youtube_video(?string $youtube_url) : string
 {
     $res = "";
     $id = extract_youtube_id($youtube_url);
@@ -87,6 +62,7 @@ function embed_youtube_video(?string $youtube_url) : bool
     }
     return $res;
 }
+*/
 
 /**
  * Валидация полей формы, перенаправление к валидации формы конкретного типа контента

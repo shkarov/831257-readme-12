@@ -66,8 +66,8 @@ function db_get_prepare_stmt($link, $sql, $data = [])
 */
 function dbConnect(array $conf) : mysqli
 {
-    $dbConf = $conf['db'];
-    $con =  mysqli_connect($dbConf['host'], $dbConf['user'], $dbConf['password'], $dbConf['database']);
+    $db_conf = $conf['db'];
+    $con =  mysqli_connect($db_conf['host'], $db_conf['user'], $db_conf['password'], $db_conf['database']);
     if (!$con) {
         exit("Ошибка подключения: " . mysqli_connect_error());
     }
@@ -893,7 +893,7 @@ function dbGetUserPosts(mysqli $con, int $user_id) : array
  */
 function dbGetUserPostsWithLikes(mysqli $con, int $user_id) : array
 {
-    $sql = "SELECT   p.id, p.picture, p.class, u.id AS user_id_who_liked_post, u.login, u.avatar, l.creation_time AS creation_time_like
+    $sql = "SELECT   p.id, p.picture, p.video, p.class, u.id AS user_id_who_liked_post, u.login, u.avatar, l.creation_time AS creation_time_like
             FROM     `like` AS l
                      JOIN user AS u
                      ON   u.id = l.user_id

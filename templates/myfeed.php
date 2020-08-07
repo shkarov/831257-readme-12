@@ -49,41 +49,23 @@
                     <?php elseif ($post['class'] === "post-video") : ?>
                         <div class="post-video__block">
                             <div class="post-video__preview">
-                                <img src="<?= htmlspecialchars($post['picture']); ?>" alt="Превью к видео" width="760" height="396">
+                                <?= embed_youtube_video($post['video']); ?>
                             </div>
-                            <div class="post-video__control">
-                                <button class="post-video__play post-video__play--paused button button--video" type="button"><span class="visually-hidden">Запустить видео</span></button>
-                                <div class="post-video__scale-wrapper">
-                                    <div class="post-video__scale">
-                                        <div class="post-video__bar">
-                                            <div class="post-video__toggle"></div>
-                                        </div>
-                                    </div>
-                                </div>
-                                <button class="post-video__fullscreen post-video__fullscreen--inactive button button--video" type="button"><span class="visually-hidden">Полноэкранный режим</span></button>
-                            </div>
-                            <button class="post-video__play-big button" type="button">
-                            <svg class="post-video__play-big-icon" width="27" height="28">
-                                <use xlink:href="#icon-video-play-big"></use>
-                            </svg>
-                            <span class="visually-hidden">Запустить проигрыватель</span>
-                            </button>
                         </div>
                     <?php elseif ($post['class'] === "post-link") : ?>
                         <div class="post-link__wrapper">
-                            <a class="post-link__external" href="http://<?= htmlspecialchars($post['link']); ?>" title="Перейти по ссылке">
-                                <div class="post-link__info-wrapper">
-                                    <div class="post-link__icon-wrapper">
-                                        <img src="https://www.google.com/s2/favicons?domain=htmlacademy.ru" alt="Иконка">
-                                    </div>
-                                    <div class="post-link__info">
-                                        <h3><?= $post['heading']; ?></h3>
-                                    </div>
-                                    <svg class="post-link__arrow" width="11" height="16">
-                                        <use xlink:href="#icon-arrow-right-ad"></use>
-                                    </svg>
+                            <a class="post-link__external" href="<?= htmlspecialchars($post['link']); ?>" title="Перейти по ссылке">
+                                <div class="post-link__icon-wrapper">
+                                    <img src="./img/icon-htmlacademy.svg" alt="Иконка">
                                 </div>
-                                <span><?= $post['text']; ?></span>
+                                <div class="post-link__info">
+                                    <h3><?= htmlspecialchars($post['heading']); ?></h3>
+                                    <p><?= $post['text']; ?></p>
+                                    <span><?= htmlspecialchars($post['link']); ?></span>
+                                </div>
+                                <svg class="post-link__arrow" width="11" height="16">
+                                    <use xlink:href="#icon-arrow-right-ad"></use>
+                                </svg>
                             </a>
                         </div>
                     <?php endif ?>

@@ -72,6 +72,27 @@ function include_template($name, array $data = [])
     return $result;
 }
 
+
+/**
+ * Возвращает код iframe для вставки youtube видео на страницу
+ *
+ * @param string $youtube_url Ссылка на youtube видео
+ *
+ * @return string
+ */
+function embed_youtube_video(?string $youtube_url) : string
+{
+    $res = "";
+    $id = extract_youtube_id($youtube_url);
+
+    if ($id) {
+        $src = "https://www.youtube.com/embed/" . $id;
+        $res = '<iframe width="760" height="400" src="' . $src . '" frameborder="0"></iframe>';
+    }
+    return $res;
+}
+
+
 /**
  * Возвращает img-тег с обложкой видео для вставки на страницу
  * @param string $youtube_url Ссылка на youtube видео
