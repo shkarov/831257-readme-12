@@ -249,8 +249,6 @@ function getHeadingAddPost(?int $type_id) : string
 function getTagsAddPost(?int $type_id) : string
 {
     switch ($type_id) {
-        case 1:
-            return 'photo-tags';
         case 2:
             return 'video-tags';
         case 3:

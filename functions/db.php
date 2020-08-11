@@ -703,38 +703,7 @@ function dbGetSubscribeCreatorsList(mysqli $con, int $user_id) : array
  *
  * @return array Ассоциативный массив Результат запроса
  */
-function getPostsFeed(mysqli $con, int $user_id, ?int $type_id) : array
-{
-    //получаем список авторов, на которых подписан текущий пользователь
-    $subscrubCreators = dbGetSubscribeCreatorsList($con, $user_id);
-
-    $arr = [];
-    foreach ($subscrubCreators as $value) {
-        $arr[] = dbGetPostsFeed($con, $value['creator_user_id'], $type_id);
-    }
-    //уменьшаем вложенность массива
-    $posts = [];
-    foreach ($arr as $value) {
-        foreach ($value as $item) {
-            $posts[] = $item;
-        }
-    }
-    //сортируем массив по убыванию даты создания поста
-    $postsSort = sortBubbleDescArray($posts, 'creation_time');
-
-    return $postsSort;
-}
-
-/**
- * Выборка всех постов конкретного пользователя, у учетом типа контента и с хештегами
- *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $creator_user_id id создателя поста
- * @param int    $type_id (может быть  null) id типа контента
- *
- * @return array Ассоциативный массив Результат запроса
- */
-function dbGetPostsFeed(mysqli $con, int $creator_user_id, ?int $type_id) : array
+function dbGetPostsFeed(mysqli $con, int $user_id, ?int $type_id) : array
 {
     $sql = "SELECT p.*, u.login, u.avatar, c.class, c.class, GROUP_CONCAT(DISTINCT tags.name ORDER BY tags.name ASC SEPARATOR ' ') AS hashtags
             FROM   post AS p
@@ -749,13 +718,17 @@ function dbGetPostsFeed(mysqli $con, int $creator_user_id, ?int $type_id) : arra
                                     ON   ph.hashtag_id = h.id
                              ) AS tags
                    ON   p.id = tags.post_id
-            WHERE  u.id = $creator_user_id";
+            WHERE  u.id IN (
+                            SELECT creator_user_id
+                            FROM   subscription
+                            WHERE  subscriber_user_id = $user_id)";
 
     if (!is_null($type_id)) {
         $sql = $sql." && c.id = $type_id";
     }
 
-    $sql = $sql." GROUP BY p.id";
+    $sql = $sql." GROUP BY p.id
+                  ORDER BY p.creation_time DESC";
 
     $result = mysqli_query($con, $sql);
     if (!$result) {

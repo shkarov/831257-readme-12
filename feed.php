@@ -32,7 +32,7 @@ $types = dbGetTypes($connect);
 
 $type_id = getTypeFromRequest($_GET);
 
-$posts = getPostsFeed($connect, $user_id_login, $type_id);
+$posts = dbGetPostsFeed($connect, $user_id_login, $type_id);
 
 $page_content = include_template("myfeed.php", ['types' => $types, 'posts' => $posts, 'type_id' => $type_id]);
 
