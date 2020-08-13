@@ -14,23 +14,25 @@ $post_id = getPostIdFromRequest($_GET);
 
 // кликнута иконка лайк
 if (isset($_GET['like_onClick'])) {
-    addLike($connect, $post_id, $user_id_login);
-    $referer = $_SERVER['HTTP_REFERER'];
-    header('Location: '.$referer);
+    if (addLike($connect, $post_id, $user_id_login)) {
+        $referer = $_SERVER['HTTP_REFERER'];
+        header('Location: '.$referer);
+    }
 }
 
 // кликнута иконка repost
 if (isset($_GET['repost_onClick'])) {
-    addRepost($connect, $post_id, $user_id_login);
-    $url = "profile.php?user_id=$user_id_login";
-    header('Location: '.$url);
+    if (addRepost($connect, $post_id, $user_id_login)) {
+        $url = "profile.php?user_id=$user_id_login";
+        header('Location: '.$url);
+    }
 }
 
 $types = dbGetTypes($connect);
 
 $type_id = getTypeFromRequest($_GET);
 
-$posts = getPostsFeed($connect, $user_id_login, $type_id);
+$posts = dbGetPostsFeed($connect, $user_id_login, $type_id);
 
 $page_content = include_template("myfeed.php", ['types' => $types, 'posts' => $posts, 'type_id' => $type_id]);
 

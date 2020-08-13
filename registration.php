@@ -5,8 +5,8 @@ require_once 'bootstrap.php';
 $errors = checkFormRegistration($connect, $_POST, $_FILES);
 
 if ($errors === []) {
-    $userId = dbAddUser($connect, $_POST, $_FILES);
-    if (!is_null($userId)) {
+    $user_id = dbAddUser($connect, $_POST, $_FILES);
+    if (!is_null($user_id)) {
         header('Location: /');
     }
 }

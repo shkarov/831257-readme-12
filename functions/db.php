@@ -66,8 +66,8 @@ function db_get_prepare_stmt($link, $sql, $data = [])
 */
 function dbConnect(array $conf) : mysqli
 {
-    $dbConf = $conf['db'];
-    $con =  mysqli_connect($dbConf['host'], $dbConf['user'], $dbConf['password'], $dbConf['database']);
+    $db_conf = $conf['db'];
+    $con =  mysqli_connect($db_conf['host'], $db_conf['user'], $db_conf['password'], $db_conf['database']);
     if (!$con) {
         exit("Ошибка подключения: " . mysqli_connect_error());
     }
@@ -188,7 +188,7 @@ function dbGetPostsPopularCount(mysqli $con, ?int $typeId, string $sort) : int
  */
 function dbGetPostWithUserInfo(mysqli $con, int $postId) : array
 {
-    $sql = "SELECT p.*, u.login, u.avatar, u.subscribers, u.posts, u.creation_time AS user_creation_time, c.class, GROUP_CONCAT(DISTINCT tags.name ORDER BY tags.name ASC SEPARATOR ' ') AS hashtags
+    $sql = "SELECT p.*, u.login, u.avatar, u.email, u.subscribers, u.posts, u.creation_time AS user_creation_time, c.class, GROUP_CONCAT(DISTINCT tags.name ORDER BY tags.name ASC SEPARATOR ' ') AS hashtags
             FROM   post AS p
                    JOIN user AS u
                    ON u.id = p.user_id
@@ -703,38 +703,7 @@ function dbGetSubscribeCreatorsList(mysqli $con, int $user_id) : array
  *
  * @return array Ассоциативный массив Результат запроса
  */
-function getPostsFeed(mysqli $con, int $user_id, ?int $type_id) : array
-{
-    //получаем список авторов, на которых подписан текущий пользователь
-    $subscrubCreators = dbGetSubscribeCreatorsList($con, $user_id);
-
-    $arr = [];
-    foreach ($subscrubCreators as $value) {
-        $arr[] = dbGetPostsFeed($con, $value['creator_user_id'], $type_id);
-    }
-    //уменьшаем вложенность массива
-    $posts = [];
-    foreach ($arr as $value) {
-        foreach ($value as $item) {
-            $posts[] = $item;
-        }
-    }
-    //сортируем массив по убыванию даты создания поста
-    $postsSort = sortBubbleDescArray($posts, 'creation_time');
-
-    return $postsSort;
-}
-
-/**
- * Выборка всех постов конкретного пользователя, у учетом типа контента и с хештегами
- *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $creator_user_id id создателя поста
- * @param int    $type_id (может быть  null) id типа контента
- *
- * @return array Ассоциативный массив Результат запроса
- */
-function dbGetPostsFeed(mysqli $con, int $creator_user_id, ?int $type_id) : array
+function dbGetPostsFeed(mysqli $con, int $user_id, ?int $type_id) : array
 {
     $sql = "SELECT p.*, u.login, u.avatar, c.class, c.class, GROUP_CONCAT(DISTINCT tags.name ORDER BY tags.name ASC SEPARATOR ' ') AS hashtags
             FROM   post AS p
@@ -749,13 +718,17 @@ function dbGetPostsFeed(mysqli $con, int $creator_user_id, ?int $type_id) : arra
                                     ON   ph.hashtag_id = h.id
                              ) AS tags
                    ON   p.id = tags.post_id
-            WHERE  u.id = $creator_user_id";
+            WHERE  u.id IN (
+                            SELECT creator_user_id
+                            FROM   subscription
+                            WHERE  subscriber_user_id = $user_id)";
 
     if (!is_null($type_id)) {
         $sql = $sql." && c.id = $type_id";
     }
 
-    $sql = $sql." GROUP BY p.id";
+    $sql = $sql." GROUP BY p.id
+                  ORDER BY p.creation_time DESC";
 
     $result = mysqli_query($con, $sql);
     if (!$result) {
@@ -893,7 +866,7 @@ function dbGetUserPosts(mysqli $con, int $user_id) : array
  */
 function dbGetUserPostsWithLikes(mysqli $con, int $user_id) : array
 {
-    $sql = "SELECT   p.id, p.picture, p.class, u.id AS user_id_who_liked_post, u.login, u.avatar, l.creation_time AS creation_time_like
+    $sql = "SELECT   p.id, p.picture, p.video, p.class, u.id AS user_id_who_liked_post, u.login, u.avatar, l.creation_time AS creation_time_like
             FROM     `like` AS l
                      JOIN user AS u
                      ON   u.id = l.user_id
@@ -1004,23 +977,46 @@ function dbGetPostComments(mysqli $con, int $post_id) : array
 }
 
 /**
- * Запись нового комментария в БД
+ * Проверяет условия и отправляет запрос на добавление комментария к посту
  *
  * @param mysqli $con Объект-соединение с БД
- * @param int    $$user_id id пользователя, добавившего комментарий
- * @param array  $post глобальный массив $_POST
+ * @param int    $post_id id поста
+ * @param int    $user_id_login id пользователя, открывшего текущую сессию
+ * @param string $comment текст комментария
  *
  * @return bool
  */
-function dbAddComment(mysqli $con, int $user_id, array $post) : bool
+function addComment(mysqli $con, int $post_id, int $user_id_login, string $comment) : bool
+{
+    // пост существует
+    if (dbFindPost($con, $post_id)) {
+        //автор поста
+        $user_id = dbGetUserIdFromPost($con, $post_id);
+        // залогиненый пользователь комментирует не свой пост
+        if ($user_id != $user_id_login) {
+            return dbAddComment($con, $post_id, $user_id_login, $comment);
+        }
+    }
+    return false;
+}
+
+/**
+ * Запись нового комментария в БД
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $post_id id поста
+ * @param int    $$user_id id пользователя, добавившего комментарий
+ * @param string $comment текст комментария
+ *
+ * @return bool
+ */
+function dbAddComment(mysqli $con, int $post_id, int $user_id, string $comment) : bool
 {
     $creation_time = date("Y-m-d H:i:s");
-    $post_id = $post['post_id'];
-    $text = $post['comment'];
 
     $sql1 = 'INSERT comment (creation_time, `text`, user_id, post_id) VALUES (?,?,?,?)';
     $stmt1 = mysqli_prepare($con, $sql1);
-    mysqli_stmt_bind_param($stmt1, 'ssii', $creation_time, $text, $user_id, $post_id);
+    mysqli_stmt_bind_param($stmt1, 'ssii', $creation_time, $comment, $user_id, $post_id);
 
     $sql2 = 'UPDATE post
              SET    comments = comments + 1

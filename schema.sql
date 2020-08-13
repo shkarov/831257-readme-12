@@ -150,17 +150,17 @@ ENGINE = InnoDB;
 CREATE TABLE IF NOT EXISTS `readme`.`subscription` (
   `id` INT UNSIGNED NOT NULL AUTO_INCREMENT,
   `creator_user_id` INT UNSIGNED NOT NULL,
-  `subscriber_user_id_` INT UNSIGNED NOT NULL,
+  `subscriber_user_id` INT UNSIGNED NOT NULL,
   PRIMARY KEY (`id`),
   INDEX `fk_subscription_user1_idx` (`creator_user_id` ASC),
-  INDEX `fk_subscription_user2_idx` (`subscriber_user_id_` ASC),
+  INDEX `fk_subscription_user2_idx` (`subscriber_user_id` ASC),
   CONSTRAINT `fk_subscription_user1`
     FOREIGN KEY (`creator_user_id`)
     REFERENCES `readme`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION,
   CONSTRAINT `fk_subscription_user2`
-    FOREIGN KEY (`subscriber_user_id_`)
+    FOREIGN KEY (`subscriber_user_id`)
     REFERENCES `readme`.`user` (`id`)
     ON DELETE NO ACTION
     ON UPDATE NO ACTION)

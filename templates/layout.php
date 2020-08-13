@@ -45,17 +45,17 @@
 
                     <ul class="header__my-nav">
                         <li class="header__my-page header__my-page--popular">
-                            <a class="header__page-link header__page-link--active" href="popular.php" title="Популярный контент">
+                            <a class="header__page-link <?= $title ==='readme: популярное' ? 'header__page-link--active' : '' ?>" href="popular.php" title="Популярный контент">
                                 <span class="visually-hidden">Популярный контент</span>
                             </a>
                         </li>
                         <li class="header__my-page header__my-page--feed">
-                            <a class="header__page-link" href="feed.php" title="Моя лента">
+                            <a class="header__page-link <?= $title ==='readme: моя лента' ? 'header__page-link--active' : '' ?>" href="feed.php" title="Моя лента">
                                 <span class="visually-hidden">Моя лента</span>
                             </a>
                         </li>
                         <li class="header__my-page header__my-page--messages">
-                            <a class="header__page-link" href="messages.php" title="Личные сообщения">
+                            <a class="header__page-link <?= $title ==='readme: сообщения' ? 'header__page-link--active' : '' ?>" href="messages.php" title="Личные сообщения">
                                 <span class="visually-hidden">Личные сообщения</span>
                             </a>
                         </li>

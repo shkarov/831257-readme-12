@@ -13,9 +13,10 @@ $user_avatar_login = $_SESSION['avatar'];
 // кликнута иконка лайк
 if (isset($_GET['like_onClick'])) {
     $post_id = getPostIdFromRequest($_GET);
-    addLike($connect, $post_id, $user_id_login);
-    $referer = $_SERVER['HTTP_REFERER'];
-    header('Location: '.$referer);
+    if (addLike($connect, $post_id, $user_id_login)) {
+        $referer = $_SERVER['HTTP_REFERER'];
+        header('Location: '.$referer);
+    }
 }
 
 $types = dbGetTypes($connect);
@@ -42,7 +43,7 @@ if (isset($_GET['page'])) {
 
 $posts = dbGetPostsPopular($connect, $type_id, $sort, $page, $limit_posts_per_page);
 
-$page_content = include_template("main.php", ['types' => $types, 'posts' => $posts, 'type_id' => $type_id, 'sort' => $sort, 'page' => $page]);
+$page_content = include_template("main.php", ['types' => $types, 'posts' => $posts, 'type_id' => $type_id, 'sort' => $sort, 'page' => $page, 'count_pages' => $count_pages]);
 
 $layout_content = include_template("layout.php", ['content' => $page_content, 'title' => 'readme: популярное', 'user_id' => $user_id_login, 'user' => $user_name_login, 'avatar' => $user_avatar_login]);
 

@@ -23,29 +23,24 @@ function is_date_valid(string $date): bool
 }
 
 /**
- * Проверяет, что переданная ссылка ведет на публично доступное видео с youtube
- *
- * @param string $youtube_url Ссылка на youtube видео
+ * Функция проверяет доступно ли видео по ссылке на youtube
+ * @param string $url ссылка на видео
  *
  * @return bool
  */
-function check_youtube_url(?string $youtube_url) : bool
+function check_youtube_link($url)
 {
-    $res = false;
-    $id = extract_youtube_id($youtube_url);
-
-    if ($id) {
-        $api_data = ['id' => $id, 'part' => 'id,status', 'key' => 'AIzaSyBN-AXBnCPxO3HJfZZdZEHMybVfIgt16PQ'];
-        $url = "https://www.googleapis.com/youtube/v3/videos?" . http_build_query($api_data);
-
-        $resp = file_get_contents($url);
-
-        if ($resp && $json = json_decode($resp, true)) {
-            $res = $json['pageInfo']['totalResults'] > 0 && $json['items'][0]['status']['privacyStatus'] == 'public';
-        }
+    $result = true;
+    $id = extract_youtube_id($url);
+    $headers = get_headers('https://www.youtube.com/oembed?format=json&url=http://www.youtube.com/watch?v=' . $id);
+    if (!is_array($headers)) {
+        $result = false;
     }
-
-    return $res;
+    $err_flag = strpos($headers[0], '200') ? 200 : 404;
+    if ($err_flag !== 200) {
+        $result = false;
+    }
+    return $result;
 }
 
 /**
@@ -55,7 +50,8 @@ function check_youtube_url(?string $youtube_url) : bool
  *
  * @return string
  */
-function embed_youtube_video(?string $youtube_url) : bool
+/*
+ function embed_youtube_video(?string $youtube_url) : string
 {
     $res = "";
     $id = extract_youtube_id($youtube_url);
@@ -66,6 +62,7 @@ function embed_youtube_video(?string $youtube_url) : bool
     }
     return $res;
 }
+*/
 
 /**
  * Валидация полей формы, перенаправление к валидации формы конкретного типа контента
@@ -365,7 +362,7 @@ function validateYoutubeLink(?string $name) : array
         $error['report'] = $type."Ошибка URL.";
         $error['header'] = "Ошибочная ссылка.";
         $error['description'] = "Введите корректный адрес ссылки на видеоролик.";
-    } elseif (!check_youtube_url($name)) {
+    } elseif (!check_youtube_link($name)) {
         $error['report'] = $type."Видео не доступно.";
         $error['header'] = "Ошибка доступа.";
         $error['description'] = "Указанный видеоролик недоступен. Укажите ссылку на видеоролик с публичным доступом";

@@ -10,9 +10,9 @@
               <div class="profile__name-wrapper user__name-wrapper">
                 <span class="profile__name user__name"><?= $user ?></span>
                 <?php
-                    $dateView = dateDifferent($user_creation_time, 'на сайте');
+                    $date_view = dateDifferent($user_creation_time, 'на сайте');
                 ?>
-                <time class="profile__user-time user__time" datetime="<?= $user_creation_time ?>"><?= $dateView ?></time>
+                <time class="profile__user-time user__time" datetime="<?= $user_creation_time ?>"><?= $date_view ?></time>
               </div>
             </div>
             <div class="profile__rating user__rating">
@@ -25,14 +25,14 @@
                 <span class="profile__rating-text user__rating-text">подписчиков</span>
               </p>
             </div>
-            <div class="profile__user-buttons user__buttons">
+            <div class="profile__user-buttons user__buttons <?=$user_id === $user_id_login ? 'visually-hidden' : '' ?>">
                 <button class="profile__user-button user__button user__button--subscription button button--main" type="button">
                     <a href="profile.php?user_id=<?=$user_id?>&subscribeButton_onClick">
                         <?= ($subscribe) ? 'Отписаться' : 'Подписаться'?>
                     </a>
                 </button>
 
-                <a class="profile__user-button user__button user__button--writing button button--green" href="messages.php?user_id=<?=$user_id?>">Сообщение</a>
+                <a class="profile__user-button user__button user__button--writing button button--green <?= !$subscribe ? 'visually-hidden' : '' ?>" href="messages.php?user_id=<?=$user_id?>">Сообщение</a>
             </div>
           </div>
         </div>

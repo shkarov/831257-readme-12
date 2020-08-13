@@ -21,11 +21,10 @@
                                         <?= htmlspecialchars($contact['text']); ?>
                                     </p>
                                     <?php
-                                       $dateTitle = strftime('%d.%m.%Y %H:%M', strtotime($contact['creation_time']));
-                                       $dateView = dateDifferent($contact['creation_time']);
+                                       $date_view = dateDifferent($contact['creation_time']);
                                     ?>
                                     <time class="messages__preview-time" datetime="<?= $contact['creation_time'] ?>">
-                                        <?= $dateView == '0 минут назад' ? '' : $dateView ?>
+                                        <?= $date_view == '0 минут назад' ? '' : $date_view ?>
                                     </time>
                                 </div>
                             </div>
@@ -55,10 +54,10 @@
                                     <?= htmlspecialchars($message['login']); ?>
                                 </a>
                                 <?php
-                                    $dateView = dateDifferent($message['creation_time']);
+                                    $date_view = dateDifferent($message['creation_time']);
                                 ?>
                                 <time class="messages__time" datetime="<?= $message['creation_time'] ?>">
-                                    <?= $dateView ?>
+                                    <?= $date_view ?>
                                 </time>
                             </div>
                         </div>

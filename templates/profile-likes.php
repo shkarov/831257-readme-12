@@ -3,8 +3,8 @@
     <ul class="profile__likes-list">
 
         <?php foreach ($posts as $key => $post) : ?>
-            <?php $classOfPost = mb_substr($post['class'], mb_strpos($post['class'], '-') + 1) ?>
-            <li class="post-mini post-mini--<?= $classOfPost; ?> post user">
+            <?php $class_of_post = mb_substr($post['class'], mb_strpos($post['class'], '-') + 1) ?>
+            <li class="post-mini post-mini--<?= $class_of_post; ?> post user">
                 <div class="post-mini__user-info user__info">
                     <div class="post-mini__avatar user__avatar">
                         <a class="user__avatar-link" href="profile.php?user_id=<?= $post['user_id_who_liked_post']; ?>">
@@ -18,9 +18,9 @@
                         <div class="post-mini__action">
                             <span class="post-mini__activity user__additional">Лайкнул вашу публикацию</span>
                             <?php
-                                $dateView = dateDifferent($post['creation_time_like']);
+                                $date_view = dateDifferent($post['creation_time_like']);
                             ?>
-                            <time class="post-mini__time user__additional" datetime="<?= $post['creation_time_like'] ?>"><?= $dateView ?></time>
+                            <time class="post-mini__time user__additional" datetime="<?= $post['creation_time_like'] ?>"><?= $date_view ?></time>
                         </div>
                     </div>
                 </div>
@@ -43,7 +43,7 @@
                                 </svg>
                         <?php elseif ($post['class'] === "post-video") : ?>
                             <div class="post-mini__image-wrapper">
-                                <img class="post-mini__image" src="img/coast-small.png" width="109" height="109" alt="Превью публикации">
+                                <?= embed_youtube_cover($post['video']) ?>
                                 <span class="post-mini__play-big">
                                     <svg class="post-mini__play-big-icon" width="12" height="13">
                                         <use xlink:href="#icon-video-play-big"></use>
