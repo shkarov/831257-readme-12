@@ -173,9 +173,9 @@ function dbGetPostsPopularCount(mysqli $con, ?int $typeId, string $sort) : int
     if (!$result) {
         exit("Ошибка MySQL: " . mysqli_error($con));
     }
-    $result_arraw = mysqli_fetch_assoc($result);
+    $result_array = mysqli_fetch_assoc($result);
 
-    return (int) $result_arraw['count_posts'];
+    return (int) $result_array['count_posts'];
 }
 
 /**
@@ -1115,9 +1115,9 @@ function dbFindLike(mysqli $con, int $post_id, int $user_id) : bool
         exit("Ошибка MySQL: " . mysqli_error($con));
     }
 
-    $result_arraw = mysqli_fetch_assoc($result);
+    $result_array = mysqli_fetch_assoc($result);
 
-    return ($result_arraw['is_like'] == 0) ? false : true;
+    return ($result_array['is_like'] == 0) ? false : true;
 }
 
 /**
@@ -1203,7 +1203,7 @@ function dbDelSubscribe(mysqli $con, int $user_id_creator, int $user_id_subscrib
  */
 function dbFindSubscribe(mysqli $con, int $user_id_creator, int $user_id_subscriber) : bool
 {
-    $sql = "SELECT COUNT(*) AS `is_subsribe`
+    $sql = "SELECT COUNT(*) AS `is_subscribe`
             FROM   subscription
             WHERE  creator_user_id = $user_id_creator AND subscriber_user_id = $user_id_subscriber";
 
@@ -1212,9 +1212,9 @@ function dbFindSubscribe(mysqli $con, int $user_id_creator, int $user_id_subscri
         exit("Ошибка MySQL: " . mysqli_error($con));
     }
 
-    $result_arraw = mysqli_fetch_assoc($result);
+    $result_array = mysqli_fetch_assoc($result);
 
-    return ($result_arraw['is_subsribe'] == 0) ? false : true;
+    return ($result_array['is_subscribe'] == 0) ? false : true;
 }
 
 /**
@@ -1239,9 +1239,9 @@ function dbGetUserIdFromPost(mysqli $con, int $post_id) : int
         exit("Ошибка MySQL: " . mysqli_error($con));
     }
 
-    $result_arraw = mysqli_fetch_assoc($result);
+    $result_array = mysqli_fetch_assoc($result);
 
-    return (int) $result_arraw['user_id'];
+    return (int) $result_array['user_id'];
 }
 
 /**

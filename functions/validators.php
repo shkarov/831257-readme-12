@@ -448,7 +448,7 @@ function checkFormRegistration(mysqli $con, array $post, array $files) : array
     foreach ($post as $key => $value) {
         switch ($key) {
             case 'email':
-                $errors[$key] = validateEmail($con, $value, false);
+                $errors[$key] = validateEmail($con, $value);
                 break;
             case 'login':
                 $errors[$key] = validateLogin($con, $value);

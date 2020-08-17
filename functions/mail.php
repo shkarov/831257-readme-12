@@ -15,14 +15,20 @@ function sendEmail(array $smtp_conf, string $type_message, array $to, array $fro
 {
     $link_profile = $smtp_conf['base_url']."profile.php?user_id=".$from['id'];
 
-    if ($type_message === 'subscribe') {
-        $message_title = "У вас новый подписчик";
-        $message_body = "На вас подписался новый пользователь ".$from['login'].". Вот ссылка на его профиль: $link_profile";
+    switch ($type_message) {
+        case 'subscribe':
+            $message_title = "У вас новый подписчик";
+            $message_body = "На вас подписался новый пользователь ".$from['login'].". Вот ссылка на его профиль: $link_profile";
+            break;
+        case 'post':
+            $message_title = "Новая публикация от пользователя ".$from['login'];
+            $message_body = "Пользователь ".$from['login']." только что опубликовал новую запись ".htmlspecialchars($post_header).". Посмотрите её на странице пользователя: $link_profile";
+            break;
+        default:
+            $message_title = '';
+            $message_body = '';
     }
-    if ($type_message === 'post') {
-        $message_title = "Новая публикация от пользователя ".$from['login'];
-        $message_body = "Пользователь ".$from['login']." только что опубликовал новую запись ".htmlspecialchars($post_header).". Посмотрите её на странице пользователя: $link_profile";
-    }
+
     transferEmail($smtp_conf, $to, $message_title, $message_body);
 }
 

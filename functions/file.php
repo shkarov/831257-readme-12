@@ -29,3 +29,27 @@ function savePicture(mysqli $con, array $files) : ?string
     }
     return $picture;
 }
+
+/**
+ * Возвращает массив, отсортированный по убыванию (пузырьковый метод)
+ *
+ * @param array  $arr Массим данных
+ * @param string $field поле, по которому сортируется массив
+ *
+ * @return array Отсортированный массив
+ */
+function sortBubbleDescArray(array $arr, string $field) : array
+{
+    $size = count($arr);
+
+    for( $i=0; $i < $size; $i++) {
+        for( $j = $size-1; $j > $i; $j-- ) {
+            if ( $arr[$j-1][$field] < $arr[$j][$field] ) {
+                $temp = $arr[$j-1];
+                $arr[$j-1]=$arr[$j];
+                $arr[$j]= $temp;
+            }
+        }
+    }
+    return $arr;
+}
