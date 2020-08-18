@@ -98,3 +98,55 @@ function getPostVal(array $arr, string $key) : string
 {
     return $arr[$key] ?? "";
 }
+
+/**
+ * Выборка постов по строке поиска
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param string $search строка поиска
+ *
+ * @return array Ассоциативный массив
+ */
+function getPostsSearch(mysqli $con, string $search) : array
+{
+    $search_string = trim($search);
+
+    if (empty($search_string)) {
+        return [];
+    }
+
+    if (mb_substr($search_string, 0, 1) === '#') {
+        return dbGetPostsSearchHashtag($con, mb_substr($search_string, 1));
+    }
+
+    return dbGetPostsSearchFulltext($con, $search_string);
+}
+
+/**
+ * Получение списка пользователей, имеющих сообщения с текущим пользователем
+ * Список отсортирован по дате создания сообщения
+ *
+ * @param mysqli $con Объект-соединение с БД
+ * @param int    $user_id id пользователя
+ *
+ * @return array Ассоциативный массив Результат запроса
+ */
+function getContactsMessages(mysqli $con, int $user_id) : array
+{
+    $contacts = dbGetContactsMessages($con, $user_id);
+
+    // отфильтровываются уникальные значения $user_id
+    $contacts_uniq = [];
+    $user_id = 0;
+    foreach ($contacts as $value) {
+        if ($user_id != $value['user_id']) {
+            $contacts_uniq[] = $value;
+        }
+        $user_id = $value['user_id'];
+    }
+
+    //сортировка
+    $contacts_sort = sortBubbleDescArray($contacts_uniq, 'creation_time');
+
+    return $contacts_sort;
+}

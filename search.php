@@ -19,7 +19,7 @@ if (isset($_GET['like_onClick'])) {
     }
 }
 
-$posts = isset($_GET['search_string']) ? dbGetPostsSearch($connect, $_GET['search_string']) : [];
+$posts = isset($_GET['search_string']) ? getPostsSearch($connect, $_GET['search_string']) : [];
 
 $template = ($posts === []) ? "no-results.php" : "search-results.php";
 

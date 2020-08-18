@@ -241,39 +241,6 @@ function dbGetPostHeader(mysqli $con, int $postId) : string
 }
 
 /**
- * Запись нового поста в БД
- *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $$user_id id  пользователя
- * @param array  $post глобальный массив $_POST
- * @param array  $files глобальный массив $_FILES
- *
- * @return array возвращает id добавленного поста либо null
- */
-function dbAddPost(mysqli $con, int $user_id, array $post, array $files) : ?int
-{
-    if ($post === []) {
-        return null;
-    }
-    $type_id = $post['type_id'];
-
-    switch ($type_id) {
-        case 1:
-            return dbAddPostPhoto($con, $user_id, $post, $files);
-        case 2:
-            return dbAddPostVideo($con, $user_id, $post);
-        case 3:
-            return dbAddPostText($con, $user_id, $post);
-        case 4:
-            return dbAddPostQuote($con, $user_id, $post);
-        case 5:
-            return dbAddPostLink($con, $user_id, $post);
-        default:
-            return checkPhotoForm($post);
-    }
-}
-
-/**
  * Запись нового поста ФОТО в БД
  *
  * @param mysqli $con Объект-соединение с БД
@@ -717,29 +684,6 @@ function dbGetPostsFeed(mysqli $con, int $user_id, ?int $type_id) : array
 }
 
 /**
- * Выборка по строке поиска
- *
- * @param mysqli $con Объект-соединение с БД
- * @param string $search строка поиска
- *
- * @return array Ассоциативный массив
- */
-function dbGetPostsSearch(mysqli $con, string $search) : array
-{
-    $search_string = trim($search);
-
-    if (empty($search_string)) {
-        return [];
-    }
-
-    if (mb_substr($search_string, 0, 1) === '#') {
-        return dbGetPostsSearchHashtag($con, mb_substr($search_string, 1));
-    }
-
-    return dbGetPostsSearchFulltext($con, $search_string);
-}
-
-/**
  * Выборка по строке полнотекстового поиска
  *
  * @param mysqli $con Объект-соединение с БД
@@ -952,30 +896,6 @@ function dbGetPostComments(mysqli $con, int $post_id) : array
     $result = mysqli_stmt_get_result($stmt);
 
     return mysqli_fetch_all($result, MYSQLI_ASSOC);
-}
-
-/**
- * Проверяет условия и отправляет запрос на добавление комментария к посту
- *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $post_id id поста
- * @param int    $user_id_login id пользователя, открывшего текущую сессию
- * @param string $comment текст комментария
- *
- * @return bool
- */
-function addComment(mysqli $con, int $post_id, int $user_id_login, string $comment) : bool
-{
-    // пост существует
-    if (dbFindPost($con, $post_id)) {
-        //автор поста
-        $user_id = dbGetUserIdFromPost($con, $post_id);
-        // залогиненый пользователь комментирует не свой пост
-        if ($user_id != $user_id_login) {
-            return dbAddComment($con, $post_id, $user_id_login, $comment);
-        }
-    }
-    return false;
 }
 
 /**
@@ -1223,97 +1143,6 @@ function dbGetUserIdFromPost(mysqli $con, int $post_id) : int
 }
 
 /**
- * Проверяет условия и отправляет запрос на добавление лайка к посту
- *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $post_id id поста
- * @param int    $user_id_login id пользователя, открывшего текущую сессию
- *
- * @return bool
- */
-function addLike(mysqli $con, int $post_id, int $user_id_login) : bool
-{
-    // пост существует
-    if (dbFindPost($con, $post_id)) {
-        // залогиненый пользователь лайкает не свой пост
-        if (dbGetUserIdFromPost($con, $post_id) != $user_id_login) {
-
-            // нет такого лайка в БД
-            if (!dbFindLike($con, $post_id, $user_id_login)) {
-                return dbAddLike($con, $post_id, $user_id_login);
-            }
-        }
-    }
-    return false;
-}
-
-/**
- * Проверяет условия и отправляет запрос на прирост счетчика просмотра поста
- *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $post_id id поста
- * @param int    $user_id_login id пользователя, открывшего текущую сессию
- *
- * @return bool
- */
-function addView(mysqli $con, int $post_id, int $user_id_login) : bool
-{
-    // пост существует
-    if (dbFindPost($con, $post_id)) {
-        // залогиненый пользователь смотрит не свой пост
-        if (dbGetUserIdFromPost($con, $post_id) != $user_id_login) {
-            return dbAddView($con, $post_id);
-        }
-    }
-    return false;
-}
-
-/**
- * Проверяет условия и отправляет запрос на добавление подписки на пользователя
- *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $user_id id пользователя, на которого подписываются
- * @param int    $user_id_login id пользователя, открывшего текущую сессию
- *
- * @return bool
- */
-function addSubscribe(mysqli $con, int $user_id, int $user_id_login) : bool
-{
-    // залогиненый пользователь подписывается НЕ на себя
-    if ($user_id != $user_id_login) {
-
-        // нет такой подписки в БД
-        if (!dbFindSubscribe($con, $user_id, $user_id_login)) {
-            return dbAddSubscribe($con, $user_id, $user_id_login);
-        }
-    }
-    return false;
-}
-
-/**
- * Проверяет условия и отправляет запрос на добавление лайка к посту
- *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $post_id id поста
- * @param int    $user_id_login id пользователя, открывшего текущую сессию
- *
- * @return bool
- */
-function addRepost(mysqli $con, int $post_id, int $user_id_login) : bool
-{
-    $post = dbGetPost($con, $post_id);
-
-    // пост найден
-    if (!empty($post)) {
-        // пользователь найден и залогиненый пользователь репостит не свой пост
-        if (isValidUser($con, $post['user_id'], $user_id_login)) {
-            return dbAddRepost($con, $post, $user_id_login);
-        }
-    }
-    return false;
-}
-
-/**
  * Отправляет запрос на чтение данных о конкретном посте
  *
  * @param mysqli $con Объект-соединение с БД
@@ -1373,34 +1202,6 @@ function dbAddRepost(mysqli $con, array $post, int $user_id) : bool
       }
     mysqli_rollback($con);
     return false;
-}
-
-/**
- * Получение списка пользователей, имеющих сообщения с текущим пользователем
- * Список отсортирован по дате создания сообщения
- *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $user_id id пользователя
- *
- * @return array Ассоциативный массив Результат запроса
- */
-function getContactsMessages(mysqli $con, int $user_id) : array
-{
-    $contacts = dbGetContactsMessages($con, $user_id);
-
-    // отфильтровываются уникальные значения $user_id
-    $contacts_uniq = [];
-    $user_id = 0;
-    foreach ($contacts as $value) {
-        if ($user_id != $value['user_id']) {
-            $contacts_uniq[] = $value;
-        }
-        $user_id = $value['user_id'];
-    }
-    //сортировка
-    $contacts_sort = sortBubbleDescArray($contacts_uniq, 'creation_time');
-
-    return $contacts_sort;
 }
 
 /**

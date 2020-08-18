@@ -19,7 +19,7 @@ $errors = checkForm($_POST, $_FILES);
 $page_content = include_template("adding-post.php", ['types' => $types, 'type_id' => $type_id, 'errors' => $errors]);
 
 if ($errors === []) {
-    $post_id = dbAddPost($connect, $user_id_login, $_POST, $_FILES);
+    $post_id = addPost($connect, $user_id_login, $_POST, $_FILES);
     if (!is_null($post_id)) {
 
         $post_header = dbGetPostHeader($connect, $post_id);
