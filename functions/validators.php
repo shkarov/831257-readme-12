@@ -1,28 +1,6 @@
 <?php
 
 /**
- * Проверяет переданную дату на соответствие формату 'ГГГГ-ММ-ДД'
- *
- * Примеры использования:
- * is_date_valid('2019-01-01'); // true
- * is_date_valid('2016-02-29'); // true
- * is_date_valid('2019-04-31'); // false
- * is_date_valid('10.10.2010'); // false
- * is_date_valid('10/10/2010'); // false
- *
- * @param string $date Дата в виде строки
- *
- * @return bool true при совпадении с форматом 'ГГГГ-ММ-ДД', иначе false
- */
-function is_date_valid(string $date): bool
-{
-    $format_to_check = 'Y-m-d';
-    $dateTimeObj = date_create_from_format($format_to_check, $date);
-
-    return $dateTimeObj !== false && array_sum(date_get_last_errors()) === 0;
-}
-
-/**
  * Функция проверяет доступно ли видео по ссылке на youtube
  * @param string $url ссылка на видео
  *
@@ -42,27 +20,6 @@ function check_youtube_link($url)
     }
     return $result;
 }
-
-/**
- * Возвращает код iframe для вставки youtube видео на страницу
- *
- * @param string $youtube_url Ссылка на youtube видео
- *
- * @return string
- */
-/*
- function embed_youtube_video(?string $youtube_url) : string
-{
-    $res = "";
-    $id = extract_youtube_id($youtube_url);
-
-    if ($id) {
-        $src = "https://www.youtube.com/embed/" . $id;
-        $res = '<iframe width="760" height="400" src="' . $src . '" frameborder="0"></iframe>';
-    }
-    return $res;
-}
-*/
 
 /**
  * Валидация полей формы, перенаправление к валидации формы конкретного типа контента
@@ -675,20 +632,6 @@ function isSortValid(array $arr) : bool
     $sort_types = [null, '', 'views', 'likes', 'creation_time'];
 
     return (isset($arr['sort']) && !in_array($arr['sort'], $sort_types)) ? false : true;
-}
-
-/**
- * Проверка соответствия типа вкладок допустимому значению
- *
- * @param array $arr Ассоциативный массив, переданный из формы методом get
- *
- * @return bool
- */
-function isTabValid(array $arr) : bool
-{
-    $tab_types = [null, '', 'likes', 'subscribes'];
-
-    return (isset($arr['tab']) && !in_array($arr['tab'], $tab_types)) ? false : true;
 }
 
 /**

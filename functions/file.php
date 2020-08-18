@@ -3,12 +3,11 @@
 /**
  * Сохранение аватара нового пользователя локально
  *
- * @param mysqli $con Объект-соединение с БД
  * @param array $files массив с данными о загружаемом аватаре пользователя
  *
  * @return string возвращает относительный путь к загруженному файлу либо null
  */
-function savePicture(mysqli $con, array $files) : ?string
+function savePicture(array $files) : ?string
 {
     $picture = '';
     $file = $files[key($files)];

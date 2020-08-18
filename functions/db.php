@@ -512,7 +512,6 @@ function dbWriteTags(mysqli $con, string $input_tags, ?int $post_id ) : void
             mysqli_stmt_close($stmt_post_tag);
         }
     }
-    return;
 }
 
 /**
@@ -614,7 +613,7 @@ function dbAddUser(mysqli $con, array $post, array $files) : ?int
     $login = $post['login'];
     $password = password_hash($post['password'], PASSWORD_DEFAULT);
 
-    $avatar = savePicture($con, $files);
+    $avatar = savePicture($files);
 
     $sql = 'INSERT user (creation_time, email, `login`, `password`, avatar) VALUES (?,?,?,?,?)';
     $stmt = mysqli_prepare($con, $sql);
@@ -670,27 +669,6 @@ function dbGetUserById(mysqli $con, int $user_id) : array
         exit("Ошибка MySQL: " . mysqli_error($con));
     }
     return mysqli_fetch_assoc($result);
-}
-
-/**
- * Возвращает список авторов, на которых подписан текущий пользователь
- *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $user_id id авторизованного пользователя
- *
- * @return array Ассоциативный массив Результат запроса
- */
-function dbGetSubscribeCreatorsList(mysqli $con, int $user_id) : array
-{
-    $sql = "SELECT creator_user_id
-            FROM   subscription
-            WHERE  subscriber_user_id = $user_id";
-
-    $result = mysqli_query($con, $sql);
-    if (!$result) {
-        exit("Ошибка MySQL: " . mysqli_error($con));
-    }
-    return mysqli_fetch_all($result, MYSQLI_ASSOC);
 }
 
 /**
