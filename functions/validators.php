@@ -6,7 +6,7 @@
  *
  * @return bool
  */
-function check_youtube_link($url)
+function check_youtube_link(string $url) : bool
 {
     $result = true;
     $id = extract_youtube_id($url);
@@ -391,8 +391,8 @@ function validateUrl(?string $name) : array
  * Валидация полей формы, перенаправление к валидации формы конкретного типа контента
  *
  * @param mysqli $con Объект-соединение с БД
- * @param array $post глобальный массив $_POST
- * @param array $files глобальный массив $_FILES
+ * @param array  $post глобальный массив $_POST
+ * @param array  $files глобальный массив $_FILES
  *
  * @return array вызов функции для проверки формы данного типа контента, возвращающей массив ошибок
  */
@@ -456,9 +456,8 @@ function validateEmail(mysqli $con, ?string $name) : array
 /**
  * Проверка поля формы "Логин"
  *
- * @param mysqli $con Объект-соединение с БД
- * @param string $name
- * @param string $name
+ * @param mysqli $con  Объект-соединение с БД
+ * @param string $name Содержание поля формы
  *
  * @return array массив сообшений об ошибках
  */
@@ -481,7 +480,7 @@ function validateLogin(mysqli $con, ?string $name) : array
 /**
  * Проверка поля формы "Пароль"
  *
- * @param string $name
+ * @param string $name Содержание поля формы
  *
  * @return array массив сообшений об ошибках
  */
@@ -637,11 +636,12 @@ function isSortValid(array $arr) : bool
 /**
  * Проверка соответствия значения параметра запроса допустимому значению
  *
- * @param array $arr Ассоциативный массив, переданный из формы методом get
+ * @param array  $arr Ассоциативный массив, переданный из формы методом get
+ * @param string $name проверяемый параметр
  *
  * @return bool
  */
-function isParameterValid(array $arr, $name) : bool
+function isParameterValid(array $arr, string $name) : bool
 {
     $types = [null, '', 'likes'];
 

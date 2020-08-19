@@ -8,7 +8,7 @@
  * @param array  $post глобальный массив $_POST
  * @param array  $files глобальный массив $_FILES
  *
- * @return array возвращает id добавленного поста либо null
+ * @return int возвращает id добавленного поста либо null
  */
 function addPost(mysqli $con, int $user_id, array $post, array $files) : ?int
 {

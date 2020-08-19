@@ -48,11 +48,13 @@ function get_noun_plural_form(int $number, string $one, string $two, string $man
 
 /**
  * Подключает шаблон, передает туда данные и возвращает итоговый HTML контент
+ *
  * @param string $name Путь к файлу шаблона относительно папки templates
  * @param array $data Ассоциативный массив с данными для шаблона
+ *
  * @return string Итоговый HTML
  */
-function include_template($name, array $data = [])
+function include_template(string $name, array $data = []) : string
 {
     $name = 'templates/' . $name;
     $result = '';
@@ -71,7 +73,6 @@ function include_template($name, array $data = [])
 
     return $result;
 }
-
 
 /**
  * Возвращает код iframe для вставки youtube видео на страницу
@@ -92,13 +93,14 @@ function embed_youtube_video(?string $youtube_url) : string
     return $res;
 }
 
-
 /**
  * Возвращает img-тег с обложкой видео для вставки на страницу
+ *
  * @param string $youtube_url Ссылка на youtube видео
+ *
  * @return string
  */
-function embed_youtube_cover($youtube_url)
+function embed_youtube_cover(string $youtube_url) : string
 {
     $res = "";
     $id = extract_youtube_id($youtube_url);
@@ -113,10 +115,12 @@ function embed_youtube_cover($youtube_url)
 
 /**
  * Извлекает из ссылки на youtube видео его уникальный ID
+ *
  * @param string $youtube_url Ссылка на youtube видео
- * @return array
+ *
+ * @return
  */
-function extract_youtube_id($youtube_url)
+function extract_youtube_id(string $youtube_url)
 {
     $id = false;
 
@@ -140,8 +144,7 @@ function extract_youtube_id($youtube_url)
  * Обрезает строку
  *
  * @param string $text - Строка текста
- *
- * @param int $lengthMax - Максимально допустимое количество символов в строке
+ * @param int    $lengthMax - Максимально допустимое количество символов в строке
  *
  * @return string - Строка, длиной $lengthMax, дополненая "...";
  *                  либо

@@ -3,13 +3,13 @@
 /**
  * Создает подготовленное выражение на основе готового SQL запроса и переданных данных
  *
- * @param mysqli $link  Ресурс соединения
+ * @param mysqli $link Ресурс соединения
  * @param string $sql  SQL запрос с плейсхолдерами вместо значений
  * @param array  $data Данные для вставки на место плейсхолдеров
  *
  * @return mysqli_stmt Подготовленное выражение
  */
-function db_get_prepare_stmt($link, $sql, $data = [])
+function db_get_prepare_stmt(mysqli $link, string $sql, array $data = []) : mysqli_stmt
 {
     $stmt = mysqli_prepare($link, $sql);
 
@@ -21,20 +21,15 @@ function db_get_prepare_stmt($link, $sql, $data = [])
     if ($data) {
         $types = '';
         $stmt_data = [];
-
+        ]
         foreach ($data as $value) {
             $type = 's';
 
             if (is_int($value)) {
-                $type = 'i';
-            } else {
-                if (is_string($value)) {
+                $type = 'i';]
                     $type = 's';
                 } else {
-                    if (is_double($value)) {
-                        $type = 'd';
-                    }
-                }
+                    if (]
             }
 
             if ($type) {
@@ -95,11 +90,11 @@ function dbGetTypes(mysqli $con) : array
 /**
  * Отправляет запрос на чтение к таблицам post, user,content_type в текущей БД и возвращает Ассоциативный массив
  *
- * @param mysqli $con  Объект-соединение с БД
- * @param int    $typeId  (может быть  null) id типа контента
- * @param string $sort вид сортировки
- * @param int    $page  номер страницы для вывода результатов запросв
- * @param int    $limit количество постов на странице
+ * @param mysqli $con    Объект-соединение с БД
+ * @param int    $typeId (может быть  null) id типа контента
+ * @param string $sort   вид сортировки
+ * @param int    $page   номер страницы для вывода результатов запросв
+ * @param int    $limit  количество постов на странице
  *
  * @return array Ассоциативный массив Результат запроса
  */
@@ -111,7 +106,7 @@ function dbGetPostsPopular(mysqli $con, ?int $typeId, string $sort, int $page, i
             FROM   post AS p
                    JOIN user AS u
                    ON u.id = p.user_id
-                   JOIN content_type AS c
+                   JOIN content_type AS c$creation_time
                    ON c.id = p.content_type_id";
 
 
@@ -140,12 +135,11 @@ function dbGetPostsPopular(mysqli $con, ?int $typeId, string $sort, int $page, i
 /**
  * Возвращает количество строк в результате запроса к таблице `post`
  *
- * @param mysqli $con  Объект-соединение с БД
- * @param int    $typeId  (может быть  null) id типа контента
- * @param string $sort вид сортировки
+ * @param mysqli $con    Объект-соединение с БД
+ * @param int    $typeId (может быть  null) id типа контента
+ * @param string $sort   вид сортировки
  *
  * @return int
- *
  */
 function dbGetPostsPopularCount(mysqli $con, ?int $typeId, string $sort) : int
 {
@@ -181,8 +175,8 @@ function dbGetPostsPopularCount(mysqli $con, ?int $typeId, string $sort) : int
 /**
  * Отправляет запрос на чтение данных о конкретном посте
  *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $postId, id выбранного поста
+ * @param mysqli $con    Объект-соединение с БД
+ * @param int    $postId id выбранного поста
  *
  * @return array Ассоциативный массив Информация о посте
  */
@@ -217,7 +211,7 @@ function dbGetPostWithUserInfo(mysqli $con, int $postId) : array
 /**
  * Запрос на получение заголовка поста
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con    бъект-соединение с БД
  * @param int    $postId id выбранного поста
  *
  * @return string заголовок поста
@@ -243,18 +237,18 @@ function dbGetPostHeader(mysqli $con, int $postId) : string
 /**
  * Запись нового поста ФОТО в БД
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con     Объект-соединение с БД
  * @param int    $user_id id  пользователя
- * @param array  $post глобальный массив $_POST
- * @param array  $files глобальный массив $_FILES
+ * @param array  $post    глобальный массив $_POST
+ * @param array  $files   глобальный массив $_FILES
  *
- * @return array возвращает id добавленного поста либо null
+ * @return int возвращает id добавленного поста либо null
  */
 function dbAddPostPhoto(mysqli $con, int $user_id, array $post, array $files) : ?int
 {
     $post_id = null;
     $creation_time = date("Y-m-d H:i:s");
-    $heading = $post['photo-heading'];
+    $heading = $post['photo-heading'];a
     $content_type_id = 1;
 
     $file_path = 'uploads/';
@@ -265,12 +259,9 @@ function dbAddPostPhoto(mysqli $con, int $user_id, array $post, array $files) : 
         //формируем новое имя файла
         $file_name = hash_hmac_file('md5', $file['tmp_name'], (string) $user_id);
         $file_ext = mb_substr($file['type'], mb_strpos($file['type'], '/') + 1);
-        $file_ext = $file_ext === 'jpeg' ? 'jpg' : $file_ext;
-        $file_url = $file_path.$file_name.'.'.$file_ext;
-
-        if (!move_uploaded_file($file['tmp_name'], $file_url)) {
+        $file_ext = $file_ext === 'jpeg' ? 'jpg' : $file_ext;a
             echo "Ошибка перемещения файла";
-        };
+        }
     //файл получен по интернет-ссылке
     } else {
         //определяем тип файла и формируем расширение
@@ -316,11 +307,11 @@ function dbAddPostPhoto(mysqli $con, int $user_id, array $post, array $files) : 
 /**
  * Запись нового поста ВИДЕО в БД
  *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $$user_id id  пользователя
- * @param array  $post глобальный массив $_POST
+ * @param mysqli $con     Объект-соединение с БД
+ * @param int    $user_id id  пользователя
+ * @param array  $post    глобальный массив $_POST
  *
- * @return array возвращает id добавленного поста либо null
+ * @return int возвращает id добавленного поста либо null
  */
 function dbAddPostVideo(mysqli $con, int $user_id, array $post) : ?int
 {
@@ -346,11 +337,11 @@ function dbAddPostVideo(mysqli $con, int $user_id, array $post) : ?int
 /**
  * Запись нового поста ТЕКСТ в БД
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con     Объект-соединение с БД
  * @param int    $user_id id  пользователя
- * @param array  $post глобальный массив $_POST
+ * @param array  $post    глобальный массив $_POST
  *
- * @return array возвращает id добавленного поста либо null
+ * @return int возвращает id добавленного поста либо null
  */
 function dbAddPostText(mysqli $con, int $user_id, array $post) : ?int
 {
@@ -376,11 +367,11 @@ function dbAddPostText(mysqli $con, int $user_id, array $post) : ?int
 /**
  * Запись нового поста ЦИТАТА в БД
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con     Объект-соединение с БД
  * @param int    $user_id id  пользователя
- * @param array  $post глобальный массив $_POST
+ * @param array  $post    глобальный массив $_POST
  *
- * @return array возвращает id добавленного поста либо null
+ * @return int возвращает id добавленного поста либо null
  */
 function dbAddPostQuote(mysqli $con, int $user_id, array $post) : ?int
 {
@@ -407,11 +398,11 @@ function dbAddPostQuote(mysqli $con, int $user_id, array $post) : ?int
 /**
  * Запись нового поста ССЫЛКА в БД
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con     Объект-соединение с БД
  * @param int    $user_id id  пользователя
- * @param array  $post глобальный массив $_POST
+ * @param array  $post    глобальный массив $_POST
  *
- * @return array возвращает id добавленного поста либо null
+ * @return int возвращает id добавленного поста либо null
  */
 function dbAddPostLink(mysqli $con, int $user_id, array $post) : ?int
 {
@@ -437,11 +428,11 @@ function dbAddPostLink(mysqli $con, int $user_id, array $post) : ?int
 /**
  * Запись тегов поста в БД
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con        Объект-соединение с БД
  * @param string $input_tags значение поля Теги формы
- * @param int    $post_id id нового поста
+ * @param int    $post_id    id нового поста
  *
- * @return
+ * @return void
  */
 function dbWriteTags(mysqli $con, string $input_tags, ?int $post_id ) : void
 {
@@ -484,7 +475,7 @@ function dbWriteTags(mysqli $con, string $input_tags, ?int $post_id ) : void
 /**
  * Отправляет запрос на поиск записи с полем $email к таблице user
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con   Объект-соединение с БД
  * @param string $email адрес электронной почты из формы регистрации
  *
  * @return bool
@@ -510,7 +501,7 @@ function dbFindEmail(mysqli $con, string $email) : bool
 /**
  * Отправляет запрос на поиск записи с полем $login к таблице user
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con   Объект-соединение с БД
  * @param string $login логин пользователя из формы регистрации
  *
  * @return bool
@@ -536,7 +527,7 @@ function dbFindLogin(mysqli $con, string $login) : bool
 /**
  * Отправляет запрос на поиск записи с полем $id к таблице post
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con     Объект-соединение с БД
  * @param int    $post_id id поста
  *
  * @return bool
@@ -562,11 +553,11 @@ function dbFindPost(mysqli $con, int $post_id) : bool
 /**
  * Запись нового пользователя в БД
  *
- * @param mysqli $con Объект-соединение с БД
- * @param array  $post массив с данными создаваемого пользователя
+ * @param mysqli $con   Объект-соединение с БД
+ * @param array  $post  массив с данными создаваемого пользователя
  * @param array  $files массив с данными о загружаемом аватаре пользователя
  *
- * @return array возвращает id добавленного пользователя либо null
+ * @return int возвращает id добавленного пользователя либо null
  */
 function dbAddUser(mysqli $con, array $post, array $files) : ?int
 {
@@ -598,7 +589,7 @@ function dbAddUser(mysqli $con, array $post, array $files) : ?int
  * @param mysqli $con   Объект-соединение с БД
  * @param string $email адрес электронной почты из формы регистрации
  *
- * @return array ассоциативный массив
+ * @return array
  */
 function dbGetUserByEmail(mysqli $con, string $email) : array
 {
@@ -618,10 +609,10 @@ function dbGetUserByEmail(mysqli $con, string $email) : array
 /**
  * Отправляет запрос на поиск записи с полем $user_id к таблице user
  *
- * @param mysqli $con   Объект-соединение с БД
+ * @param mysqli $con     Объект-соединение с БД
  * @param int    $user_id id пользователя
  *
- * @return array ассоциативный массив
+ * @return array
  */
 function dbGetUserById(mysqli $con, int $user_id) : array
 {
@@ -747,7 +738,7 @@ function dbGetPostsSearchHashtag(mysqli $con, string $str) : array
 /**
  * Выборка всех постов пользователя
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con     Объект-соединение с БД
  * @param int    $user_id id пользователя
  *
  * @return array Ассоциативный массив Результат запроса
@@ -781,7 +772,7 @@ function dbGetUserPosts(mysqli $con, int $user_id) : array
 /**
  * Выборка постов пользователя с лайками
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con     Объект-соединение с БД
  * @param int    $user_id id пользователя
  *
  * @return array Ассоциативный массив Результат запроса
@@ -812,7 +803,7 @@ function dbGetUserPostsWithLikes(mysqli $con, int $user_id) : array
 /**
  * Выборка подписчиков пользователя
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con     Объект-соединение с БД
  * @param int    $user_id id пользователя
  *
  * @return array Ассоциативный массив Результат запроса
@@ -835,8 +826,8 @@ function dbGetUserSubscribers(mysqli $con, int $user_id) : array
 /**
  * Выборка подписчиков пользователя + поле наличия подписки на него залогиненого пользователя
  *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $user_id id пользователя
+ * @param mysqli $con           Объект-соединение с БД
+ * @param int    $user_id       id пользователя
  * @param int    $user_id_login id залогиненого пользователя
  *
  * @return array Ассоциативный массив Результат запроса
@@ -875,7 +866,7 @@ function dbGetUserSubscribersWithMutualSubscription(mysqli $con, int $user_id, i
 /**
  * Отправляет запрос на чтение к текущей БД для получения комментариев к запросу
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con     Объект-соединение с БД
  * @param int    $post_id id поста
  *
  * @return array Ассоциативный массив Результат запроса
@@ -901,10 +892,10 @@ function dbGetPostComments(mysqli $con, int $post_id) : array
 /**
  * Запись нового комментария в БД
  *
- * @param mysqli $con Объект-соединение с БД
- * @param int    $post_id id поста
+ * @param mysqli $con      Объект-соединение с БД
+ * @param int    $post_id  id поста
  * @param int    $$user_id id пользователя, добавившего комментарий
- * @param string $comment текст комментария
+ * @param string $comment  текст комментария
  *
  * @return bool
  */
@@ -939,7 +930,7 @@ function dbAddComment(mysqli $con, int $post_id, int $user_id, string $comment) 
 /**
  * Увеличение счетчика просмотров поста
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con     Объект-соединение с БД
  * @param int    $post_id id поста
  *
  * @return bool
@@ -959,7 +950,7 @@ function dbAddView(mysqli $con, int $post_id) : bool
 /**
  * Запись нового лайка в БД
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con     Объект-соединение с БД
  * @param int    $post_id id поста
  * @param int    $user_id id пользователя, добавившего лайк
  *
@@ -996,7 +987,7 @@ function dbAddLike(mysqli $con, int $post_id, int $user_id) : bool
 /**
  * Ищет лайк в БД
  *
- * @param mysqli $con Объект-соединение с БД
+ * @param mysqli $con     Объект-соединение с БД
  * @param int    $post_id id поста
  * @param int    $user_id id пользователя
  *
@@ -1022,8 +1013,8 @@ function dbFindLike(mysqli $con, int $post_id, int $user_id) : bool
  * Запись новой подписки в БД
  *
  * @param mysqli $con Объект-соединение с БД
- * @param int $user_id_creator id пользователя, на которого подписались
- * @param int $user_id_subscriber id подписщика
+ * @param int    $user_id_creator id пользователя, на которого подписались
+ * @param int    $user_id_subscriber id подписчика
  *
  * @return bool
  */
@@ -1057,8 +1048,8 @@ function dbAddSubscribe(mysqli $con, int $user_id_creator, int $user_id_subscrib
  * Удаление подписки в БД
  *
  * @param mysqli $con Объект-соединение с БД
- * @param int $user_id_creator id пользователя, на которого подписались
- * @param int $user_id_subscriber id подписщика
+ * @param int    $user_id_creator id пользователя, на которого подписались
+ * @param int    $user_id_subscriber id подписчика
  *
  * @return bool
  */
@@ -1094,8 +1085,8 @@ function dbDelSubscribe(mysqli $con, int $user_id_creator, int $user_id_subscrib
  * Ищет подписку в БД
  *
  * @param mysqli $con Объект-соединение с БД
- * @param int $user_id_creator id пользователя, на которого подписались
- * @param int $user_id_subscriber id подписщика
+ * @param int    $user_id_creator id пользователя, на которого подписались
+ * @param int    $user_id_subscriber id подписчика
  *
  * @return bool Возвращает false усли подписка не найдена, иначе true
  */
