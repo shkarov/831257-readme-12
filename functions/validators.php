@@ -256,6 +256,7 @@ function validateFile(?string $url, array $files = []) : array
     $error = [];
 
     $file = $files['userpic-file-photo'];
+
     if (!empty($file['name'])) {
         $type = 'Выбор файла.';
         if (!($file['type'] === 'image/jpeg' || $file['type'] === 'image/png' || $file['type'] === 'image/gif')) {
@@ -263,47 +264,56 @@ function validateFile(?string $url, array $files = []) : array
             $error['header'] = "Выбран недопустимый тип файла.";
             $error['description'] = "Выберите файл формата JPEG, PNG или GIF.";
         }
-    } else {
-        $type = 'Ссылка из интернета.';
-        if (validateFilled($url)) {
-            $error['report'] = $type."Необходимо выбрать файл на локальном ПК или указать ссылку на файл в интернете.";
-            $error['header'] = "Это поле должно быть заполнено.";
-            $error['description'] = "Введите ссылку на файл в интернете или выберите файл на локальном ПК.";
-        } elseif (!filter_var($url, FILTER_VALIDATE_URL)) {
-            $error['report'] = $type."Ошибка URL.";
-            $error['header'] = "Ошибочная ссылка.";
-            $error['description'] = "Введите корректный адрес ссылки.";
-        } else {
-            $file_headers = get_headers($url);
-            if (!strpos($file_headers[0], '200')) {
-                $error['report'] = $type."Файл не найден.";
-                $error['header'] = "Ошибка загрузки.";
-                $error['description'] = "Не удалось найти файл по указанному адресу.";
-            } else {
-                $content_type = '';
-                foreach ($file_headers as $key => $value) {
-                    if (mb_strpos($value, 'Content-Type:') !== false) {
-                        $content_type = ltrim(mb_substr($value, -10));
-                    }
-                }
-                if (!($content_type === 'image/jpeg' || $content_type === 'image/png' || $content_type === 'image/gif')) {
-                    $error['report'] = $type. "Допустимый тип файла JPEG, PNG, GIF.";
-                    $error['header'] = "Выбран недопустимый тип файла.";
-                    $error['description'] = "Выберите файл формата JPEG, PNG или GIF.";
-                } elseif (!file_get_contents($url)) {
-                    $error['report'] = $type."Ошибка загрузки файла.";
-                    $error['header'] = "Ошибка загрузки.";
-                    $error['description'] = "Не удалось загрузить файл с указанного адреса.";
-                }
-            }
+        return $error;
+    }
+
+    $type = 'Ссылка из интернета.';
+    if (validateFilled($url)) {
+        $error['report'] = $type."Необходимо выбрать файл на локальном ПК или указать ссылку на файл в интернете.";
+        $error['header'] = "Это поле должно быть заполнено.";
+        $error['description'] = "Введите ссылку на файл в интернете или выберите файл на локальном ПК.";
+        return $error;
+    }
+    if (!filter_var($url, FILTER_VALIDATE_URL)) {
+        $error['report'] = $type."Ошибка URL.";
+        $error['header'] = "Ошибочная ссылка.";
+        $error['description'] = "Введите корректный адрес ссылки.";
+        return $error;
+    }
+
+    $file_headers = get_headers($url);
+    if (!strpos($file_headers[0], '200')) {
+        $error['report'] = $type."Файл не найден.";
+        $error['header'] = "Ошибка загрузки.";
+        $error['description'] = "Не удалось найти файл по указанному адресу.";
+        return $error;
+    }
+
+    $content_type = '';
+    foreach ($file_headers as $value) {
+        if (mb_strpos($value, 'Content-Type:') !== false) {
+            $content_type = ltrim(mb_substr($value, -10));
         }
     }
+
+    if (!($content_type === 'image/jpeg' || $content_type === 'image/png' || $content_type === 'image/gif')) {
+        $error['report'] = $type. "Допустимый тип файла JPEG, PNG, GIF.";
+        $error['header'] = "Выбран недопустимый тип файла.";
+        $error['description'] = "Выберите файл формата JPEG, PNG или GIF.";
+        return $error;
+    }
+    if (!file_get_contents($url)) {
+        $error['report'] = $type."Ошибка загрузки файла.";
+        $error['header'] = "Ошибка загрузки.";
+        $error['description'] = "Не удалось загрузить файл с указанного адреса.";
+    }
+
     return $error;
 }
 
 /**
  * Проверка поля формы "Youtube ссылка"
- * @param  string $name
+ * @param string $name
  *
  * @return array массив сообшений об ошибках
  */
@@ -315,11 +325,15 @@ function validateYoutubeLink(?string $name) : array
         $error['report'] = $type."Это поле должно быть заполнено.";
         $error['header'] = "Это обязательно поле.";
         $error['description'] = "Введите адрес ссылки на видеоролик.";
-    } elseif (!filter_var($name, FILTER_VALIDATE_URL)) {
+        return $error;
+    }
+    if (!filter_var($name, FILTER_VALIDATE_URL)) {
         $error['report'] = $type."Ошибка URL.";
         $error['header'] = "Ошибочная ссылка.";
         $error['description'] = "Введите корректный адрес ссылки на видеоролик.";
-    } elseif (!check_youtube_link($name)) {
+        return $error;
+    }
+    if (!check_youtube_link($name)) {
         $error['report'] = $type."Видео не доступно.";
         $error['header'] = "Ошибка доступа.";
         $error['description'] = "Указанный видеоролик недоступен. Укажите ссылку на видеоролик с публичным доступом";
@@ -379,7 +393,9 @@ function validateUrl(?string $name) : array
         $error['report'] = $type."Это поле должно быть заполнено.";
         $error['header'] = "Это обязательно поле.";
         $error['description'] = "Введите адрес ссылки.";
-    } elseif (!filter_var($name, FILTER_VALIDATE_URL)) {
+        return $error;
+    }
+    if (!filter_var($name, FILTER_VALIDATE_URL)) {
         $error['report'] = $type."Ошибка URL.";
         $error['header'] = "Ошибочная ссылка.";
         $error['description'] = "Введите корректный адрес ссылки.";
@@ -440,12 +456,16 @@ function validateEmail(mysqli $con, ?string $name) : array
         $error['report'] = $type."Это поле должно быть заполнено.";
         $error['header'] = "Это обязательно поле.";
         $error['description'] = "Введите адрес электронной почты.";
+        return $error;
 
-    } elseif (!filter_var($name, FILTER_VALIDATE_EMAIL)) {
+    }
+    if (!filter_var($name, FILTER_VALIDATE_EMAIL)) {
         $error['report'] = $type."Ошибка адреса электронной почты.";
         $error['header'] = "Ошибочный email.";
         $error['description'] = "Введите корректный адрес электронной почты.";
-    } elseif (dbFindEmail($con, $name)) {
+        return $error;
+    }
+    if (dbFindEmail($con, $name)) {
         $error['report'] = $type."Этот адрес электронной почты уже присутствует в нашей базе.";
         $error['header'] = "Этот email уже используется.";
         $error['description'] = "Введите другой адрес электронной почты.";
@@ -469,7 +489,9 @@ function validateLogin(mysqli $con, ?string $name) : array
         $error['report'] = $type."Это поле должно быть заполнено.";
         $error['header'] = "Это обязательно поле.";
         $error['description'] = "Введите ваш логин.";
-    } elseif (dbFindLogin($con, $name)) {
+        return $error;
+    }
+    if (dbFindLogin($con, $name)) {
         $error['report'] = $type."Этот логин уже присутствует в нашей базе.";
         $error['header'] = "Этот логин уже используется.";
         $error['description'] = "Введите другой логин.";
@@ -512,7 +534,9 @@ function validatePasswordRepeat(?string $name, ?string $nameOrigin) : array
         $error['report'] = $type."Это поле должно быть заполнено.";
         $error['header'] = "Это обязательно поле.";
         $error['description'] = "Введите ваш пароль.";
-    } elseif ($name !== $nameOrigin) {
+        return $error;
+    }
+    if ($name !== $nameOrigin) {
         $error['report'] = $type."Значение в этом поле не совпадает со значением в поле 'Пароль'.";
         $error['header'] = "Ошибка ввода данных.";
         $error['description'] = "Введите значение, идентичное значению в поле 'Пароль'.";
@@ -594,10 +618,14 @@ function validateEmailLogin(mysqli $con, ?string $name) : array
     if (validateFilled($name)) {
         $error['email']['header'] = "Это обязательно поле.";
         $error['email']['description'] = "Введите адрес электронной почты.";
-    } elseif (!filter_var($name, FILTER_VALIDATE_EMAIL)) {
+        return $error;
+    }
+    if (!filter_var($name, FILTER_VALIDATE_EMAIL)) {
         $error['email']['header'] = "Ошибочный email.";
         $error['email']['description'] = "Введите корректный адрес электронной почты.";
-    } elseif (!dbFindEmail($con, $name)) {
+        return $error;
+    }
+    if (!dbFindEmail($con, $name)) {
         $error['email']['header'] = "Такой email не зарегистрирован.";
         $error['email']['description'] = "Вы ввели неверный email.";
     }
@@ -634,25 +662,17 @@ function isSortValid(array $arr) : bool
 }
 
 /**
- * Проверка соответствия значения параметра запроса допустимому значению
+ * Проверка соответствия значения параметра запроса допустимому значению наименования вкладки для вывода информации в профиле пользователя (Посты, Лайки, Подписки)
  *
  * @param array  $arr Ассоциативный массив, переданный из формы методом get
- * @param string $name проверяемый параметр
  *
  * @return bool
  */
-function isParameterValid(array $arr, string $name) : bool
+function isTabValid(array $arr) : bool
 {
-    $types = [null, '', 'likes'];
+    $types = [null, '', 'posts', 'likes', 'subscribes'];
 
-    if ($name === 'sort') {
-        $types[] = 'creation_time';
-    }
-    if ($name === 'tab') {
-        $types[] = 'subscribes';
-    }
-
-    return (isset($arr[$name]) && !in_array($arr[$name], $types)) ? false : true;
+    return (isset($arr['tab']) && !in_array($arr['tab'], $types)) ? false : true;
 }
 
 /**
@@ -674,7 +694,9 @@ function checkFormComment(array $arr) : array
         if (validateFilled($arr[$name_field])) {
             $error[$name_field]['header'] = "Это обязательно поле.";
             $error[$name_field]['description'] = "Введите текст сообщения.";
-        } elseif (!isCorrectLength($arr[$name_field], $minlength, $maxlength)) {
+            return $error;
+        }
+        if (!isCorrectLength($arr[$name_field], $minlength, $maxlength)) {
             $error[$name_field]['header'] = "Длина текста не соответствует требованиям.";
             $error[$name_field]['description'] = "Допустимая длина текста от 4 до 70 знаков.";
         }

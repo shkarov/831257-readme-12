@@ -12,7 +12,8 @@ function getTypeFromRequest(array $get, array $post = []) : ?int
 {
     if (isset($get['type_id'])) {
         return empty($get['type_id']) ? null : (int) $get['type_id'];
-    } elseif (isset($post['type_id'])) {
+    }
+    if (isset($post['type_id'])) {
         return (int) $post['type_id'];
     }
     return null;
@@ -30,7 +31,8 @@ function getPostIdFromRequest(array $get, array $post = []) : ?int
 {
     if (isset($get['post_id'])) {
         return (int) $get['post_id'];
-    } elseif (isset($post['post_id'])) {
+    }
+    if (isset($post['post_id'])) {
         return (int) $post['post_id'];
     }
     return null;
@@ -61,7 +63,7 @@ function getSortFromRequest(array $arr) : string
  */
 function getTabFromRequest(array $arr) : string
 {
-    if (!isParameterValid($arr, 'tab')) {
+    if (!isTabValid($arr, 'tab')) {
         exit('Некорректный параметр tab');
     }
 
@@ -80,7 +82,8 @@ function getUserIdFromRequest(array $get, array $post = []) : ?int
 {
     if (isset($get['user_id'])) {
         return (int) $get['user_id'];
-    } elseif (isset($post['user_id'])) {
+    }
+    if (isset($post['user_id'])) {
         return (int) $post['user_id'];
     }
     return null;
