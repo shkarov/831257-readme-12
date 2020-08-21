@@ -35,15 +35,24 @@ if ($user['id'] === $user_id_login) {
     $subscribe = dbFindSubscribe($connect, $user_id, $user_id_login);
 }
 
+
+// проверка клика иконки лайк
+checkLike($connect, $_GET, $user_id_login);
+
+// проверка клика иконки repost
+checkRepost($connect, $_GET, $user_id_login);
+
+
+/*
 $post_id = getPostIdFromRequest($_GET);
 
-// кликнута иконка лайк
 if (isset($_GET['like_onClick'])) {
     if (addLike($connect, $post_id, $user_id_login)) {
         $referer = $_SERVER['HTTP_REFERER'];
         header('Location: '.$referer);
     }
 }
+
 
 // кликнута иконка repost
 if (isset($_GET['repost_onClick'])) {
@@ -52,6 +61,8 @@ if (isset($_GET['repost_onClick'])) {
         header('Location: '.$url);
     }
 }
+*/
+
 
 // Нажата кнопка Подписаться/Отписаться на пользователя, профиль которого просматривается
 if (isset($_GET['subscribeButton_onClick'])) {

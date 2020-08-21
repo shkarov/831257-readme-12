@@ -10,6 +10,7 @@ $user_id_login = $_SESSION['id'];
 $user_name_login = $_SESSION['login'];
 $user_avatar_login = $_SESSION['avatar'];
 
+/*
 // кликнута иконка лайк
 if (isset($_GET['like_onClick'])) {
     $post_id = getPostIdFromRequest($_GET);
@@ -18,6 +19,10 @@ if (isset($_GET['like_onClick'])) {
         header('Location: '.$referer);
     }
 }
+*/
+
+// проверка клика иконки лайк
+checkLike($connect, $_GET, $user_id_login);
 
 $types = dbGetTypes($connect);
 
