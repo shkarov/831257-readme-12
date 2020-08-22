@@ -40,26 +40,6 @@ checkLike($connect, $_GET, $user_id_login);
 // проверка клика иконки repost
 checkRepost($connect, $_GET, $user_id_login);
 
-/*
-if (isset($_GET['like_onClick'])) {
-    if (addLike($connect, (int) $_GET['post_id'], $user_id_login)) {
-        $referer = $_SERVER['HTTP_REFERER'];
-        header('Location: '.$referer);
-    }
-}
-
-
-// кликнута иконка repost
-if (isset($_GET['repost_onClick'])) {
-    if (addRepost($connect, $post_id, $user_id_login)) {
-        $url = "profile.php?user_id=$user_id_login";
-        header('Location: '.$url);
-    }
-}
-*/
-
-
-
 // автор поста
 $user_id = $post['user_id'];
 

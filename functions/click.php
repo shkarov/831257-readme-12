@@ -1,54 +1,15 @@
 <?php
 
-/*
-//feed
-// кликнута иконка лайк
-if (isset($_GET['like_onClick'])) {
-    if (addLike($connect, $post_id, $user_id_login)) {
-        $referer = $_SERVER['HTTP_REFERER'];
-        header('Location: '.$referer);
-    }
-}
-
-//popular
-// кликнута иконка лайк
-if (isset($_GET['like_onClick'])) {
-    $post_id = getPostIdFromRequest($_GET);
-    if (addLike($connect, $post_id, $user_id_login)) {
-        $referer = $_SERVER['HTTP_REFERER'];
-        header('Location: '.$referer);
-    }
-}
-
-//post
-// кликнута иконка лайк
-if (isset($_GET['like_onClick'])) {
-    if (addLike($connect, (int) $_GET['post_id'], $user_id_login)) {
-        $referer = $_SERVER['HTTP_REFERER'];
-        header('Location: '.$referer);
-    }
-}
-
-//profile
-// кликнута иконка лайк
-if (isset($_GET['like_onClick'])) {
-    if (addLike($connect, $post_id, $user_id_login)) {
-        $referer = $_SERVER['HTTP_REFERER'];
-        header('Location: '.$referer);
-    }
-}
-
-//search
-// кликнута иконка лайк
-if (isset($_GET['like_onClick'])) {
-    $post_id = getPostIdFromRequest($_GET);
-    if (addLike($connect, $post_id, $user_id_login)) {
-        $referer = $_SERVER['HTTP_REFERER'];
-        header('Location: '.$referer);
-    }
-}
-*/
-
+/**
+ * Проверка клика иконки лайк
+ * Если пост лайкнут, производит запись лайка в БД
+ *
+ * @param mysqli $con  Объект-соединение с БД
+ * @param array  $get Ассоциативный массив, переданный методом get
+ * @param int    $user_id id залогиненного пользователя
+ *
+ * @return void
+ */
 function checkLike(mysqli $con, array $get, int $user_id) : void
 {
     if (isset($get['like_onClick'])) {
@@ -60,36 +21,16 @@ function checkLike(mysqli $con, array $get, int $user_id) : void
     }
 }
 
-/*
-//feed
-// кликнута иконка repost
-if (isset($_GET['repost_onClick'])) {
-    if (addRepost($connect, $post_id, $user_id_login)) {
-        $url = "profile.php?user_id=$user_id_login";
-        header('Location: '.$url);
-    }
-}
-
-//post
-// кликнута иконка repost
-if (isset($_GET['repost_onClick'])) {
-    if (addRepost($connect, $post_id, $user_id_login)) {
-        $url = "profile.php?user_id=$user_id_login";
-        header('Location: '.$url);
-    }
-}
-
-//profile
-// кликнута иконка repost
-if (isset($_GET['repost_onClick'])) {
-    if (addRepost($connect, $post_id, $user_id_login)) {
-        $url = "profile.php?user_id=$user_id_login";
-        header('Location: '.$url);
-    }
-}
-*/
-
-
+/**
+ * Проверка клика иконки репост
+ * Если иконка репоста кликнута, производит запись репоста в БД
+ *
+ * @param mysqli $con  Объект-соединение с БД
+ * @param array  $get Ассоциативный массив, переданный методом get
+ * @param int    $user_id id залогиненного пользователя
+ *
+ * @return void
+ */
 function checkRepost(mysqli $con, array $get, int $user_id) : void
 {
     if (isset($get['repost_onClick'])) {
@@ -100,5 +41,3 @@ function checkRepost(mysqli $con, array $get, int $user_id) : void
         }
     }
 }
-
-

@@ -457,7 +457,6 @@ function validateEmail(mysqli $con, ?string $name) : array
         $error['header'] = "Это обязательно поле.";
         $error['description'] = "Введите адрес электронной почты.";
         return $error;
-
     }
     if (!filter_var($name, FILTER_VALIDATE_EMAIL)) {
         $error['report'] = $type."Ошибка адреса электронной почты.";

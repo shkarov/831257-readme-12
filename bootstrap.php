@@ -18,6 +18,7 @@ require_once 'functions/requests.php';
 require_once 'functions/file.php';
 require_once 'functions/mail.php';
 require_once 'functions/append.php';
+require_once 'functions/click.php';
 
 if (!file_exists('config.php')) {
     exit('Создайте файл config.php на основе config.sample.php и сконфигурируйте его');

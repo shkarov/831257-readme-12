@@ -13,16 +13,6 @@ $user_avatar_login = $_SESSION['avatar'];
 // проверка клика иконки лайк
 checkLike($connect, $_GET, $user_id_login);
 
-/*
-if (isset($_GET['like_onClick'])) {
-    $post_id = getPostIdFromRequest($_GET);
-    if (addLike($connect, $post_id, $user_id_login)) {
-        $referer = $_SERVER['HTTP_REFERER'];
-        header('Location: '.$referer);
-    }
-}
-*/
-
 $posts = isset($_GET['search_string']) ? getPostsSearch($connect, $_GET['search_string']) : [];
 
 $template = ($posts === []) ? "no-results.php" : "search-results.php";

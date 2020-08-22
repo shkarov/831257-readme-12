@@ -153,3 +153,20 @@ function getContactsMessages(mysqli $con, int $user_id) : array
 
     return $contacts_sort;
 }
+
+/**
+ * Возвращает номер страницы для пагинации
+ *
+ * @param array $get Ассоциативный массив, переданный методом get
+ * @param int   $count_pages количество страниц для полного вывода результата запроса
+ *
+ * @return int номер страницы
+ */
+function getPageNumber(array $get, int $count_pages) : int
+{
+    $page = isset($get['page']) ? (int) $get['page'] : 1;
+    if ($page > $count_pages) {
+        $page = $count_pages;
+    }
+    return $page;
+}

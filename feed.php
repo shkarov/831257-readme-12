@@ -10,26 +10,6 @@ $user_id_login = $_SESSION['id'];
 $user_name_login = $_SESSION['login'];
 $user_avatar_login = $_SESSION['avatar'];
 
-/*
-$post_id = getPostIdFromRequest($_GET);
-
-// кликнута иконка лайк
-if (isset($_GET['like_onClick'])) {
-    if (addLike($connect, $post_id, $user_id_login)) {
-        $referer = $_SERVER['HTTP_REFERER'];
-        header('Location: '.$referer);
-    }
-}
-
-// кликнута иконка repost
-if (isset($_GET['repost_onClick'])) {
-    if (addRepost($connect, $post_id, $user_id_login)) {
-        $url = "profile.php?user_id=$user_id_login";
-        header('Location: '.$url);
-    }
-}
-*/
-
 // проверка клика иконки лайк
 checkLike($connect, $_GET, $user_id_login);
 

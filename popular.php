@@ -10,17 +10,6 @@ $user_id_login = $_SESSION['id'];
 $user_name_login = $_SESSION['login'];
 $user_avatar_login = $_SESSION['avatar'];
 
-/*
-// кликнута иконка лайк
-if (isset($_GET['like_onClick'])) {
-    $post_id = getPostIdFromRequest($_GET);
-    if (addLike($connect, $post_id, $user_id_login)) {
-        $referer = $_SERVER['HTTP_REFERER'];
-        header('Location: '.$referer);
-    }
-}
-*/
-
 // проверка клика иконки лайк
 checkLike($connect, $_GET, $user_id_login);
 
@@ -36,15 +25,8 @@ $limit_posts_per_page = 6;
 //количество страниц для полного вывода результата запроса
 $count_pages = (int) ceil(dbGetPostsPopularCount($connect, $type_id, $sort) / $limit_posts_per_page);
 
-// номер страницы
-$page = 1;
-if (isset($_GET['page'])) {
-    if ((int) $_GET['page'] > $count_pages) {
-        $page = $count_pages;
-    } elseif ((int) $_GET['page'] > 1) {
-        $page = (int) $_GET['page'];
-    }
-}
+// номер страницы для пагинации
+$page = getPageNumber($_GET, $count_pages);
 
 $posts = dbGetPostsPopular($connect, $type_id, $sort, $page, $limit_posts_per_page);
 
