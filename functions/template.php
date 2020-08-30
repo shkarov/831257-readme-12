@@ -118,11 +118,11 @@ function embed_youtube_cover(string $youtube_url) : string
  *
  * @param string $youtube_url Ссылка на youtube видео
  *
- * @return
+ * @return string Строка id или null
  */
-function extract_youtube_id(string $youtube_url)
+function extract_youtube_id(string $youtube_url) : ?string
 {
-    $id = false;
+    $id = null;
 
     $parts = parse_url($youtube_url);
 

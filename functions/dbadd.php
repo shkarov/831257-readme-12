@@ -8,7 +8,7 @@
  * @param array  $post глобальный массив $_POST
  * @param array  $files глобальный массив $_FILES
  *
- * @return array возвращает id добавленного поста либо null
+ * @return int возвращает id добавленного поста либо null
  */
 function dbAddPostPhoto(mysqli $con, int $user_id, array $post, array $files) : ?int
 {
@@ -232,7 +232,7 @@ function dbAddUser(mysqli $con, array $post, array $files) : ?int
  *
  * @param mysqli $con      Объект-соединение с БД
  * @param int    $post_id  id поста
- * @param int    $$user_id id пользователя, добавившего комментарий
+ * @param int    $user_id id пользователя, добавившего комментарий
  * @param string $comment  текст комментария
  *
  * @return bool
@@ -384,7 +384,6 @@ function dbAddRepost(mysqli $con, array $post, int $user_id) : bool
     mysqli_begin_transaction($con);
 
     $result1 = mysqli_stmt_execute($stmt1);
-    //$post_id_new = mysqli_stmt_insert_id($stmt1);
     $result2 = mysqli_stmt_execute($stmt2);
 
     if ($result1 && $result2) {

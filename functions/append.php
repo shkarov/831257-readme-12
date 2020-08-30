@@ -4,7 +4,7 @@
  * Запись нового поста в БД
  *
  * @param mysqli $con Объект-соединение с БД
- * @param int    $$user_id id  пользователя
+ * @param int    $user_id id  пользователя
  * @param array  $post глобальный массив $_POST
  * @param array  $files глобальный массив $_FILES
  *
@@ -29,7 +29,7 @@ function addPost(mysqli $con, int $user_id, array $post, array $files) : ?int
         case 5:
             return dbAddPostLink($con, $user_id, $post);
         default:
-            return checkPhotoForm($post);
+            return null;
     }
 }
 

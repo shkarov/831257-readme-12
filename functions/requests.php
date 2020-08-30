@@ -63,7 +63,7 @@ function getSortFromRequest(array $arr) : string
  */
 function getTabFromRequest(array $arr) : string
 {
-    if (!isTabValid($arr, 'tab')) {
+    if (!isTabValid($arr)) {
         exit('Некорректный параметр tab');
     }
 
@@ -148,10 +148,11 @@ function getContactsMessages(mysqli $con, int $user_id) : array
         $user_id = $value['user_id'];
     }
 
-    //сортировка
-    $contacts_sort = sortBubbleDescArray($contacts_uniq, 'creation_time');
+    //сортировка масива по убыванию даты создания поста
+    usort($contacts_uniq, function ($a, $b)
+                            { return $a['creation_time'] === $b['creation_time'] ? 0 : ($a['creation_time'] < $b['creation_time'] ? 1 : -1);} );
 
-    return $contacts_sort;
+    return $contacts_uniq;
 }
 
 /**
