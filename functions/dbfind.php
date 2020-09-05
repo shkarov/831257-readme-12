@@ -99,8 +99,7 @@ function dbFindLike(mysqli $con, int $post_id, int $user_id) : bool
     }
 
     $result_array = mysqli_fetch_assoc($result);
-
-    return (!is_null($result_array['is_like']));
+    return (!empty($result_array['is_like']));
 }
 
 /**
@@ -125,5 +124,5 @@ function dbFindSubscribe(mysqli $con, int $user_id_creator, int $user_id_subscri
 
     $result_array = mysqli_fetch_assoc($result);
 
-    return (!is_null($result_array['is_subscribe']));
+    return (!empty($result_array['is_subscribe']));
 }

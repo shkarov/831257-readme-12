@@ -72,7 +72,6 @@ function addLike(mysqli $con, int $post_id, int $user_id_login) : bool
     if (dbFindPost($con, $post_id)) {
         // залогиненый пользователь лайкает не свой пост
         if (dbGetUserIdFromPost($con, $post_id) != $user_id_login) {
-
             // нет такого лайка в БД
             if (!dbFindLike($con, $post_id, $user_id_login)) {
                 return dbAddLike($con, $post_id, $user_id_login);

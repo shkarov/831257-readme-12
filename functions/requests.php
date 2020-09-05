@@ -20,25 +20,6 @@ function getTypeFromRequest(array $get, array $post = []) : ?int
 }
 
 /**
- * Возвращает id поста из массива параметров запроса, если id найден, иначе возвращает null
- *
- * @param array $get массив параметров запроса
- * @param array $post массив параметров запроса
- *
- * @return int or null
- */
-function getPostIdFromRequest(array $get, array $post = []) : ?int
-{
-    if (isset($get['post_id'])) {
-        return (int) $get['post_id'];
-    }
-    if (isset($post['post_id'])) {
-        return (int) $post['post_id'];
-    }
-    return null;
-}
-
-/**
  * Возвращает имя поля в БД, по которому будет производится сортировка данных в запросе
  *
  * @param array $arr массив параметров запроса
@@ -68,25 +49,6 @@ function getTabFromRequest(array $arr) : string
     }
 
     return empty($arr['tab']) ? 'posts' : $arr['tab'];
-}
-
-/**
- * Возвращает id пользователя из массива параметров запроса, если id найден, иначе возвращает null
- *
- * @param array $get массив параметров запроса
- * @param array $post массив параметров запроса
- *
- * @return int or null
- */
-function getUserIdFromRequest(array $get, array $post = []) : ?int
-{
-    if (isset($get['user_id'])) {
-        return (int) $get['user_id'];
-    }
-    if (isset($post['user_id'])) {
-        return (int) $post['user_id'];
-    }
-    return null;
 }
 
 /**

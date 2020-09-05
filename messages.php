@@ -12,7 +12,11 @@ $user_avatar_login = $_SESSION['avatar'];
 
 $contacts = getContactsMessages($connect, $user_id_login);
 
-$user_id = getUserIdFromRequest($_GET, $_POST);
+$user_id = filter_input(INPUT_GET, 'user_id');
+if (is_null($user_id)) {
+    $user_id = filter_input(INPUT_POST, 'user_id');
+}
+
 
 if (!is_null($user_id)) {
     if (!isValidUser($connect, $user_id, $user_id_login)) {

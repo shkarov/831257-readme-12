@@ -10,7 +10,10 @@ $user_id_login = $_SESSION['id'];
 $user_name_login = $_SESSION['login'];
 $user_avatar_login = $_SESSION['avatar'];
 
-$post_id = getPostIdFromRequest($_GET, $_POST);
+$post_id = filter_input(INPUT_GET, 'post_id');
+if (is_null($post_id)) {
+    $post_id = filter_input(INPUT_POST, 'post_id');
+}
 
 if (!dbFindPost($connect, $post_id)) {
     header("HTTP/1.0 404 Not Found");
